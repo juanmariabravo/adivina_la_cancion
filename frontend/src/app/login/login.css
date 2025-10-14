@@ -1,4 +1,4 @@
-// Variables CSS
+/* Variables CSS */
 :root {
   --spotify-green: #1db954;
   --spotify-dark-green: #1aa34a;
@@ -20,7 +20,7 @@
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-// Estilos base
+/* Estilos base */
 .login-container {
   min-height: 100vh;
   display: flex;
@@ -31,7 +31,7 @@
   position: relative;
 }
 
-// Efectos de fondo
+/* Efectos de fondo */
 .background-effects {
   position: fixed;
   top: 0;
@@ -82,7 +82,7 @@
   }
 }
 
-// Card de login
+/* Card de login */
 .login-card {
   background: var(--gradient-card);
   border-radius: var(--border-radius-lg);
@@ -96,7 +96,7 @@
   z-index: 1;
 }
 
-// Header
+/* Header */
 .card-header {
   margin-bottom: 2rem;
 
@@ -153,7 +153,7 @@
   }
 }
 
-// Formulario
+/* Formulario */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -227,7 +227,7 @@
   }
 }
 
-// Opciones del formulario
+/* Opciones del formulario */
 .form-options {
   display: flex;
   justify-content: space-between;
@@ -282,7 +282,7 @@
   }
 }
 
-// Mensajes de error
+/* Mensajes de error */
 .error-message {
   color: var(--error-red);
   font-size: 0.8rem;
@@ -297,7 +297,7 @@
   }
 }
 
-// Botón de envío
+/* Botón de envío */
 .submit-button {
   background: var(--spotify-green);
   color: var(--spotify-white);
@@ -342,7 +342,7 @@
   100% { transform: rotate(360deg); }
 }
 
-// Divisor de redes sociales
+/* Divisor de redes sociales */
 .social-divider {
   display: flex;
   align-items: center;
@@ -360,7 +360,7 @@
   }
 }
 
-// Botones de redes sociales
+/* Botones de redes sociales */
 .social-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -391,7 +391,7 @@
   }
 }
 
-// Sección de invitado
+/* Sección de invitado */
 .guest-section {
   margin: 2rem 0 1.5rem;
 
@@ -439,7 +439,7 @@
   }
 }
 
-// Footer
+/* Footer */
 .card-footer {
   text-align: center;
   padding-top: 1.5rem;
@@ -461,7 +461,7 @@
   }
 }
 
-// Notificación
+/* Notificación */
 .notification {
   position: fixed;
   top: 2rem;
@@ -490,7 +490,7 @@
   }
 }
 
-// Responsive
+/* Responsive */
 @media (max-width: 768px) {
   .login-card {
     padding: 2rem 1.5rem;

@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎵 Adivina la Canción</title>
-    <link rel="stylesheet" href="home.css">
-</head>
 <body>
     <!-- Hero Section -->
     <section class="hero-section">
@@ -24,9 +16,11 @@
             <p class="hero-description">Inicia sesión para jugar con tus propias playlists de Spotify</p>
             
             <div class="hero-buttons">
-                <button class="btn btn-primary" onclick="window.location.href='/jugar-invitado'">Jugar como invitado</button>
-                <button class="btn btn-secondary" onclick="window.location.href='/login'">Iniciar Sesión</button>
-                <button class="btn btn-outline" onclick="window.location.href='/register'">Registrarse</button>
+                <!-- Deja este para invitado (ajusta si quieres otra ruta) -->
+                <button type="button" class="btn btn-secondary">Jugar como invitado</button>
+                <!-- Botón con onclick para ir a login -->
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='/login'">Iniciar Sesión</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='/register'">Registrarse</button>
             </div>
         </div>
     </section>
@@ -79,9 +73,8 @@
                 <a href="#" class="footer-link">Contacto</a>
             </div>
             <div class="footer-copyright">
-                © 2025 Adivina la Canción · Proyecto educativo · No afiliado a Spotify
+                © 2025 Adivina la Canción · Proyecto para la asignatura Multimedia · No afiliado a Spotify
             </div>
         </div>
     </footer>
 </body>
-</html>

@@ -11,10 +11,10 @@
     <div class="login-card">
         <!-- Header -->
         <div class="card-header">
-            <a routerLink="/home" class="back-button">
-                <span class="back-arrow">←</span>
-                Volver al inicio
-            </a>
+<a href="/" class="back-button">
+                    <span class="back-arrow">←</span>
+                    Volver al inicio
+                </a>
             <div class="logo-section">
                 <div class="logo">🎵</div>
                 <h1>Iniciar Sesión</h1>
@@ -100,27 +100,12 @@
                 <span class="button-text">
                     {{ isLoading() ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
                 </span>
-                @if (isLoading()) {
+                @if (isLoading() ) {
                     <div class="loading-spinner"></div>
                 }
             </button>
 
-            <!-- Social Login Divider -->
-            <div class="social-divider">
-                <span>o inicia sesión con</span>
-            </div>
-
-            <!-- Social Buttons -->
-            <div class="social-buttons">
-                <button type="button" class="social-button spotify-button">
-                    <span class="social-icon">🎵</span>
-                    Spotify
-                </button>
-                <button type="button" class="social-button google-button">
-                    <span class="social-icon">🔍</span>
-                    Google
-                </button>
-            </div>
+            
         </form>
 
         <!-- Guest Access -->
@@ -130,12 +115,10 @@
             </div>
             <button 
                 type="button" 
-                class="guest-button"
-                (click)="loginAsGuest()"
-            >
+                class="guest-button">
+                <!--(click)="loginAsGuest()"-->
                 <span class="guest-icon">🎮</span>
-                Jugar como invitado
-            </button>
+                Jugar como invitado</button>
         </div>
 
         <!-- Footer -->
