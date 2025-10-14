@@ -1,0 +1,156 @@
+<div class="login-container">
+    <!-- Background Effects -->
+    <div class="background-effects">
+        <div class="floating-note">🎵</div>
+        <div class="floating-note">🎶</div>
+        <div class="floating-note">🎵</div>
+        <div class="floating-note">🎶</div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-card">
+        <!-- Header -->
+        <div class="card-header">
+            <a routerLink="/home" class="back-button">
+                <span class="back-arrow">←</span>
+                Volver al inicio
+            </a>
+            <div class="logo-section">
+                <div class="logo">🎵</div>
+                <h1>Iniciar Sesión</h1>
+                <p>Bienvenido de vuelta</p>
+            </div>
+        </div>
+
+        <!-- Login Form -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+            <!-- Email Field -->
+            <div class="form-group">
+                <label for="email">Correo electrónico</label>
+                <div class="input-container" [class.error]="isEmailInvalid">
+                    <input 
+                        type="email" 
+                        id="email" 
+                        formControlName="email"
+                        placeholder="tu@email.com"
+                        [attr.aria-invalid]="isEmailInvalid"
+                        aria-describedby="emailError"
+                    >
+                    <span class="input-icon">📧</span>
+                </div>
+                @if (isEmailInvalid) {
+                    <div class="error-message" id="emailError">
+                        {{ validationMessages.email }}
+                    </div>
+                }
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <div class="input-container" [class.error]="isPasswordInvalid">
+                    <input 
+                        [type]="showPassword() ? 'text' : 'password'" 
+                        id="password" 
+                        formControlName="password"
+                        placeholder="Tu contraseña"
+                        [attr.aria-invalid]="isPasswordInvalid"
+                        aria-describedby="passwordError"
+                    >
+                    <span class="input-icon">🔒</span>
+                    <button 
+                        type="button" 
+                        class="toggle-password" 
+                        (click)="togglePasswordVisibility()"
+                        [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                    >
+                        {{ showPassword() ? '👁️‍🗨️' : '👁️' }}
+                    </button>
+                </div>
+                @if (isPasswordInvalid) {
+                    <div class="error-message" id="passwordError">
+                        {{ validationMessages.password }}
+                    </div>
+                }
+            </div>
+
+            <!-- Remember Me & Forgot Password -->
+            <div class="form-options">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="rememberMe">
+                    <span class="checkmark"></span>
+                    Recordar sesión
+                </label>
+                <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <!-- General Error Message -->
+            @if (errorMessage()) {
+                <div class="error-message general-error">
+                    {{ errorMessage() }}
+                </div>
+            }
+
+            <!-- Submit Button -->
+            <button 
+                type="submit" 
+                class="submit-button"
+                [disabled]="isLoading() || loginForm.invalid"
+            >
+                <span class="button-text">
+                    {{ isLoading() ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+                </span>
+                @if (isLoading()) {
+                    <div class="loading-spinner"></div>
+                }
+            </button>
+
+            <!-- Social Login Divider -->
+            <div class="social-divider">
+                <span>o inicia sesión con</span>
+            </div>
+
+            <!-- Social Buttons -->
+            <div class="social-buttons">
+                <button type="button" class="social-button spotify-button">
+                    <span class="social-icon">🎵</span>
+                    Spotify
+                </button>
+                <button type="button" class="social-button google-button">
+                    <span class="social-icon">🔍</span>
+                    Google
+                </button>
+            </div>
+        </form>
+
+        <!-- Guest Access -->
+        <div class="guest-section">
+            <div class="guest-divider">
+                <span>¿Solo quieres probar?</span>
+            </div>
+            <button 
+                type="button" 
+                class="guest-button"
+                (click)="loginAsGuest()"
+            >
+                <span class="guest-icon">🎮</span>
+                Jugar como invitado
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer">
+            <p>¿No tienes una cuenta? <a routerLink="/register" class="auth-link">Regístrate aquí</a></p>
+        </div>
+    </div>
+
+    <!-- Success Notification -->
+    @if (showNotification()) {
+        <div class="notification show">
+            <div class="notification-content">
+                <span class="notification-icon">✅</span>
+                <span class="notification-text">¡Sesión iniciada correctamente!</span>
+            </div>
+        </div>
+    }
+</div>

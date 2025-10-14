@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 // Importamos el cliente HTTP para hacer peticiones
 import { HttpClient, HttpClientModule } from '@angular/common/http'; 
 import { CommonModule } from '@angular/common'; // Necesario para directivas (ngIf, ngClass, pipes)
+import { Home } from './home/home';
 
 // Definición de la estructura de la respuesta JSON que esperamos de Flask
 interface SaludoResponse {
@@ -14,7 +15,7 @@ interface SaludoResponse {
   selector: 'app-root',
   standalone: true,
   // Es crucial importar HttpClientModule y CommonModule (para pipes y directivas)
-  imports: [HttpClientModule, CommonModule],
+  imports: [HttpClientModule, CommonModule, Home], // Agrega HomeComponent aquí
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -58,4 +59,3 @@ export class App {
     });
   }
 }
-  

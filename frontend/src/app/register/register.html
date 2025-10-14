@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Adivina la Canción</title>
+    <link rel="stylesheet" href="register.css">
+</head>
+<body>
+    <div class="register-container">
+        <!-- Background con efecto musical -->
+        <div class="background-effects">
+            <div class="floating-note">🎵</div>
+            <div class="floating-note">🎶</div>
+            <div class="floating-note">🎵</div>
+            <div class="floating-note">🎶</div>
+        </div>
+
+        <!-- Card de registro -->
+        <div class="register-card">
+            <!-- Header -->
+            <div class="card-header">
+                <a href="home.html" class="back-button">
+                    <span class="back-arrow">←</span>
+                    Volver al inicio
+                </a>
+                <div class="logo-section">
+                    <div class="logo">🎵</div>
+                    <h1>Crear Cuenta</h1>
+                    <p>Únete a la comunidad musical</p>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <form class="register-form" id="registerForm">
+                <div class="form-group">
+                    <label for="username">Nombre de usuario</label>
+                    <div class="input-container">
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username"
+                            placeholder="Elige tu nombre de usuario"
+                            required
+                            minlength="3"
+                            maxlength="20"
+                        >
+                        <span class="input-icon">👤</span>
+                    </div>
+                    <div class="error-message" id="usernameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <div class="input-container">
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            placeholder="tu@email.com"
+                            required
+                        >
+                        <span class="input-icon">📧</span>
+                    </div>
+                    <div class="error-message" id="emailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-container">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password"
+                            placeholder="Crea una contraseña segura"
+                            required
+                            minlength="6"
+                        >
+                        <span class="input-icon">🔒</span>
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            👁️
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <span class="strength-text" id="strengthText">Seguridad de la contraseña</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar contraseña</label>
+                    <div class="input-container">
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword"
+                            placeholder="Repite tu contraseña"
+                            required
+                        >
+                        <span class="input-icon">✅</span>
+                    </div>
+                    <div class="error-message" id="confirmPasswordError"></div>
+                </div>
+
+                <!-- Términos y condiciones -->
+                <div class="terms-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="acceptTerms" name="acceptTerms" required>
+                        <span class="checkmark"></span>
+                        Acepto los <a href="#" class="terms-link">términos y condiciones</a> y la 
+                        <a href="#" class="terms-link">política de privacidad</a>
+                    </label>
+                    <div class="error-message" id="termsError"></div>
+                </div>
+
+                <!-- Mensajes de error general -->
+                <div class="error-message general-error" id="generalError"></div>
+
+                <!-- Botón de registro -->
+                <button type="submit" class="submit-button" id="submitButton">
+                    <span class="button-text">Crear Cuenta</span>
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                </button>
+
+                <!-- Redes sociales -->
+                <div class="social-divider">
+                    <span>o regístrate con</span>
+                </div>
+
+                <div class="social-buttons">
+                    <button type="button" class="social-button spotify-button">
+                        <span class="social-icon">🎵</span>
+                        Spotify
+                    </button>
+                    <button type="button" class="social-button google-button">
+                        <span class="social-icon">🔍</span>
+                        Google
+                    </button>
+                </div>
+            </form>
+
+            <!-- Footer del card -->
+            <div class="card-footer">
+                <p>¿Ya tienes una cuenta? <a href="login.html" class="auth-link">Inicia sesión aquí</a></p>
+            </div>
+        </div>
+
+        <!-- Notificaciones -->
+        <div class="notification" id="successNotification">
+            <div class="notification-content">
+                <span class="notification-icon">✅</span>
+                <span class="notification-text">¡Cuenta creada exitosamente!</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="register.js"></script>
+</body>
+</html>
