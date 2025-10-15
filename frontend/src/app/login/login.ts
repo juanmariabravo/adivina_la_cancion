@@ -157,7 +157,7 @@ export class Login implements OnInit {
         
         // Redirigir después de 1.5 segundos
         setTimeout(() => {
-          this.router.navigate(['/']);
+          this.router.navigate(['/levels']);
         }, 1500);
       },
       error: (error) => {

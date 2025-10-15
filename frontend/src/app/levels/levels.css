@@ -1,0 +1,494 @@
+/* levels.css - Estilos unificados con home.css */
+
+/* Variables CSS para consistencia */
+:root {
+  --spotify-green: #1db954;
+  --spotify-black: #191414;
+  --spotify-dark-gray: #282828;
+  --spotify-medium-gray: #535353;
+  --spotify-light-gray: #b3b3b3;
+  --spotify-white: #ffffff;
+  --gradient-primary: linear-gradient(135deg, #1db954 0%, #191414 100%);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 12px 40px rgba(0, 0, 0, 0.2);
+  --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.3);
+  --border-radius: 1.5rem;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset y estilos base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--spotify-black);
+  color: var(--spotify-white);
+  overflow-x: hidden;
+}
+
+.levels-container {
+  min-height: 100vh;
+  background: var(--spotify-black);
+}
+
+/* Navigation Bar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(40, 40, 40, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--spotify-white);
+  font-weight: 700;
+  font-size: 1.2rem;
+  transition: var(--transition);
+}
+
+.brand-link:hover {
+  color: var(--spotify-green);
+}
+
+.brand-icon {
+  font-size: 1.5rem;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid var(--spotify-medium-gray);
+  border-radius: var(--border-radius);
+  background: transparent;
+  color: var(--spotify-white);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.nav-btn:hover {
+  border-color: var(--spotify-green);
+  background: rgba(29, 185, 84, 0.1);
+  transform: translateY(-2px);
+}
+
+.profile-btn:hover {
+  border-color: #1db954;
+}
+
+.ranking-btn:hover {
+  border-color: #ffd700;
+}
+
+.logout-btn:hover {
+  border-color: #e22134;
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+/* Main Content */
+.levels-content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Welcome Section */
+.welcome-section {
+  margin-bottom: 3rem;
+}
+
+.welcome-card {
+  background: var(--spotify-dark-gray);
+  padding: 2.5rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-medium);
+}
+
+.welcome-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--spotify-white) 0%, var(--spotify-green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-subtitle {
+  color: var(--spotify-light-gray);
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.user-stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--spotify-green);
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  color: var(--spotify-light-gray);
+  font-size: 0.9rem;
+}
+
+/* Section Titles */
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  background: linear-gradient(135deg, var(--spotify-white) 0%, var(--spotify-green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Daily Challenge Section */
+.daily-section {
+  margin-bottom: 3rem;
+}
+
+.daily-card {
+  background: var(--gradient-primary);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  border: 2px solid var(--spotify-green);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-strong);
+}
+
+.daily-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(29, 185, 84, 0.3);
+}
+
+.daily-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.daily-icon {
+  font-size: 3rem;
+}
+
+.daily-info {
+  flex: 1;
+}
+
+.daily-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.daily-description {
+  color: var(--spotify-light-gray);
+}
+
+.daily-badge {
+  background: var(--spotify-green);
+  color: var(--spotify-black);
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.daily-badge.completed {
+  background: var(--spotify-light-gray);
+  color: var(--spotify-black);
+}
+
+.daily-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detail-icon {
+  font-size: 1.2rem;
+}
+
+.detail-text {
+  color: var(--spotify-light-gray);
+}
+
+.daily-action {
+  text-align: center;
+}
+
+.play-button {
+  background: var(--spotify-white);
+  color: var(--spotify-black);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: var(--border-radius);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.play-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Levels Grid */
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.level-card {
+  background: var(--spotify-dark-gray);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.level-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(29, 185, 84, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.level-card:hover::before {
+  left: 100%;
+}
+
+.level-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--spotify-green);
+  box-shadow: var(--shadow-medium);
+}
+
+.level-card.completed {
+  border-color: var(--spotify-green);
+}
+
+.level-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.level-icon {
+  font-size: 2rem;
+}
+
+.level-info {
+  flex: 1;
+}
+
+.level-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.level-description {
+  color: var(--spotify-light-gray);
+  font-size: 0.9rem;
+}
+
+.level-score {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(29, 185, 84, 0.2);
+  padding: 0.5rem 0.75rem;
+  border-radius: 1rem;
+  font-weight: 600;
+}
+
+.score-icon {
+  font-size: 1rem;
+}
+
+.level-details {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.level-progress {
+  margin-top: 1rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--spotify-medium-gray);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--spotify-green);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  color: var(--spotify-light-gray);
+  font-size: 0.8rem;
+  text-align: center;
+  display: block;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .levels-content {
+    padding: 1rem;
+  }
+
+  .navbar {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .nav-actions {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+
+  .welcome-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .welcome-title {
+    font-size: 2rem;
+  }
+
+  .user-stats {
+    gap: 2rem;
+  }
+
+  .levels-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .daily-details {
+    grid-template-columns: 1fr;
+  }
+
+  .level-details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .user-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .daily-card {
+    padding: 1.5rem;
+  }
+
+  .daily-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .level-card {
+    padding: 1.25rem;
+  }
+
+  .level-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+}
