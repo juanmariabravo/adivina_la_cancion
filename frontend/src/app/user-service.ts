@@ -5,8 +5,9 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class UserService {
-  private registerUrl = 'http://localhost:5000/api/v1/register'
-  private loginUrl = 'http://localhost:5000/api/v1/login'
+
+  private registerUrl = 'http://localhost:5000/api/v1/auth/register'
+  private loginUrl = 'http://localhost:5000/api/v1/auth/login'
 
   constructor(private http: HttpClient) {}
 
@@ -25,5 +26,9 @@ export class UserService {
     const payload = { email, password };
     const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
     return this.http.post<any>(this.loginUrl, payload, { headers });
+  }
+
+  isLoggedIn() {
+    return !!localStorage.getItem('authToken');
   }
 }
