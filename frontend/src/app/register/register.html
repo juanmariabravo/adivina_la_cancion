@@ -19,7 +19,7 @@
         <div class="register-card">
             <!-- Header -->
             <div class="card-header">
-                <a href="/" class="back-button">
+                <a routerLink="/" class="back-button">
                     <span class="back-arrow">←</span>
                     Volver al inicio
                 </a>
@@ -31,10 +31,12 @@
             </div>
 
             <!-- Formulario -->
-            <form class="register-form" id="registerForm" (ngSubmit)="onRegister()" novalidate>
+            <form class="register-form" id="registerForm" (ngSubmit)="onRegister()" #registerForm="ngForm" novalidate>
+                
+                <!-- Username -->
                 <div class="form-group">
                     <label for="username">Nombre de usuario</label>
-                    <div class="input-container">
+                    <div class="input-container" [class.error]="usernameInvalid">
                         <input 
                             type="text" 
                             id="username"
@@ -44,14 +46,23 @@
                             required
                             minlength="3"
                             maxlength="20"
+                            (blur)="validateUsername()"
+                            #usernameInput="ngModel"
                         >
+                        <span class="input-icon">👤</span>
                     </div>
-                    <div class="error-message" id="usernameError"></div>
+                    <div class="error-message" *ngIf="usernameInvalid">
+                        <span *ngIf="usernameInput.errors?.['required']">El nombre de usuario es requerido</span>
+                        <span *ngIf="usernameInput.errors?.['minlength']">Mínimo 3 caracteres</span>
+                        <span *ngIf="usernameInput.errors?.['maxlength']">Máximo 20 caracteres</span>
+                        <span *ngIf="usernameError">{{ usernameError }}</span>
+                    </div>
                 </div>
 
+                <!-- Email -->
                 <div class="form-group">
                     <label for="email">Correo electrónico</label>
-                    <div class="input-container">
+                    <div class="input-container" [class.error]="emailInvalid">
                         <input 
                             type="email" 
                             id="email" 
@@ -59,70 +70,102 @@
                             name="email"
                             placeholder="tu@email.com"
                             required
+                            email
+                            (blur)="validateEmail()"
+                            #emailInput="ngModel"
                         >
+                        <span class="input-icon">📧</span>
                     </div>
-                    <div class="error-message" id="emailError"></div>
+                    <div class="error-message" *ngIf="emailInvalid">
+                        <span *ngIf="emailInput.errors?.['required']">El email es requerido</span>
+                        <span *ngIf="emailError">{{ emailError }}</span>
+                    </div>
                 </div>
 
+                <!-- Password -->
                 <div class="form-group">
                     <label for="password">Contraseña</label>
-                    <div class="input-container">
+                    <div class="input-container" [class.error]="passwordInvalid">
                         <input 
-                            type="password" 
+                            [type]="showPassword ? 'text' : 'password'" 
                             id="password" 
                             [(ngModel)]="pwd1"
                             name="password"
                             placeholder="Crea una contraseña segura"
                             required
                             minlength="6"
+                            (input)="validatePassword()"
+                            #passwordInput="ngModel"
                         >
-                        <!-- <button type="button" class="toggle-password" id="togglePassword" aria-label="Mostrar/Ocultar contraseña">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;">
-                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" stroke="#555" stroke-width="2" fill="none"/>
-                                <circle cx="12" cy="12" r="3.5" stroke="#555" stroke-width="2" fill="none"/>
-                                <circle cx="12" cy="12" r="2" fill="#555"/>
-                            </svg>
-                        </button> -->
+                        <span class="input-icon">🔒</span>
+                        <button 
+                            type="button" 
+                            class="toggle-password" 
+                            (click)="togglePasswordVisibility()"
+                            [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                        >
+                            {{ showPassword ? '👁️‍🗨️' : '👁️' }}
+                        </button>
                     </div>
-                    <div class="password-strength">
+                    <div class="error-message" *ngIf="passwordInvalid">
+                        <span *ngIf="passwordInput.errors?.['required']">La contraseña es requerida</span>
+                        <span *ngIf="passwordInput.errors?.['minlength']">Mínimo 6 caracteres</span>
+                    </div>
+                    
+                    <!-- Indicador de fuerza de contraseña -->
+                    <div class="password-strength" *ngIf="pwd1.length > 0">
                         <div class="strength-bar">
-                            <div class="strength-fill" id="strengthFill"></div>
+                            <div class="strength-fill" [class]="passwordStrengthClass"></div>
                         </div>
+                        <span class="strength-text">{{ passwordStrengthText }}</span>
                     </div>
                 </div>
 
+                <!-- Confirm Password -->
                 <div class="form-group">
                     <label for="confirmPassword">Confirmar contraseña</label>
-                    <div class="input-container">
+                    <div class="input-container" [class.error]="confirmPasswordInvalid">
                         <input 
-                            type="password" 
+                            [type]="showPassword ? 'text' : 'password'" 
                             id="confirmPassword" 
                             [(ngModel)]="pwd2"
                             name="confirmPassword"
                             placeholder="Repite tu contraseña"
                             required
+                            (input)="validateConfirmPassword()"
+                            #confirmPasswordInput="ngModel"
                         >
+                        <span class="input-icon">✅</span>
                     </div>
-                    <div class="error-message" id="confirmPasswordError"></div>
+                    <div class="error-message" *ngIf="confirmPasswordInvalid">
+                        <span *ngIf="confirmPasswordInput.errors?.['required']">Confirma tu contraseña</span>
+                        <span *ngIf="confirmPasswordError">{{ confirmPasswordError }}</span>
+                    </div>
                 </div>
 
                 <!-- Mensajes de error general -->
-                <div class="error-message general-error" *ngIf="formError">{{ formError }}</div>
-                <div class="notification" *ngIf="successMessage">
-                    <div class="notification-content">
-                        <span class="notification-icon">✅</span>
-                        <span class="notification-text">{{ successMessage }}</span>
+                <div *ngIf="formError" class="error-message general-error">
+                    {{ formError }}
+                </div>
+
+                <!-- Mensaje de éxito -->
+                <div *ngIf="successMessage" class="success-message">
+                    <div class="success-content">
+                        <span class="success-icon">✅</span>
+                        <span class="success-text">{{ successMessage }}</span>
                     </div>
                 </div>
 
                 <!-- Botón de registro -->
-                <button type="submit" class="submit-button" id="submitButton" [disabled]="loading">
+                <button 
+                    type="submit" 
+                    class="submit-button" 
+                    [disabled]="loading || !isFormValid()"
+                >
                     <span class="button-text">
                         {{ loading ? 'Creando cuenta...' : 'Crear Cuenta' }}
                     </span>
-                    @if (loading) {
-                        <div class="loading-spinner"></div>
-                    }
+                    <div *ngIf="loading" class="loading-spinner"></div>
                 </button>
             </form>
 

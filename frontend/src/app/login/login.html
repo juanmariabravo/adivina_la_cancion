@@ -11,10 +11,10 @@
     <div class="login-card">
         <!-- Header -->
         <div class="card-header">
-<a href="/" class="back-button">
-                    <span class="back-arrow">←</span>
-                    Volver al inicio
-                </a>
+            <a routerLink="/" class="back-button">
+                <span class="back-arrow">←</span>
+                Volver al inicio
+            </a>
             <div class="logo-section">
                 <div class="logo">🎵</div>
                 <h1>Iniciar Sesión</h1>
@@ -24,23 +24,31 @@
 
         <!-- Login Form -->
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+            
             <!-- Email Field -->
             <div class="form-group">
                 <label for="email">Correo electrónico</label>
-                <div class="input-container" [class.error]="isEmailInvalid">
+                <div class="input-container" [class.error]="emailInvalid">
                     <input 
                         type="email" 
                         id="email" 
                         formControlName="email"
                         placeholder="tu@email.com"
-                        [attr.aria-invalid]="isEmailInvalid"
-                        aria-describedby="emailError"
+                        (blur)="validateEmail()"
                     >
                     <span class="input-icon">📧</span>
                 </div>
-                @if (isEmailInvalid) {
-                    <div class="error-message" id="emailError">
-                        {{ validationMessages.email }}
+                @if (emailInvalid) {
+                    <div class="error-message">
+                        @if (emailControl?.errors?.['required']) {
+                            <span>El email es requerido</span>
+                        }
+                        @if (emailControl?.errors?.['email']) {
+                            <span>Formato de email inválido</span>
+                        }
+                        @if (emailError) {
+                            <span>{{ emailError }}</span>
+                        }
                     </div>
                 }
             </div>
@@ -48,46 +56,53 @@
             <!-- Password Field -->
             <div class="form-group">
                 <label for="password">Contraseña</label>
-                <div class="input-container" [class.error]="isPasswordInvalid">
+                <div class="input-container" [class.error]="passwordInvalid">
                     <input 
-                        [type]="showPassword() ? 'text' : 'password'" 
+                        [type]="showPassword ? 'text' : 'password'" 
                         id="password" 
                         formControlName="password"
                         placeholder="Tu contraseña"
-                        [attr.aria-invalid]="isPasswordInvalid"
-                        aria-describedby="passwordError"
+                        (blur)="validatePassword()"
                     >
                     <span class="input-icon">🔒</span>
                     <button 
                         type="button" 
                         class="toggle-password" 
                         (click)="togglePasswordVisibility()"
-                        [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                        [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                     >
-                        {{ showPassword() ? '👁️‍🗨️' : '👁️' }}
+                        {{ showPassword ? '👁️‍🗨️' : '👁️' }}
                     </button>
                 </div>
-                @if (isPasswordInvalid) {
-                    <div class="error-message" id="passwordError">
-                        {{ validationMessages.password }}
+                @if (passwordInvalid) {
+                    <div class="error-message">
+                        @if (passwordControl?.errors?.['required']) {
+                            <span>La contraseña es requerida</span>
+                        }
+                        @if (passwordControl?.errors?.['minlength']) {
+                            <span>Mínimo 6 caracteres</span>
+                        }
+                        @if (passwordError) {
+                            <span>{{ passwordError }}</span>
+                        }
                     </div>
                 }
             </div>
 
-            <!-- Remember Me & Forgot Password -->
-            <div class="form-options">
-                <label class="checkbox-container">
-                    <input type="checkbox" id="rememberMe">
-                    <span class="checkmark"></span>
-                    Recordar sesión
-                </label>
-                <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
-            </div>
-
             <!-- General Error Message -->
-            @if (errorMessage()) {
+            @if (formError) {
                 <div class="error-message general-error">
-                    {{ errorMessage() }}
+                    {{ formError }}
+                </div>
+            }
+
+            <!-- Success Message -->
+            @if (successMessage) {
+                <div class="success-message">
+                    <div class="success-content">
+                        <span class="success-icon">✅</span>
+                        <span class="success-text">{{ successMessage }}</span>
+                    </div>
                 </div>
             }
 
@@ -95,17 +110,15 @@
             <button 
                 type="submit" 
                 class="submit-button"
-                [disabled]="isLoading() || loginForm.invalid"
+                [disabled]="loading || !isFormValid()"
             >
                 <span class="button-text">
-                    {{ isLoading() ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+                    {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
                 </span>
-                @if (isLoading() ) {
+                @if (loading) {
                     <div class="loading-spinner"></div>
                 }
             </button>
-
-            
         </form>
 
         <!-- Guest Access -->
@@ -115,10 +128,12 @@
             </div>
             <button 
                 type="button" 
-                class="guest-button">
-                <!--(click)="loginAsGuest()"-->
+                class="guest-button"
+                (click)="loginAsGuest()"
+            >
                 <span class="guest-icon">🎮</span>
-                Jugar como invitado</button>
+                Jugar como invitado
+            </button>
         </div>
 
         <!-- Footer -->
@@ -126,14 +141,4 @@
             <p>¿No tienes una cuenta? <a routerLink="/register" class="auth-link">Regístrate aquí</a></p>
         </div>
     </div>
-
-    <!-- Success Notification -->
-    @if (showNotification()) {
-        <div class="notification show">
-            <div class="notification-content">
-                <span class="notification-icon">✅</span>
-                <span class="notification-text">¡Sesión iniciada correctamente!</span>
-            </div>
-        </div>
-    }
 </div>

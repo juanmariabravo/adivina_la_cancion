@@ -1,535 +1,460 @@
-/* Variables CSS */
+/* register.css - Estilos unificados con home.css */
+
+/* Variables CSS para consistencia (mismas que home.css) */
 :root {
-    --spotify-green: #1db954;
-    --spotify-dark-green: #1aa34a;
-    --spotify-black: #191414;
-    --spotify-dark-gray: #282828;
-    --spotify-medium-gray: #535353;
-    --spotify-light-gray: #b3b3b3;
-    --spotify-white: #ffffff;
-    --error-red: #e22134;
-    --warning-orange: #ffa500;
-    --success-green: #1db954;
-    --gradient-primary: linear-gradient(135deg, #1db954 0%, #191414 100%);
-    --gradient-card: linear-gradient(145deg, #2a2a2a 0%, #1f1f1f 100%);
-    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
-    --shadow-medium: 0 12px 40px rgba(0, 0, 0, 0.2);
-    --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.3);
-    --border-radius: 1rem;
-    --border-radius-lg: 2rem;
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --spotify-green: #1db954;
+  --spotify-black: #191414;
+  --spotify-dark-gray: #282828;
+  --spotify-light-gray: #b3b3b3;
+  --spotify-white: #ffffff;
+  --gradient-primary: linear-gradient(135deg, #1db954 0%, #191414 100%);
+  --gradient-secondary: linear-gradient(135deg, #1ed760 0%, #1db954 50%, #191414 100%);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 12px 40px rgba(0, 0, 0, 0.2);
+  --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.3);
+  --border-radius: 2rem;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --error-red: #e22134;
+  --success-green: #1db954;
+  --warning-orange: #ffa500;
 }
 
-/* Reset y estilos base */
+/* Reset y estilos base (consistentes con home.css) */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--spotify-black);
-    color: var(--spotify-white);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--spotify-black);
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
 }
 
 /* Container principal */
 .register-container {
-    width: 100%;
-    max-width: 480px;
-    position: relative;
-    z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  z-index: 1;
 }
 
-/* Efectos de fondo */
+/* Efectos de fondo (consistentes con home.css) */
 .background-effects {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .floating-note {
-    position: absolute;
-    font-size: 2rem;
-    opacity: 0.1;
-    animation: float 6s ease-in-out infinite;
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.1;
+  animation: float 6s ease-in-out infinite;
 }
 
 .floating-note:nth-child(1) {
-    top: 10%;
-    left: 10%;
-    animation-delay: 0s;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
 }
 
 .floating-note:nth-child(2) {
-    top: 20%;
-    right: 15%;
-    animation-delay: 1.5s;
+  top: 20%;
+  right: 15%;
+  animation-delay: 1.5s;
 }
 
 .floating-note:nth-child(3) {
-    bottom: 30%;
-    left: 15%;
-    animation-delay: 3s;
+  bottom: 30%;
+  left: 15%;
+  animation-delay: 3s;
 }
 
 .floating-note:nth-child(4) {
-    bottom: 15%;
-    right: 10%;
-    animation-delay: 4.5s;
+  bottom: 15%;
+  right: 10%;
+  animation-delay: 4.5s;
 }
 
 @keyframes float {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-20px) rotate(10deg);
-    }
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(10deg);
+  }
 }
 
-/* Card de registro */
+/* Card de registro (estilo similar a feature-card) */
 .register-card {
-    background: var(--gradient-card);
-    border-radius: var(--border-radius-lg);
-    padding: 2.5rem;
-    box-shadow: var(--shadow-strong);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+  background: var(--spotify-dark-gray);
+  border-radius: var(--border-radius);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-strong);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: var(--transition);
+}
+
+.register-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-strong);
+  border-color: var(--spotify-green);
 }
 
 /* Header del card */
 .card-header {
-    margin-bottom: 2rem;
+  margin-bottom: 2rem;
 }
 
 .back-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--spotify-light-gray);
-    text-decoration: none;
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
-    transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--spotify-light-gray);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  transition: var(--transition);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
 }
 
 .back-button:hover {
-    color: var(--spotify-white);
+  color: var(--spotify-white);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .back-arrow {
-    font-size: 1.2rem;
+  font-size: 1.2rem;
 }
 
 .logo-section {
-    text-align: center;
+  text-align: center;
 }
 
 .logo {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    animation: bounce 2s infinite;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: bounce 2s infinite;
 }
 
 @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-    }
-    40% {
-        transform: translateY(-10px);
-    }
-    60% {
-        transform: translateY(-5px);
-    }
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
 }
 
 .logo-section h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, var(--spotify-white) 0%, var(--spotify-green) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--spotify-white) 0%, var(--spotify-green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .logo-section p {
-    color: var(--spotify-light-gray);
-    font-size: 1rem;
+  color: var(--spotify-light-gray);
+  font-size: 1rem;
 }
 
 /* Formulario */
 .register-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .form-group label {
-    font-weight: 600;
-    color: var(--spotify-white);
-    font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--spotify-white);
+  font-size: 0.95rem;
 }
 
+/* Input containers mejorados */
 .input-container {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .input-container input {
-    width: 100%;
-    padding: 1rem 3rem 1rem 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid var(--spotify-medium-gray);
-    border-radius: var(--border-radius);
-    color: var(--spotify-white);
-    font-size: 1rem;
-    transition: var(--transition);
+  width: 100%;
+  padding: 1rem 3rem 1rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--spotify-medium-gray);
+  border-radius: var(--border-radius);
+  color: var(--spotify-white);
+  font-size: 1rem;
+  transition: var(--transition);
 }
 
 .input-container input:focus {
-    outline: none;
-    border-color: var(--spotify-green);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
+  outline: none;
+  border-color: var(--spotify-green);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
 }
 
 .input-container input::placeholder {
-    color: var(--spotify-light-gray);
+  color: var(--spotify-light-gray);
 }
 
+/* Estados de error en inputs */
+.input-container.error input {
+  border-color: var(--error-red) !important;
+  background: rgba(226, 33, 52, 0.05);
+}
+
+/* Input icons */
 .input-icon {
-    position: absolute;
-    right: 1rem;
-    font-size: 1.1rem;
-    opacity: 0.7;
+  position: absolute;
+  right: 1rem;
+  font-size: 1.1rem;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 .toggle-password {
-    position: absolute;
-    right: 1rem;
-    background: none;
-    border: none;
-    color: var(--spotify-light-gray);
-    cursor: pointer;
-    font-size: 1.1rem;
-    padding: 0;
-    transition: var(--transition);
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--spotify-light-gray);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0;
+  transition: var(--transition);
 }
 
 .toggle-password:hover {
-    color: var(--spotify-white);
+  color: var(--spotify-white);
 }
 
 /* Indicador de fuerza de contraseña */
 .password-strength {
-    margin-top: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .strength-bar {
-    width: 100%;
-    height: 4px;
-    background: var(--spotify-medium-gray);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-bottom: 0.25rem;
+  width: 100%;
+  height: 4px;
+  background: var(--spotify-medium-gray);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
 }
 
 .strength-fill {
-    height: 100%;
-    width: 0%;
-    border-radius: 2px;
-    transition: var(--transition);
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  transition: var(--transition);
 }
 
 .strength-fill.weak {
-    width: 33%;
-    background: var(--error-red);
+  width: 33%;
+  background: var(--error-red);
 }
 
 .strength-fill.medium {
-    width: 66%;
-    background: var(--warning-orange);
+  width: 66%;
+  background: var(--warning-orange);
 }
 
 .strength-fill.strong {
-    width: 100%;
-    background: var(--success-green);
+  width: 100%;
+  background: var(--success-green);
 }
 
 .strength-text {
-    font-size: 0.8rem;
-    color: var(--spotify-light-gray);
-}
-
-/* Términos y condiciones */
-.terms-group {
-    margin: 1rem 0;
-}
-
-.checkbox-container {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: var(--spotify-light-gray);
-    line-height: 1.4;
-}
-
-.checkbox-container input {
-    display: none;
-}
-
-.checkmark {
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--spotify-medium-gray);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: var(--transition);
-    margin-top: 0.1rem;
-}
-
-.checkbox-container input:checked + .checkmark {
-    background: var(--spotify-green);
-    border-color: var(--spotify-green);
-}
-
-.checkbox-container input:checked + .checkmark::after {
-    content: '✓';
-    color: white;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-.terms-link {
-    color: var(--spotify-green);
-    text-decoration: none;
-}
-
-.terms-link:hover {
-    text-decoration: underline;
+  font-size: 0.75rem;
+  color: var(--spotify-light-gray);
+  display: block;
+  text-align: center;
 }
 
 /* Mensajes de error */
 .error-message {
-    color: var(--error-red);
-    font-size: 0.8rem;
-    min-height: 1rem;
-    display: none;
+  color: var(--error-red);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  min-height: 1rem;
+  display: block;
 }
 
-.error-message.show {
-    display: block;
+.error-message.general-error {
+  text-align: center;
+  padding: 0.75rem;
+  background: rgba(226, 33, 52, 0.1);
+  border: 1px solid rgba(226, 33, 52, 0.3);
+  border-radius: var(--border-radius);
+  margin: 1rem 0;
 }
 
-.general-error {
-    text-align: center;
-    padding: 0.75rem;
-    background: rgba(226, 33, 52, 0.1);
-    border: 1px solid rgba(226, 33, 52, 0.3);
-    border-radius: var(--border-radius);
+/* Mensajes de éxito */
+.success-message {
+  background: rgba(29, 185, 84, 0.1);
+  border: 1px solid rgba(29, 185, 84, 0.3);
+  border-radius: var(--border-radius);
+  padding: 0.75rem;
+  margin: 1rem 0;
+  text-align: center;
 }
 
-/* Botón de envío */
+.success-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--success-green);
+}
+
+.success-icon {
+  font-size: 1.1rem;
+}
+
+.success-text {
+  font-weight: 500;
+}
+
+/* Botón de envío (estilo similar a .btn) */
 .submit-button {
-    background: var(--spotify-green);
-    color: var(--spotify-white);
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: var(--border-radius);
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
+  background: var(--spotify-green);
+  color: var(--spotify-white);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: var(--border-radius);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.submit-button:hover::before {
+  left: 100%;
 }
 
 .submit-button:hover:not(:disabled) {
-    background: var(--spotify-dark-green);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
+  background: #1ed760;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
 }
 
 .submit-button:disabled {
-    background: var(--spotify-medium-gray);
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+  background: var(--spotify-medium-gray);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.submit-button:disabled::before {
+  display: none;
 }
 
 .loading-spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid transparent;
-    border-top: 2px solid var(--spotify-white);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    display: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--spotify-white);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Divisor de redes sociales */
-.social-divider {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: 1.5rem 0;
-    color: var(--spotify-light-gray);
-    font-size: 0.9rem;
-}
-
-.social-divider::before,
-.social-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--spotify-medium-gray);
-}
-
-/* Botones de redes sociales */
-.social-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.social-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border: 2px solid var(--spotify-medium-gray);
-    border-radius: var(--border-radius);
-    background: transparent;
-    color: var(--spotify-white);
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.social-button:hover {
-    border-color: var(--spotify-green);
-    background: rgba(29, 185, 84, 0.1);
-}
-
-.social-icon {
-    font-size: 1.1rem;
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Footer del card */
 .card-footer {
-    text-align: center;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--spotify-medium-gray);
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 1rem;
 }
 
 .card-footer p {
-    color: var(--spotify-light-gray);
-    font-size: 0.95rem;
+  color: var(--spotify-light-gray);
+  font-size: 0.95rem;
 }
 
 .auth-link {
-    color: var(--spotify-green);
-    text-decoration: none;
-    font-weight: 600;
+  color: var(--spotify-green);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition);
 }
 
 .auth-link:hover {
-    text-decoration: underline;
+  text-decoration: underline;
+  color: #1ed760;
 }
 
-/* Notificación de éxito */
-.notification {
-    position: fixed;
-    top: 2rem;
-    right: 2rem;
-    background: var(--success-green);
-    color: white;
-    padding: 1rem 1.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-medium);
-    transform: translateX(400px);
-    transition: transform 0.3s ease;
-    z-index: 1000;
-}
-
-.notification.show {
-    transform: translateX(0);
-}
-
-.notification-content {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.notification-icon {
-    font-size: 1.2rem;
-}
-
-/* Responsive */
+/* Responsive Design (consistent with home.css) */
 @media (max-width: 768px) {
-    .register-card {
-        padding: 2rem 1.5rem;
-    }
+  .register-card {
+    padding: 2rem 1.5rem;
+  }
 
-    .social-buttons {
-        grid-template-columns: 1fr;
-    }
+  body {
+    padding: 0.5rem;
+  }
 
-    .notification {
-        right: 1rem;
-        left: 1rem;
-        transform: translateY(-100px);
-    }
-
-    .notification.show {
-        transform: translateY(0);
-    }
+  .logo-section h1 {
+    font-size: 1.75rem;
+  }
 }
 
 @media (max-width: 480px) {
-    body {
-        padding: 0.5rem;
-    }
+  .register-card {
+    padding: 1.5rem 1rem;
+  }
 
-    .register-card {
-        padding: 1.5rem 1rem;
-    }
-
-    .logo-section h1 {
-        font-size: 1.75rem;
-    }
+  .logo {
+    font-size: 2.5rem;
+  }
 }

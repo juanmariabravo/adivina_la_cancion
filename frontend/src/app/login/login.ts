@@ -1,18 +1,8 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../auth-service';
-
-interface LoginForm {
-  email: string;
-  password: string;
-}
-
-interface ValidationMessages {
-  email: string;
-  password: string;
-}
+import { UserService } from '../user-service';
 
 @Component({
   selector: 'app-login',
@@ -22,21 +12,24 @@ interface ValidationMessages {
   styleUrls: ['./login.css']
 })
 export class Login implements OnInit {
-  // Signals para estado reactivo
-  isLoading = signal<boolean>(false);
-  showPassword = signal<boolean>(false);
-  errorMessage = signal<string>('');
-  showNotification = signal<boolean>(false);
-
+  // Formulario reactivo
   loginForm: FormGroup;
-  validationMessages: ValidationMessages = {
-    email: '',
-    password: ''
-  };
+  
+  // Estados
+  loading = false;
+  showPassword = false;
+  
+  // Mensajes de error
+  formError = '';
+  emailError = '';
+  passwordError = '';
+  
+  // Mensaje de éxito
+  successMessage = '';
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
+    private service: UserService,
     private router: Router
   ) {
     this.loginForm = this.fb.group({
@@ -47,140 +40,147 @@ export class Login implements OnInit {
 
   ngOnInit(): void {
     // Si ya está autenticado, redirigir al juego
-    if (this.authService.isLoggedIn()) {
+    if (this.service.isLoggedIn()) {
       this.router.navigate(['/game']);
     }
 
-    // Observar cambios en los campos para validación en tiempo real
+    // Validación en tiempo real
     this.setupFormValidation();
   }
 
   private setupFormValidation(): void {
     // Validación en tiempo real para email
     this.loginForm.get('email')?.valueChanges.subscribe(() => {
-      this.validateEmail();
+      if (this.emailControl?.touched) {
+        this.validateEmail();
+      }
     });
 
     // Validación en tiempo real para password
     this.loginForm.get('password')?.valueChanges.subscribe(() => {
-      this.validatePassword();
+      if (this.passwordControl?.touched) {
+        this.validatePassword();
+      }
     });
   }
 
-  private validateEmail(): void {
-    const emailControl = this.loginForm.get('email');
-    if (!emailControl) return;
+  // Getters para los controles del formulario
+  get emailControl() {
+    return this.loginForm.get('email');
+  }
 
-    if (emailControl.errors?.['required']) {
-      this.validationMessages.email = 'El email es requerido';
-    } else if (emailControl.errors?.['email']) {
-      this.validationMessages.email = 'Formato de email inválido';
-    } else {
-      this.validationMessages.email = '';
+  get passwordControl() {
+    return this.loginForm.get('password');
+  }
+
+  // Getters para validación visual
+  get emailInvalid(): boolean {
+    return (this.emailControl?.invalid && this.emailControl?.touched) || !!this.emailError;
+  }
+
+  get passwordInvalid(): boolean {
+    return (this.passwordControl?.invalid && this.passwordControl?.touched) || !!this.passwordError;
+  }
+
+  // Métodos de validación
+  validateEmail(): void {
+    this.emailError = '';
+    
+    if (!this.emailControl?.value) return;
+    
+    if (this.emailControl?.errors?.['email']) {
+      this.emailError = 'Formato de email inválido';
     }
   }
 
-  private validatePassword(): void {
-    const passwordControl = this.loginForm.get('password');
-    if (!passwordControl) return;
-
-    if (passwordControl.errors?.['required']) {
-      this.validationMessages.password = 'La contraseña es requerida';
-    } else if (passwordControl.errors?.['minlength']) {
-      this.validationMessages.password = 'Mínimo 6 caracteres';
-    } else {
-      this.validationMessages.password = '';
+  validatePassword(): void {
+    this.passwordError = '';
+    
+    if (!this.passwordControl?.value) return;
+    
+    if (this.passwordControl?.errors?.['minlength']) {
+      this.passwordError = 'Mínimo 6 caracteres';
     }
   }
 
   togglePasswordVisibility(): void {
-    this.showPassword.update(value => !value);
+    this.showPassword = !this.showPassword;
+  }
+
+  isFormValid(): boolean {
+    return !this.emailInvalid && 
+           !this.passwordInvalid &&
+           this.emailControl?.value?.length > 0 &&
+           this.passwordControl?.value?.length > 0;
   }
 
   onSubmit(): void {
+    // Limpiar mensajes anteriores
+    this.formError = '';
+    this.successMessage = '';
+    this.emailError = '';
+    this.passwordError = '';
+    
     // Marcar todos los campos como touched para mostrar errores
-    this.markFormGroupTouched();
+    this.emailControl?.markAsTouched();
+    this.passwordControl?.markAsTouched();
+    
+    // Ejecutar validaciones
+    this.validateEmail();
+    this.validatePassword();
+    
+    // Verificar si el formulario es válido
+    if (!this.isFormValid()) {
+      this.formError = 'Por favor, corrige los errores del formulario.';
+      return;
+    }
 
     if (this.loginForm.valid) {
       this.attemptLogin();
-    } else {
-      this.validateForm();
     }
   }
 
-  private markFormGroupTouched(): void {
-    Object.keys(this.loginForm.controls).forEach(key => {
-      const control = this.loginForm.get(key);
-      control?.markAsTouched();
-    });
-  }
+  private attemptLogin(): void {
+    this.loading = true;
+    this.formError = '';
 
-  private validateForm(): void {
-    this.validateEmail();
-    this.validatePassword();
-  }
+    const email = this.loginForm.value.email;
+    const password = this.loginForm.value.password;
 
-  private async attemptLogin(): Promise<void> {
-    this.isLoading.set(true);
-    this.errorMessage.set('');
-
-    const credentials: LoginForm = this.loginForm.value;
-
-    try {
-      const success = await this.authService.login(credentials);
-      
-      if (success) {
-        this.showSuccessNotification();
-        // Redirigir después de un breve delay para mostrar la notificación
+    this.service.login(email, password).subscribe({
+      next: (response: any) => {
+        this.loading = false;
+        this.successMessage = '¡Sesión iniciada correctamente! Redirigiendo...';
+        
+        // Limpiar formulario
+        this.loginForm.reset();
+        
+        // Redirigir después de 1.5 segundos
         setTimeout(() => {
-          this.router.navigate(['/game']);
+          this.router.navigate(['/']);
         }, 1500);
-      } else {
-        this.errorMessage.set('Credenciales inválidas. Por favor, intenta de nuevo.');
+      },
+      error: (error) => {
+        this.loading = false;
+        
+        if (error.status === 401) {
+          this.formError = 'Email o contraseña incorrectos.';
+        } else if (error.status === 400) {
+          this.formError = error.error?.error || 'Credenciales inválidas.';
+        } else if (error.status === 0) {
+          this.formError = 'Error de conexión. Verifica tu internet.';
+        } else {
+          this.formError = error.error?.error || 'Error del servidor. Intenta más tarde.';
+        }
+        
+        // Limpiar contraseña en caso de error
+        this.loginForm.patchValue({ password: '' });
+        this.passwordControl?.markAsUntouched();
       }
-    } catch (error) {
-      console.error('Error durante el login:', error);
-      this.handleLoginError(error);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  private handleLoginError(error: any): void {
-    if (error.status === 401) {
-      this.errorMessage.set('Email o contraseña incorrectos.');
-    } else if (error.status === 0) {
-      this.errorMessage.set('Error de conexión. Verifica tu internet.');
-    } else {
-      this.errorMessage.set('Error del servidor. Intenta más tarde.');
-    }
-  }
-
-  private showSuccessNotification(): void {
-    this.showNotification.set(true);
-    setTimeout(() => {
-      this.showNotification.set(false);
-    }, 3000);
+    });
   }
 
   loginAsGuest(): void {
     this.router.navigate(['/game']);
-  }
-
-  // Getters para facilitar el acceso en el template
-  get email() { 
-    return this.loginForm.get('email'); 
-  }
-
-  get password() { 
-    return this.loginForm.get('password'); 
-  }
-
-  get isEmailInvalid(): boolean {
-    return !!this.email && this.email.invalid && this.email.touched;
-  }
-
-  get isPasswordInvalid(): boolean {
-    return !!this.password && this.password.invalid && this.password.touched;
   }
 }
