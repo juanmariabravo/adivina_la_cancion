@@ -154,6 +154,10 @@ export class Login implements OnInit {
         
         // Limpiar formulario
         this.loginForm.reset();
+
+        // Guardar datos de la respuesta
+        this.service.saveCurrentUser(response.user);
+        this.service.saveToken(response.token_type, response.access_token);
         
         // Redirigir después de 1.5 segundos
         setTimeout(() => {

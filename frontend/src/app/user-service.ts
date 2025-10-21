@@ -23,10 +23,18 @@ export class UserService {
   }
 
   login(email: string, password: string) {
-    localStorage.setItem('currentUser', JSON.stringify({ email }));
     const payload = { email, password };
     const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
     return this.http.post<any>(this.loginUrl, payload, { headers });
+  }
+
+  saveToken(type: string, access_token: string) {
+    const token = `${type} ${access_token}`;
+    localStorage.setItem('authToken', token);
+  }
+
+  saveCurrentUser(user: string) {
+    localStorage.setItem('currentUser', JSON.stringify(user));
   }
 
   isLoggedIn() {
