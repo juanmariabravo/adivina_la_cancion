@@ -32,7 +32,8 @@ class Database:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     is_active BOOLEAN DEFAULT TRUE,
                     total_score INTEGER DEFAULT 0,
-                    games_played INTEGER DEFAULT 0
+                    games_played TEXT DEFAULT '0',
+                    daily_completed BOOLEAN DEFAULT FALSE
                 )
             ''')
             

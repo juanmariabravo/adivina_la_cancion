@@ -23,11 +23,12 @@ interface Level {
   styleUrls: ['./levels.css']
 })
 export class Levels implements OnInit {
-  username: string = 'Usuario';
+  username: string = '';
   totalScore: number = 0;
   gamesPlayed: number = 0;
   dailyCompleted: boolean = false;
   timeRemaining: string = '23:45:12';
+  isGuest: boolean = false;
 
   levels: Level[] = [
     {
@@ -107,11 +108,18 @@ export class Levels implements OnInit {
   private loadUserData(): void {
     
     const user = this.userService.getCurrentUser();
-    if (user) {
+    if (user && this.userService.isLoggedIn()) {
+      this.isGuest = false;
       this.username = user.username;
       this.totalScore = user.total_score || 0;
       this.gamesPlayed = user.games_played || 0;
+      this.dailyCompleted = user?.daily_completed || false;
     }
+    else
+      this.username = 'Invitado';
+      this.isGuest = true;
+    
+
   }
 
   private startCountdown(): void {

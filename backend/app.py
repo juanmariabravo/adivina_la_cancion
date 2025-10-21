@@ -71,6 +71,7 @@ def login():
         if user:
             token = db.create_token(user)
             
+            
             return jsonify({
                 "message": "Login exitoso",
                 "access_token": token,
@@ -79,7 +80,8 @@ def login():
                     "username": user['username'],
                     "email": user['email'],
                     "total_score": user['total_score'],
-                    "games_played": user['games_played']
+                    "games_played": user['games_played'],
+                    "dailyCompleted": user['daily_completed']
                 }
             })
         else:
