@@ -1,0 +1,135 @@
+<div class="profile-container">
+  <!-- Header -->
+  <div class="profile-header">
+    <button class="back-button" routerLink="/levels">
+      <span>←</span> Volver a Niveles
+    </button>
+    <h1 class="profile-title">Mi Perfil</h1>
+  </div>
+
+  <!-- Card de Perfil -->
+  <div class="profile-card">
+    <!-- Avatar Section -->
+    <div class="avatar-section">
+      <div class="avatar">
+        {{ username.charAt(0).toUpperCase() }}
+      </div>
+      <h2 class="username">{{ username }}</h2>
+    </div>
+
+    <!-- Información del Usuario -->
+    <div class="user-info-section" *ngIf="!isEditing">
+      <div class="info-item">
+        <span class="info-label">📧 Email:</span>
+        <span class="info-value">{{ email }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">🏆 Puntuación Total:</span>
+        <span class="info-value">{{ totalScore }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">🎮 Partidas Jugadas:</span>
+        <span class="info-value">{{ gamesPlayed }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">📊 Promedio por Partida:</span>
+        <span class="info-value">{{ averageScore }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">🎯 Desafío Diario:</span>
+        <span class="info-value" [class.completed]="dailyCompleted">
+          {{ dailyCompleted ? '✅ Completado Hoy' : '⏳ Pendiente' }}
+        </span>
+      </div>
+
+      <button class="edit-button" (click)="toggleEdit()">
+        ✏️ Editar Perfil
+      </button>
+    </div>
+
+    <!-- Formulario de Edición -->
+    <div class="edit-section" *ngIf="isEditing">
+      <div class="form-group">
+        <label for="editEmail">Nuevo Email (opcional):</label>
+        <input 
+          type="email" 
+          id="editEmail" 
+          [(ngModel)]="editEmail"
+          placeholder="tu@email.com"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="editPassword">Nueva Contraseña (opcional):</label>
+        <input 
+          type="password" 
+          id="editPassword" 
+          [(ngModel)]="editPassword"
+          placeholder="Mínimo 6 caracteres"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="editPasswordConfirm">Confirmar Contraseña:</label>
+        <input 
+          type="password" 
+          id="editPasswordConfirm" 
+          [(ngModel)]="editPasswordConfirm"
+          placeholder="Repite la contraseña"
+        >
+      </div>
+
+      <div class="edit-actions">
+        <button class="save-button" (click)="saveChanges()">
+          💾 Guardar Cambios
+        </button>
+        <button class="cancel-button" (click)="cancelEdit()">
+          ❌ Cancelar
+        </button>
+      </div>
+    </div>
+
+    <!-- Mensajes -->
+    <div *ngIf="successMessage" class="success-message">
+      ✅ {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="error-message">
+      ❌ {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- Estadísticas Rápidas -->
+  <div class="stats-section">
+    <h3>Estadísticas</h3>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🎵</div>
+        <div class="stat-label">Canciones Adivinadas</div>
+        <div class="stat-value">{{ gamesPlayed }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-label">Mejor Puntuación</div>
+        <div class="stat-value">{{ totalScore }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-label">Promedio</div>
+        <div class="stat-value">{{ averageScore }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="actions-section">
+    <button class="action-button" (click)="goToLevels()">
+      🎮 Jugar
+    </button>
+    <button class="action-button" (click)="goToRanking()">
+      🏆 Ver Ranking
+    </button>
+    <button class="action-button logout" (click)="logout()">
+      🚪 Cerrar Sesión
+    </button>
+  </div>
+</div>
