@@ -30,3 +30,5 @@ backend/adivina_la_cancion.db
 backend/adivina_la_cancion.db-journal
 backend/db/__pycache__/database.cpython-313.pyc
 backend/models/__pycache__/user.cpython-313.pyc
+adivina_la_cancion.db
+
