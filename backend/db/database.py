@@ -5,14 +5,16 @@ import os
 from datetime import datetime, timedelta
 from typing import Optional
 from models.user import User
+from models.song import Song
 
 # Configuración
 SECRET_KEY = os.getenv("SECRET_KEY", "clave-secreta-desarrollo")
-DATABASE_PATH = "adivina_la_cancion.db"
+DATABASE_PATH = os.getenv("DATABASE_PATH", "adivina_la_cancion.db")
 
 class Database:
     def __init__(self):
         self.init_database()
+        self.init_songs_data()  # Datos de canciones en memoria
     
     def get_connection(self):
         """Obtener conexión a la base de datos"""
@@ -252,6 +254,34 @@ class Database:
             return False, f"Error al actualizar el perfil: {str(e)}"
         finally:
             conn.close()
+    
+    def init_songs_data(self):
+        """Inicializar datos de canciones (simulación en memoria)"""
+        self.songs = [
+            Song(1, "Bohemian Rhapsody", "Queen", "A Night at the Opera", 1975, "Rock", 
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", 
+        "https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Bohemian_Rhapsody.png/220px-Bohemian_Rhapsody.png", 1),
+
+    Song(2, "Blinding Lights", "The Weeknd", "After Hours", 2020, "Pop", 
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", 
+        "https://cdn-images.dzcdn.net/images/cover/cf22674710be326f668dfb27d5af9576/1900x1900-000000-81-0-0.jpg", 2),
+
+    Song(3, "Bad Guy", "Billie Eilish", "When We All Fall Asleep, Where Do We Go?", 2019, "Pop", 
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", 
+        "https://cdn-images.dzcdn.net/images/cover/6630083f454d48eadb6a9b53f035d734/500x500.jpg", 3),
+        ]
+    
+    def get_song_by_id(self, song_id: int) -> Optional[Song]:
+        """Obtener canción por ID"""
+        for song in self.songs:
+            if song.id == song_id:
+                return song
+        return None
+    
+    def get_songs_by_level(self, level_id: int) -> list:
+        """Obtener canciones de un nivel"""
+        return [song for song in self.songs if song.level_id == level_id]
+    
 
 # Instancia global de la base de datos
 db = Database()
