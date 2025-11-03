@@ -33,7 +33,7 @@
                         type="email" 
                         id="email" 
                         formControlName="email"
-                        placeholder="tu@email.com"
+                        placeholder="Introduce tu correo"
                         (blur)="validateEmail()"
                     >
                     <span class="input-icon">📧</span>
@@ -44,7 +44,6 @@
                             <span>El email es requerido</span>
                         }
                         @if (emailControl?.errors?.['email']) {
-                            <span>Formato de email inválido</span>
                         }
                         @if (emailError) {
                             <span>{{ emailError }}</span>
@@ -61,7 +60,7 @@
                         [type]="showPassword ? 'text' : 'password'" 
                         id="password" 
                         formControlName="password"
-                        placeholder="Tu contraseña"
+                        placeholder="Introduce tu contraseña"
                         (blur)="validatePassword()"
                     >
                     <span class="input-icon">🔒</span>

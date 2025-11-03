@@ -68,7 +68,7 @@
                             id="email" 
                             [(ngModel)]="email"
                             name="email"
-                            placeholder="tu@email.com"
+                            placeholder="Introduce tu correo"
                             required
                             email
                             (blur)="validateEmail()"
@@ -94,7 +94,6 @@
                             placeholder="Crea una contraseña segura"
                             required
                             minlength="6"
-                            (input)="validatePassword()"
                             #passwordInput="ngModel"
                         >
                         <span class="input-icon">🔒</span>
