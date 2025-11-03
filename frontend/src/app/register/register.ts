@@ -171,13 +171,13 @@ export class Register {
         this.pwd2 = '';
 
         // Guardar datos de la respuesta
-        //this.service.saveCurrentUser(response.user);
+        this.service.saveCurrentUser(response.user);
         this.service.saveToken(response.token_type, response.access_token);
         
         // Redirigir después de 2 segundos
         setTimeout(() => {
           this.router.navigate(['/levels']);
-        }, 2000);
+        }, 15000);
       },
       error: (err) => {
         this.loading = false;
@@ -191,7 +191,7 @@ export class Register {
             this.formError = err.error?.error || 'Error en el registro';
           }
         } else if (err.status === 0) {
-          this.formError = 'Error de conexión. Verifica tu internet.\nRevisa que el servidor esté en funcionamiento.';
+          this.formError = 'Error de conexión. Revisa que el servidor esté en funcionamiento.';
         } else {
           this.formError = err.error?.error || 'Error del servidor. Intenta más tarde.';
         }

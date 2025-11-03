@@ -43,6 +43,12 @@ export class Profile implements OnInit {
   }
 
   private loadUserProfile(): void {
+    const token = this.userService.getToken();
+    if (!token) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    
     this.userService.validateToken().subscribe({
       next: (userData) => {
         this.username = userData.username;

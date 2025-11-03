@@ -106,7 +106,30 @@ export class Levels implements OnInit {
   }
 
   private loadUserData(): void {
-    this.userService.refreshUserData()
+    const token = this.userService.getToken();
+    
+    if (token) {
+      // Validar y actualizar datos del usuario
+      this.userService.validateToken().subscribe({
+        next: (userData) => {
+          this.isGuest = false;
+          this.username = userData.username;
+          this.totalScore = userData.total_score || 0;
+          this.gamesPlayed = userData.games_played || 0;
+          this.dailyCompleted = userData.daily_completed || false;
+          
+          // Guardar datos actualizados
+          this.userService.saveCurrentUser(userData);
+        },
+        error: (err) => {
+          console.error('Token inválido o expirado:', err);
+          this.userService.logout();
+          this.setGuestMode();
+        }
+      });
+    } else {
+      this.setGuestMode();
+    }
   }
 
   private setGuestMode(): void {

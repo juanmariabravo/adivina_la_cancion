@@ -42,7 +42,7 @@ export class Login implements OnInit {
     // Si ya está autenticado, redirigir a la página de niveles
     const token = this.service.getToken();
     if (token) {
-      this.service.validateToken(token).subscribe({
+      this.service.validateToken().subscribe({
         next: () => {
           this.router.navigate(['/levels']);
         },
@@ -164,7 +164,7 @@ export class Login implements OnInit {
         this.loginForm.reset();
 
         // Guardar datos de la respuesta
-        //this.service.saveCurrentUser(response.user);
+        this.service.saveCurrentUser(response.user);
         this.service.saveToken(response.token_type, response.access_token);
         
         // Redirigir después de 1.5 segundos

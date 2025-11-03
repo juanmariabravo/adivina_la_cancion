@@ -52,7 +52,12 @@ export class UserService {
     return localStorage.getItem('authToken');
   }
 
-  validateToken(token: string) {
+  validateToken() {
+    const token = this.getToken();
+    if (!token) {
+      throw new Error('No token found');
+    }
+
     const headers = { 
       'Content-Type': 'application/json',
       'Authorization': token
@@ -63,19 +68,21 @@ export class UserService {
 
   refreshUserData() {
     const token = this.getToken();
-    if (token) {
-      // Validar token con el backend
-      this.validateToken(token).subscribe({
-        next: (userData) => {
-          
-          // Actualizar datos en localStorage
-          this.saveCurrentUser(userData);
-        },
-        error: (err) => {
-          console.error('Token inválido o expirado:', err);
-          this.logout();
-        }
-      });
+    if (!token) {
+      this.logout();
+      return;
     }
+
+    // Validar token con el backend
+    this.validateToken().subscribe({
+      next: (userData) => {
+        // Actualizar datos en localStorage
+        this.saveCurrentUser(userData);
+      },
+      error: (err) => {
+        console.error('Token inválido o expirado:', err);
+        this.logout();
+      }
+    });
   }
 }

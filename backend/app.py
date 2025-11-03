@@ -83,7 +83,7 @@ def login():
 def get_current_user():
     try:
         auth_header = request.headers.get('Authorization')
-        if not auth_header or not auth_header.startswith('Bearer '):
+        if not auth_header or not auth_header.startswith('bearer '):
             return jsonify({"error": "Token requerido"}), 401
         
         token = auth_header.split(' ')[1]
@@ -126,7 +126,7 @@ def update_score():
             return jsonify({"error": "Error actualizando puntuación"}), 500
             
     except Exception as e:
-        return jsonify({"error": "Error interno del servidor"}), 500
+        return jsonify({"error": "Error interno del servidor "+{e}}), 500
 
 @app.route('/api/v1/ranking', methods=['GET'])
 def get_ranking():
@@ -138,7 +138,7 @@ def get_ranking():
             "ranking": ranking
         })
     except Exception as e:
-        return jsonify({"error": "Error interno del servidor"}), 500
+        return jsonify({"error": "Error interno del servidor "+{e}}), 500
 
 @app.route('/api/v1/health', methods=['GET'])
 def health_check():
