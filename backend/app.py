@@ -86,7 +86,7 @@ def login():
 def get_current_user():
     try:
         auth_header = request.headers.get('Authorization')
-        if not auth_header or not auth_header.startswith('bearer '):
+        if not auth_header or not auth_header.lower().startswith('bearer '):
             return jsonify({"error": "Token requerido"}), 401
         
         token = auth_header.split(' ')[1]
@@ -98,13 +98,13 @@ def get_current_user():
             return jsonify({"error": "Token inválido"}), 401
             
     except Exception as e:
-        return jsonify({"error": {e}}), 500
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/v1/game/score', methods=['POST'])
 def update_score():
     try:
         auth_header = request.headers.get('Authorization')
-        if not auth_header or not auth_header.startswith('Bearer '):
+        if not auth_header or not auth_header.lower().startswith('bearer '):
             return jsonify({"error": "Token requerido"}), 401
         
         token = auth_header.split(' ')[1]
@@ -151,7 +151,7 @@ def health_check():
 def complete_daily():
     try:
         auth_header = request.headers.get('Authorization')
-        if not auth_header or not auth_header.startswith('Bearer '):
+        if not auth_header or not auth_header.lower().startswith('bearer '):
             return jsonify({"error": "Token requerido"}), 401
         
         token = auth_header.split(' ')[1]
@@ -167,6 +167,63 @@ def complete_daily():
             })
         else:
             return jsonify({"error": "Error marcando daily como completado"}), 500
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/v1/auth/update-profile', methods=['PUT'])
+def update_profile():
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.lower().startswith('bearer '):
+            return jsonify({"error": "Token requerido"}), 401
+        
+        token = auth_header.split(' ')[1]
+        user = db.verify_token(token)
+        
+        if not user:
+            return jsonify({"error": "Token inválido"}), 401
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No se enviaron datos"}), 400
+        
+        new_username = data.get('username', '').strip()
+        new_password = data.get('password', '').strip()
+        
+        # Validar username si se proporciona
+        if new_username and len(new_username) < 3:
+            return jsonify({"error": "El username debe tener al menos 3 caracteres"}), 400
+        
+        # Validar contraseña si se proporciona
+        if new_password and len(new_password) < 6:
+            return jsonify({"error": "La contraseña debe tener al menos 6 caracteres"}), 400
+        
+        # Actualizar perfil
+        success, message = db.update_user_profile(user.username, new_username, new_password)
+        
+        if success:
+            # Obtener usuario actualizado (puede tener nuevo username)
+            updated_user = db.get_user_by_username(new_username if new_username else user.username)
+            
+            # Si cambió el username, generar nuevo token
+            new_token = None
+            if new_username:
+                new_token = db.create_token(updated_user)
+            
+            response = {
+                "message": message,
+                "user": updated_user.to_public_dict()
+            }
+            
+            # Incluir nuevo token si se cambió el username
+            if new_token:
+                response["access_token"] = new_token
+                response["token_type"] = "bearer"
+            
+            return jsonify(response)
+        else:
+            return jsonify({"error": message}), 400
             
     except Exception as e:
         return jsonify({"error": str(e)}), 500

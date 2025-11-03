@@ -49,13 +49,19 @@
 
     <!-- Formulario de Edición -->
     <div class="edit-section" *ngIf="isEditing">
+      <div class="info-item" style="margin-bottom: 1rem;">
+        <span class="info-label">📧 Email:</span>
+        <span class="info-value">{{ email }}</span>
+      </div>
+
       <div class="form-group">
-        <label for="editEmail">Nuevo Email (opcional):</label>
+        <label for="editUsername">Nuevo Nombre de Usuario (opcional):</label>
         <input 
-          type="email" 
-          id="editEmail" 
-          [(ngModel)]="editEmail"
-          placeholder="tu@email.com"
+          type="text" 
+          id="editUsername" 
+          [(ngModel)]="editUsername"
+          placeholder="Mínimo 3 caracteres"
+          minlength="3"
         >
       </div>
 

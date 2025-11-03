@@ -21,7 +21,7 @@ export class Profile implements OnInit {
   
   // Estado de edición
   isEditing: boolean = false;
-  editEmail: string = '';
+  editUsername: string = '';
   editPassword: string = '';
   editPasswordConfirm: string = '';
   
@@ -75,7 +75,7 @@ export class Profile implements OnInit {
   toggleEdit(): void {
     this.isEditing = !this.isEditing;
     if (this.isEditing) {
-      this.editEmail = this.email;
+      this.editUsername = this.username;
       this.editPassword = '';
       this.editPasswordConfirm = '';
     }
@@ -88,8 +88,8 @@ export class Profile implements OnInit {
     this.errorMessage = '';
 
     // Validaciones
-    if (this.editEmail && !this.editEmail.includes('@')) {
-      this.errorMessage = 'Email inválido';
+    if (this.editUsername && this.editUsername.length < 3) {
+      this.errorMessage = 'El username debe tener al menos 3 caracteres';
       return;
     }
 
@@ -98,24 +98,51 @@ export class Profile implements OnInit {
       return;
     }
 
-    if (this.editPassword !== this.editPasswordConfirm) {
+    if (this.editPassword && this.editPassword !== this.editPasswordConfirm) {
       this.errorMessage = 'Las contraseñas no coinciden';
       return;
     }
 
-    // TODO: Implementar endpoint de actualización en el backend
-    // Por ahora solo simular éxito
-    this.successMessage = 'Perfil actualizado correctamente';
-    this.isEditing = false;
-    
-    if (this.editEmail) {
-      this.email = this.editEmail;
+    // Verificar si hay cambios
+    const hasUsernameChange = this.editUsername && this.editUsername !== this.username;
+    const hasPasswordChange = this.editPassword && this.editPassword.length > 0;
+
+    if (!hasUsernameChange && !hasPasswordChange) {
+      this.errorMessage = 'No hay cambios para guardar';
+      return;
     }
+
+    // Llamar al backend
+    this.userService.updateProfile(
+      hasUsernameChange ? this.editUsername : undefined,
+      hasPasswordChange ? this.editPassword : undefined
+    ).subscribe({
+      next: (response) => {
+        this.successMessage = response.message || 'Perfil actualizado correctamente';
+        this.isEditing = false;
+        
+        // Si cambió el username, actualizar datos locales
+        if (hasUsernameChange) {
+          this.username = this.editUsername;
+          
+          // Si el backend devuelve un nuevo token, actualizarlo
+          if (response.access_token && response.token_type) {
+            this.userService.saveToken(response.token_type, response.access_token);
+          }
+        }
+        
+        // Actualizar usuario en localStorage
+        this.userService.saveCurrentUser(response.user);
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.error || 'Error al actualizar el perfil';
+      }
+    });
   }
 
   cancelEdit(): void {
     this.isEditing = false;
-    this.editEmail = '';
+    this.editUsername = '';
     this.editPassword = '';
     this.editPasswordConfirm = '';
     this.successMessage = '';

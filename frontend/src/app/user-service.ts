@@ -9,6 +9,7 @@ export class UserService {
   private registerUrl = 'http://localhost:5000/api/v1/auth/register'
   private loginUrl = 'http://localhost:5000/api/v1/auth/login'
   private meUrl = 'http://localhost:5000/api/v1/auth/me'
+  private updateProfileUrl = 'http://localhost:5000/api/v1/auth/update-profile'
 
   constructor(private http: HttpClient) {}
 
@@ -84,5 +85,23 @@ export class UserService {
         this.logout();
       }
     });
+  }
+
+  updateProfile(username?: string, password?: string) {
+    const token = this.getToken();
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const payload: any = {};
+    if (username) payload.username = username;
+    if (password) payload.password = password;
+
+    const headers = { 
+      'Content-Type': 'application/json',
+      'Authorization': token
+    };
+
+    return this.http.put<any>(this.updateProfileUrl, payload, { headers });
   }
 }

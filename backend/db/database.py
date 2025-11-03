@@ -204,6 +204,54 @@ class Database:
             return False
         finally:
             conn.close()
+    
+    def update_user_profile(self, username: str, new_username: str = None, new_password: str = None) -> tuple[bool, str]:
+        """
+        Actualizar username y/o contraseña del usuario.
+        Retorna (éxito, mensaje) para feedback.
+        """
+        conn = self.get_connection()
+        try:
+            # Verificar si el nuevo username ya existe (si se proporciona)
+            if new_username:
+                existing_user = self.get_user_by_username(new_username)
+                if existing_user and existing_user.username != username:
+                    return False, "El nombre de usuario ya está en uso"
+            
+            # Preparar actualización
+            if new_username and new_password:
+                hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                conn.execute('''
+                    UPDATE users 
+                    SET username = ?, hashed_password = ?
+                    WHERE username = ?
+                ''', (new_username, hashed_password, username))
+                message = "Nombre de usuario y contraseña actualizados"
+            elif new_username:
+                conn.execute('''
+                    UPDATE users 
+                    SET username = ?
+                    WHERE username = ?
+                ''', (new_username, username))
+                message = "Nombre de usuario actualizado"
+            elif new_password:
+                hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                conn.execute('''
+                    UPDATE users 
+                    SET hashed_password = ?
+                    WHERE username = ?
+                ''', (hashed_password, username))
+                message = "Contraseña actualizada"
+            else:
+                return False, "No se proporcionaron datos para actualizar"
+            
+            conn.commit()
+            return True, message
+        except Exception as e:
+            print(f"Error actualizando perfil: {e}")
+            return False, f"Error al actualizar el perfil: {str(e)}"
+        finally:
+            conn.close()
 
 # Instancia global de la base de datos
 db = Database()
