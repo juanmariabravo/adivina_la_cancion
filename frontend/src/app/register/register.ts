@@ -177,18 +177,21 @@ export class Register {
         // Redirigir después de 2 segundos
         setTimeout(() => {
           this.router.navigate(['/levels']);
-        }, 15000);
+        }, 2000);
       },
       error: (err) => {
         this.loading = false;
         
         if (err.status === 400) {
-          if (err.error?.error?.includes('username')) {
-            this.usernameError = 'Este nombre de usuario ya está en uso';
-          } else if (err.error?.error?.includes('email')) {
-            this.emailError = 'Este email ya está registrado';
+          const errorMsg = err.error?.error || '';
+          
+          // Detectar si es error de username o email duplicado
+          if (errorMsg.toLowerCase().includes('usuario')) {
+            this.usernameError = errorMsg;
+          } else if (errorMsg.toLowerCase().includes('email')) {
+            this.emailError = errorMsg;
           } else {
-            this.formError = err.error?.error || 'Error en el registro';
+            this.formError = errorMsg || 'Error en el registro';
           }
         } else if (err.status === 0) {
           this.formError = 'Error de conexión. Revisa que el servidor esté en funcionamiento.';

@@ -34,19 +34,22 @@ def register():
         if len(pwd1) < 6:
             return jsonify({"error": "La contraseña debe tener al menos 6 caracteres"}), 400
         
-        # Crear usuario
-        if db.create_user(username, email, pwd1):
+        # Crear usuario con feedback específico
+        success, message = db.create_user(username, email, pwd1)
+        
+        if success:
             user = db.get_user_by_username(username)
             token = db.create_token(user)
             
             return jsonify({
-                "message": "Usuario creado exitosamente",
+                "message": message,
                 "access_token": token,
                 "token_type": "bearer",
                 "user": user.to_public_dict()
             }), 201 # 201 means created
         else:
-            return jsonify({"error": "El username o email ya existen"}), 400
+            # Retornar el mensaje específico de error
+            return jsonify({"error": message}), 400
             
     except Exception as e:
         return jsonify({"error": str(e)}), 500

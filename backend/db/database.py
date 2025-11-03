@@ -60,13 +60,20 @@ class Database:
         finally:
             conn.close()
     
-    def create_user(self, username: str, email: str, password: str) -> bool:
-        """Crear nuevo usuario"""
+    def create_user(self, username: str, email: str, password: str) -> tuple[bool, str]:
+        """
+        Crear nuevo usuario.
+        Retorna (éxito, mensaje) para feedback específico.
+        """
         conn = self.get_connection()
         try:
-            # Verificar si el usuario ya existe
-            if self.get_user_by_username(username) or self.get_user_by_email(email):
-                return False
+            # Verificar si el username ya existe
+            if self.get_user_by_username(username):
+                return False, "El nombre de usuario ya existe"
+            
+            # Verificar si el email ya existe
+            if self.get_user_by_email(email):
+                return False, "El email ya está registrado"
             
             # Hashear contraseña
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -78,10 +85,10 @@ class Database:
             ''', (username, email, hashed_password))
             
             conn.commit()
-            return True
+            return True, "Usuario creado exitosamente"
         except Exception as e:
             print(f"Error creando usuario: {e}")
-            return False
+            return False, f"Error al crear el usuario: {str(e)}"
         finally:
             conn.close()
     
