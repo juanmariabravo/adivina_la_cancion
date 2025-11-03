@@ -39,9 +39,17 @@ export class Login implements OnInit {
   }
 
   ngOnInit(): void {
-    // Si ya está autenticado, redirigir al juego
-    if (this.service.isLoggedIn()) {
-      this.router.navigate(['/game']);
+    // Si ya está autenticado, redirigir a la página de niveles
+    const token = this.service.getToken();
+    if (token) {
+      this.service.validateToken(token).subscribe({
+        next: () => {
+          this.router.navigate(['/levels']);
+        },
+        error: () => {
+          // Token inválido, continuar en login
+        }
+      });
     }
 
     // Validación en tiempo real
@@ -156,7 +164,7 @@ export class Login implements OnInit {
         this.loginForm.reset();
 
         // Guardar datos de la respuesta
-        this.service.saveCurrentUser(response.user);
+        //this.service.saveCurrentUser(response.user);
         this.service.saveToken(response.token_type, response.access_token);
         
         // Redirigir después de 1.5 segundos
@@ -172,7 +180,7 @@ export class Login implements OnInit {
         } else if (error.status === 400) {
           this.formError = error.error?.error || 'Credenciales inválidas.';
         } else if (error.status === 0) {
-          this.formError = 'Error de conexión. Verifica tu internet.';
+          this.formError = 'Error de conexión. Revisa que el servidor esté activo.';
         } else {
           this.formError = error.error?.error || 'Error del servidor. Intenta más tarde.';
         }

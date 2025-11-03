@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 from db.database import db
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)  # Habilitar CORS para Angular
@@ -42,18 +43,13 @@ def register():
                 "message": "Usuario creado exitosamente",
                 "access_token": token,
                 "token_type": "bearer",
-                "user": {
-                    "username": user['username'],
-                    "email": user['email'],
-                    "total_score": user['total_score'],
-                    "games_played": user['games_played']
-                }
+                "user": user.to_public_dict()
             }), 201 # 201 means created
         else:
             return jsonify({"error": "El username o email ya existen"}), 400
             
     except Exception as e:
-        return jsonify({"error": "Error interno del servidor"}), 500
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/v1/auth/login', methods=['POST'])
 def login():
@@ -71,24 +67,17 @@ def login():
         if user:
             token = db.create_token(user)
             
-            
             return jsonify({
                 "message": "Login exitoso",
                 "access_token": token,
                 "token_type": "bearer",
-                "user": {
-                    "username": user['username'],
-                    "email": user['email'],
-                    "total_score": user['total_score'],
-                    "games_played": user['games_played'],
-                    "dailyCompleted": user['daily_completed']
-                }
+                "user": user.to_public_dict()
             })
         else:
             return jsonify({"error": "Credenciales inválidas"}), 401
             
     except Exception as e:
-        return jsonify({"error": "Error interno del servidor"}), 500
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/v1/auth/me', methods=['GET'])
 def get_current_user():
@@ -101,17 +90,12 @@ def get_current_user():
         user = db.verify_token(token)
         
         if user:
-            return jsonify({
-                "username": user['username'],
-                "email": user['email'],
-                "total_score": user['total_score'],
-                "games_played": user['games_played']
-            })
+            return jsonify(user.to_public_dict())
         else:
             return jsonify({"error": "Token inválido"}), 401
             
     except Exception as e:
-        return jsonify({"error": "Error interno del servidor"}), 500
+        return jsonify({"error": {e}}), 500
 
 @app.route('/api/v1/game/score', methods=['POST'])
 def update_score():
@@ -159,6 +143,30 @@ def get_ranking():
 @app.route('/api/v1/health', methods=['GET'])
 def health_check():
     return jsonify({"status": "healthy", "service": "Adivina la Canción API"})
+
+@app.route('/api/v1/game/daily/complete', methods=['POST'])
+def complete_daily():
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({"error": "Token requerido"}), 401
+        
+        token = auth_header.split(' ')[1]
+        user = db.verify_token(token)
+        
+        if not user:
+            return jsonify({"error": "Token inválido"}), 401
+        
+        if db.mark_daily_completed(user.username):
+            return jsonify({
+                "message": "Desafío diario completado",
+                "last_daily_completed": datetime.now().strftime("%d-%m-%Y")
+            })
+        else:
+            return jsonify({"error": "Error marcando daily como completado"}), 500
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     print("🚀 Iniciando Adivina la Canción API...")

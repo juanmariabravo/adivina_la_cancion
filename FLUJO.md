@@ -1,39 +1,59 @@
-# Flujo desde el registro hasta el juego (backend y frontend):
+# Flujo desde el registro/inicio sesión hasta el juego (backend y frontend):
 
 ---
 
-### 1. Registro de usuario (`/api/v1/auth/register`)
+### 1a. Registro de usuario (`/api/v1/auth/register`)
 
 - **Frontend:**  
-  El usuario completa el formulario de registro (username, email, pwd1, pwd2) y envía los datos.
+  - El usuario completa el formulario de registro (username, email, pwd1, pwd2) y envía los datos al backend (POST a `/api/v1/auth/register`).
+  - Se guarda el usuario en localStorage y el token de acceso devuelto por el backend.
+  - Se redirige al usuario a la página de niveles (`/levels`).
 - **Backend:**  
   - Recibe los datos.
   - Valida que los campos sean correctos y que las contraseñas coincidan.
   - Si todo es válido, crea el usuario en la base de datos.
-  - Genera un **token** (por ejemplo, JWT o similar) para ese usuario.
-  - Devuelve al frontend:
-    - `access_token` (el token generado)
-    - `token_type` (usualmente "bearer")
+  - Genera un **token** JWT de tipo "bearer" para que el usuario pueda autenticarse en futuras peticiones.
+  - Responde con:
+    - Token de acceso
     - Datos del usuario (username, email, total_score, games_played)
-    - Mensaje de éxito
+    - Mensaje de éxito (201 Created)
 
 ---
 
-### 2. Almacenamiento del token
-
+### 1b. Inicio de sesión de usuario (`/api/v1/auth/login`)
 - **Frontend:**  
-  - Recibe el token y los datos del usuario.
-  - Guarda el token en el almacenamiento local (localStorage, sessionStorage o en memoria).
-  - Opcional: guarda también los datos del usuario para mostrar en la UI. Hasta ahora se guarda games_played y total_score.
+  (Si al hacer click en "Login" ya hay un `auth_token` en localStorage, se asume que el usuario ya está logueado y se redirige a `/levels` automáticamente).
+  El usuario completa el formulario de login (username/email y password) y envía los datos al backend (POST a `/api/v1/auth/login`).
+  Si las credenciales son correctas, guarda el usuario en localStorage y el token de acceso devuelto por el backend.
+- **Backend:**
+  - Recibe los datos.
+  - Valida las credenciales del usuario.
+  - Si son correctas, genera un **token** JWT de tipo "bearer". Se crea un token nuevo en cada login para mayor seguridad.
+  - Responde con:
+    - Token de acceso
+    - Datos del usuario (username, email, total_score, games_played, daily_completed)
+      - `daily_completed` se calcula comparando `last_daily_completed` (formato "dd-mm-yyyy") con la fecha de hoy
+    - Mensaje de éxito (200 OK)
+- **Frontend:**  
+  - Redirige al usuario a la página de niveles (`/levels`).
 
 ---
 
-### 3. Acceso al juego
-
+### 1c. Inicio como invitado
 - **Frontend:**
-  - Cuando el usuario navega a la sección de juego, el frontend verifica que el token esté presente.
+  - Si el usuario no se registra ni inicia sesión, puede jugar como invitado.
+  - No se guarda ningún dato en localStorage.
+  - No se obtiene ningún token de acceso.
+  - El usuario puede jugar, pero no se guarda su puntuación ni progreso.
+  - Es redirigido directamente a la página de niveles (`/levels`).
+
+---
+
+### 2. Acceso al juego
+- **Frontend:**
+  - Al acceder a la página de niveles (`/levels`), el frontend verifica si hay un token de acceso en localStorage.
   - Si no hay token, se procede a jugar como invitado (sin guardar puntuación).
-  - Si hay token, lo incluye en las peticiones protegidas (por ejemplo, para obtener datos del usuario o actualizar puntuación).
+  - Si hay token, se valida y obtiene los datos del usuario (username, total_score, games_played, daily_completed).
 
 ---
 

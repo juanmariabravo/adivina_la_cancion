@@ -3,7 +3,8 @@ import bcrypt
 import jwt
 import os
 from datetime import datetime, timedelta
-from typing import Optional, Dict
+from typing import Optional
+from models.user import User
 
 # Configuración
 SECRET_KEY = os.getenv("SECRET_KEY", "clave-secreta-desarrollo")
@@ -32,8 +33,8 @@ class Database:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     is_active BOOLEAN DEFAULT TRUE,
                     total_score INTEGER DEFAULT 0,
-                    games_played TEXT DEFAULT '0',
-                    daily_completed BOOLEAN DEFAULT FALSE
+                    games_played INTEGER DEFAULT 0,
+                    last_daily_completed TEXT
                 )
             ''')
             
@@ -84,55 +85,55 @@ class Database:
         finally:
             conn.close()
     
-    def get_user_by_username(self, username: str) -> Optional[Dict]:
+    def get_user_by_username(self, username: str) -> Optional[User]:
         """Obtener usuario por username"""
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT username, email, hashed_password, created_at, is_active, total_score, games_played
+                SELECT username, email, hashed_password, created_at, is_active, total_score, games_played, last_daily_completed
                 FROM users WHERE username = ?
             ''', (username,))
-            user = cursor.fetchone()
-            return dict(user) if user else None
+            row = cursor.fetchone()
+            return User.from_dict(dict(row)) if row else None
         except Exception as e:
             print(f"Error obteniendo usuario: {e}")
             return None
         finally:
             conn.close()
     
-    def get_user_by_email(self, email: str) -> Optional[Dict]:
+    def get_user_by_email(self, email: str) -> Optional[User]:
         """Obtener usuario por email"""
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT username, email, hashed_password, created_at, is_active, total_score, games_played
+                SELECT username, email, hashed_password, created_at, is_active, total_score, games_played, last_daily_completed
                 FROM users WHERE email = ?
             ''', (email,))
-            user = cursor.fetchone()
-            return dict(user) if user else None
+            row = cursor.fetchone()
+            return User.from_dict(dict(row)) if row else None
         except Exception as e:
             print(f"Error obteniendo usuario por email: {e}")
             return None
         finally:
             conn.close()
     
-    def validate_credentials(self, email: str, password: str) -> Optional[Dict]:
+    def validate_credentials(self, email: str, password: str) -> Optional[User]:
         """Validar credenciales de usuario"""
         user = self.get_user_by_email(email)
-        if user and bcrypt.checkpw(password.encode('utf-8'), user['hashed_password'].encode('utf-8')):
+        if user and bcrypt.checkpw(password.encode('utf-8'), user.hashed_password.encode('utf-8')):
             return user
         return None
     
-    def create_token(self, user: Dict) -> str:
+    def create_token(self, user: User) -> str:
         """Crear JWT token"""
         payload = {
-            'sub': user['username'],
-            'email': user['email'],
+            'sub': user.username,
+            'email': user.email,
             'exp': datetime.utcnow() + timedelta(hours=24)
         }
         return jwt.encode(payload, SECRET_KEY, algorithm='HS256')
     
-    def verify_token(self, token: str) -> Optional[Dict]:
+    def verify_token(self, token: str) -> Optional[User]:
         """Verificar JWT token"""
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
@@ -176,6 +177,24 @@ class Database:
         except Exception as e:
             print(f"Error obteniendo ranking: {e}")
             return []
+        finally:
+            conn.close()
+    
+    def mark_daily_completed(self, username: str) -> bool:
+        """Marcar desafío diario como completado hoy"""
+        conn = self.get_connection()
+        try:
+            today = datetime.now().strftime("%d-%m-%Y")
+            conn.execute('''
+                UPDATE users 
+                SET last_daily_completed = ?
+                WHERE username = ?
+            ''', (today, username))
+            conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error marcando daily completado: {e}")
+            return False
         finally:
             conn.close()
 

@@ -111,10 +111,6 @@ export class Register {
     }
   }
 
-  validatePassword(): void {
-    // La validación básica se maneja con las directivas de Angular
-  }
-
   validateConfirmPassword(): void {
     this.confirmPasswordError = '';
     
@@ -157,7 +153,7 @@ export class Register {
     
     // Verificar si el formulario es válido
     if (!this.isFormValid()) {
-      this.formError = 'Por favor, corrige los errores del formulario.';
+      this.formError = 'Por favor, corrije los errores del formulario.';
       return;
     }
 
@@ -175,7 +171,7 @@ export class Register {
         this.pwd2 = '';
 
         // Guardar datos de la respuesta
-        this.service.saveCurrentUser(response.user);
+        //this.service.saveCurrentUser(response.user);
         this.service.saveToken(response.token_type, response.access_token);
         
         // Redirigir después de 2 segundos

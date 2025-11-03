@@ -27,7 +27,7 @@ export class Levels implements OnInit {
   totalScore: number = 0;
   gamesPlayed: number = 0;
   dailyCompleted: boolean = false;
-  timeRemaining: string = '23:45:12';
+  timeRemaining: string = '00:00:00'; // Tiempo restante para que empiece el próximo nivel diario
   isGuest: boolean = false;
 
   levels: Level[] = [
@@ -106,35 +106,34 @@ export class Levels implements OnInit {
   }
 
   private loadUserData(): void {
-    
-    const user = this.userService.getCurrentUser();
-    if (user && this.userService.isLoggedIn()) {
-      this.isGuest = false;
-      this.username = user.username;
-      this.totalScore = user.total_score || 0;
-      this.gamesPlayed = user.games_played || 0;
-      this.dailyCompleted = user?.daily_completed || false;
-    }
-    else
-      this.username = 'Invitado';
-      this.isGuest = true;
-    
+    this.userService.refreshUserData()
+  }
 
+  private setGuestMode(): void {
+    this.username = 'Invitado';
+    this.isGuest = true;
+    this.totalScore = 0;
+    this.gamesPlayed = 0;
+    this.dailyCompleted = false;
   }
 
   private startCountdown(): void {
-    // Simular cuenta regresiva del desafío diario
+    // Tomar la hora actual y restarla a 23:59:59 para obtener la cuenta regresiva
     setInterval(() => {
       const now = new Date();
       const endOfDay = new Date();
       endOfDay.setHours(23, 59, 59, 999);
-      
-      const diff = endOfDay.getTime() - now.getTime();
+
+      let diff = endOfDay.getTime() - now.getTime();
+      if (diff < 0) diff = 0; // evitar valores negativos cuando ya pasó el día
+
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      
-      this.timeRemaining = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      this.timeRemaining = `${hours.toString().padStart(2, '0')}:${minutes
+        .toString()
+        .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }, 1000);
   }
 

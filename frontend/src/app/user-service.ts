@@ -8,6 +8,7 @@ export class UserService {
 
   private registerUrl = 'http://localhost:5000/api/v1/auth/register'
   private loginUrl = 'http://localhost:5000/api/v1/auth/login'
+  private meUrl = 'http://localhost:5000/api/v1/auth/me'
 
   constructor(private http: HttpClient) {}
 
@@ -37,10 +38,6 @@ export class UserService {
     localStorage.setItem('currentUser', JSON.stringify(user));
   }
 
-  isLoggedIn() {
-    return !!localStorage.getItem('authToken'); // !! devuelve true/false según si existe o no el token
-  }
-
   getCurrentUser() {
     const user = localStorage.getItem('currentUser');
     return user ? JSON.parse(user) : null;
@@ -49,5 +46,36 @@ export class UserService {
   logout() {
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('authToken');
+  }
+
+  validateToken(token: string) {
+    const headers = { 
+      'Content-Type': 'application/json',
+      'Authorization': token
+    };
+
+    return this.http.get<any>(this.meUrl, { headers });
+  }
+
+  refreshUserData() {
+    const token = this.getToken();
+    if (token) {
+      // Validar token con el backend
+      this.validateToken(token).subscribe({
+        next: (userData) => {
+          
+          // Actualizar datos en localStorage
+          this.saveCurrentUser(userData);
+        },
+        error: (err) => {
+          console.error('Token inválido o expirado:', err);
+          this.logout();
+        }
+      });
+    }
   }
 }
