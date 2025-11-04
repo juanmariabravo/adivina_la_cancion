@@ -30,64 +30,65 @@ export class Levels implements OnInit {
   timeRemaining: string = '00:00:00'; // Tiempo restante para que empiece el próximo nivel diario
   isGuest: boolean = false;
 
+  // TODO: cargar niveles desde la API
   levels: Level[] = [
     {
       id: 1,
       title: 'Nivel 1 - Principiante',
-      description: 'Canciones populares y fáciles',
+      description: 'Adivina una canción clásica',
       difficulty: 'Fácil',
-      songsCount: 5,
-      completed: true,
-      score: 850,
-      progress: 100
+      songsCount: 1,
+      completed: false,
+      score: 0,
+      progress: 0
     },
     {
       id: 2,
       title: 'Nivel 2 - Intermedio',
-      description: 'Mix de géneros y épocas',
+      description: 'Canción moderna popular',
       difficulty: 'Intermedio',
-      songsCount: 8,
-      completed: true,
-      score: 1200,
-      progress: 100
+      songsCount: 1,
+      completed: false,
+      score: 0,
+      progress: 0
     },
     {
       id: 3,
       title: 'Nivel 3 - Avanzado',
-      description: 'Canciones desafiantes',
+      description: 'Desafío musical',
       difficulty: 'Difícil',
-      songsCount: 10,
+      songsCount: 1,
       completed: false,
       score: 0,
-      progress: 60
+      progress: 0
     },
     {
       id: 4,
       title: 'Nivel 4 - Experto',
       description: 'Solo para conocedores',
       difficulty: 'Experto',
-      songsCount: 12,
+      songsCount: 1,
       completed: false,
       score: 0,
       progress: 0
     },
     {
       id: 5,
-      title: 'Modo Rock',
-      description: 'Solo canciones de rock',
+      title: 'Nivel 5 - Rock',
+      description: 'Un clásico del rock',
       difficulty: 'Intermedio',
-      songsCount: 15,
+      songsCount: 1,
       completed: false,
       score: 0,
-      progress: 20,
+      progress: 0,
       genre: 'Rock'
     },
     {
       id: 6,
-      title: 'Modo Pop',
-      description: 'Los éxitos del pop',
+      title: 'Nivel 6 - Pop',
+      description: 'Éxito reciente del pop',
       difficulty: 'Intermedio',
-      songsCount: 15,
+      songsCount: 1,
       completed: false,
       score: 0,
       progress: 0,
@@ -161,14 +162,12 @@ export class Levels implements OnInit {
   }
 
   startLevel(levelId: number): void {
-    console.log(`Iniciando nivel ${levelId}`);
     this.router.navigate(['/game'], { 
       queryParams: { level: levelId } 
     });
   }
 
   startDailyChallenge(): void {
-    console.log('Iniciando desafío diario');
     this.router.navigate(['/game'], { 
       queryParams: { mode: 'daily' } 
     });

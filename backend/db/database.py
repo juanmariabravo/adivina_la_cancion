@@ -257,18 +257,31 @@ class Database:
     
     def init_songs_data(self):
         """Inicializar datos de canciones (simulación en memoria)"""
+        # Cada nivel tiene UNA canción asociada
         self.songs = [
             Song(1, "Bohemian Rhapsody", "Queen", "A Night at the Opera", 1975, "Rock", 
-        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", 
-        "https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Bohemian_Rhapsody.png/220px-Bohemian_Rhapsody.png", 1),
-
-    Song(2, "Blinding Lights", "The Weeknd", "After Hours", 2020, "Pop", 
-        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", 
-        "https://cdn-images.dzcdn.net/images/cover/cf22674710be326f668dfb27d5af9576/1900x1900-000000-81-0-0.jpg", 2),
-
-    Song(3, "Bad Guy", "Billie Eilish", "When We All Fall Asleep, Where Do We Go?", 2019, "Pop", 
-        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", 
-        "https://cdn-images.dzcdn.net/images/cover/6630083f454d48eadb6a9b53f035d734/500x500.jpg", 3),
+                 "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", 
+                 "https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Bohemian_Rhapsody.png/220px-Bohemian_Rhapsody.png", 1),
+            
+            Song(2, "Blinding Lights", "The Weeknd", "After Hours", 2020, "Pop", 
+                 "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", 
+                 "https://cdn-images.dzcdn.net/images/cover/cf22674710be326f668dfb27d5af9576/1900x1900-000000-81-0-0.jpg", 2),
+            
+            Song(3, "Bad Guy", "Billie Eilish", "When We All Fall Asleep, Where Do We Go?", 2019, "Pop", 
+                 "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", 
+                 "https://cdn-images.dzcdn.net/images/cover/6630083f454d48eadb6a9b53f035d734/500x500.jpg", 3),
+            
+            Song(4, "Stairway to Heaven", "Led Zeppelin", "Led Zeppelin IV", 1971, "Rock", 
+                 "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3", 
+                 "https://upload.wikimedia.org/wikipedia/en/2/26/Led_Zeppelin_-_Led_Zeppelin_IV.jpg", 4),
+            
+            Song(5, "Smells Like Teen Spirit", "Nirvana", "Nevermind", 1991, "Rock", 
+                 "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3", 
+                 "https://upload.wikimedia.org/wikipedia/en/b/b7/NirvanaNevermindalbumcover.jpg", 5),
+            
+            Song(6, "Shape of You", "Ed Sheeran", "÷ (Divide)", 2017, "Pop", 
+                 "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3", 
+                 "https://upload.wikimedia.org/wikipedia/en/b/b4/Shape_Of_You_%28Official_Single_Cover%29_by_Ed_Sheeran.png", 6),
         ]
     
     def get_song_by_id(self, song_id: int) -> Optional[Song]:
@@ -278,10 +291,12 @@ class Database:
                 return song
         return None
     
-    def get_songs_by_level(self, level_id: int) -> list:
-        """Obtener canciones de un nivel"""
-        return [song for song in self.songs if song.level_id == level_id]
-    
+    def get_song_by_level(self, level_id: int) -> Optional[Song]:
+        """Obtener LA canción de un nivel (una sola canción por nivel)"""
+        for song in self.songs:
+            if song.level_id == level_id:
+                return song
+        return None
 
 # Instancia global de la base de datos
 db = Database()

@@ -1,14 +1,17 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+import game
 from db.database import db
 from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)  # Habilitar CORS para Angular
 
-# Configuración
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "clave-secreta-desarrollo")
+# Configuración desde variables de entorno
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "clave-secreta-desarrollo-fallback")
+DEBUG_MODE = os.getenv("DEBUG", "False").lower() == "true"
+PORT = int(os.getenv("PORT", 5000))
 
 @app.route('/api/v1/auth/register', methods=['POST'])
 def register():
@@ -228,8 +231,103 @@ def update_profile():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/v1/levels/<int:level_id>/song', methods=['GET'])
+def get_level_song(level_id):
+    """Obtener LA canción de un nivel (una sola canción por nivel)"""
+    try:
+        song = db.get_song_by_level(level_id)
+        if not song:
+            return jsonify({"error": "No hay canción para este nivel"}), 404
+        
+        return jsonify({
+            "song": song.to_dict(include_answer=False)
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/v1/game/validate', methods=['POST'])
+def validate_answer():
+    """Validar respuesta del usuario"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'song_id' not in data or 'answer' not in data:
+            return jsonify({"error": "Faltan campos"}), 400
+        
+        song_id = data['song_id']
+        answer = data['answer']
+        
+        # Obtener canción
+        song = db.get_song_by_id(song_id)
+        if not song:
+            return jsonify({"error": "Canción no encontrada"}), 404
+        
+        # Validar respuesta
+        is_correct = game.validate_answer(song_id, answer)
+        
+        # Siempre devolver la respuesta si es correcta o si el usuario pide revelarla
+        if is_correct or answer.upper() == 'REVEAL_ANSWER':
+            return jsonify({
+                "correct": is_correct,
+                "answer": song.to_dict(include_answer=True)
+            })
+        else:
+            return jsonify({
+                "correct": False,
+                "answer": None
+            })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/v1/game/song/<int:song_id>/reveal', methods=['GET'])
+def reveal_song(song_id):
+    """Revelar la respuesta correcta de una canción"""
+    try:
+        song = db.get_song_by_id(song_id)
+        if not song:
+            return jsonify({"error": "Canción no encontrada"}), 404
+        
+        return jsonify(song.to_dict(include_answer=True))
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/v1/game/submit-score', methods=['POST'])
+def submit_score():
+    """Enviar puntuación (requiere autenticación)"""
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.lower().startswith('bearer '):
+            # Invitado - no guardar puntuación
+            return jsonify({"message": "Puntuación no guardada (invitado)"}), 200
+        
+        token = auth_header.split(' ')[1]
+        user = db.verify_token(token)
+        
+        if not user:
+            return jsonify({"error": "Token inválido"}), 401
+        
+        data = request.get_json()
+        if not data or 'score' not in data:
+            return jsonify({"error": "Puntuación requerida"}), 400
+        
+        score = data['score']
+        
+        if db.update_user_score(user.username, score):
+            updated_user = db.get_user_by_username(user.username)
+            return jsonify({
+                "message": "Puntuación guardada",
+                "total_score": updated_user.total_score,
+                "games_played": updated_user.games_played
+            })
+        else:
+            return jsonify({"error": "Error guardando puntuación"}), 500
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
     print("🚀 Iniciando Adivina la Canción API...")
     print("📊 Base de datos: SQLite")
-    print("🌐 Servidor: http://localhost:5000")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    print(f"🌐 Servidor: http://localhost:{PORT}")
+    print(f"🔧 Modo debug: {DEBUG_MODE}")
+    app.run(debug=DEBUG_MODE, host='0.0.0.0', port=PORT)
