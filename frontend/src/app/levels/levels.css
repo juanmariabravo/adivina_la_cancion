@@ -409,6 +409,51 @@ body {
   display: block;
 }
 
+/* Spotify Warning */
+.spotify-warning {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  background: rgba(29, 185, 84, 0.1);
+  border: 2px solid #1DB954;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.warning-content h2 {
+  margin-bottom: 1rem;
+  color: #1DB954;
+}
+
+.connect-spotify-btn {
+  background: #1DB954;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 2rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 1rem;
+}
+
+.connect-spotify-btn:hover {
+  background: #1ed760;
+  transform: scale(1.05);
+}
+
+.level-card.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .levels-content {

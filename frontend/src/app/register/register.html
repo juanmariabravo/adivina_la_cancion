@@ -61,7 +61,10 @@
 
                 <!-- Email -->
                 <div class="form-group">
-                    <label for="email">Correo electrónico</label>
+                    <label for="email">
+                      Email *
+                      <span class="email-hint">📧 Usa tu email de Spotify</span>
+                    </label>
                     <div class="input-container" [class.error]="emailInvalid">
                         <input 
                             type="email" 
@@ -79,6 +82,9 @@
                     <div class="error-message" *ngIf="emailInvalid">
                         <span *ngIf="emailInput.errors?.['required']">El email es requerido</span>
                         <span *ngIf="emailError">{{ emailError }}</span>
+                    </div>
+                    <div class="info-message">
+                      ℹ️ Debes usar el mismo email que tu cuenta de Spotify para jugar
                     </div>
                 </div>
 

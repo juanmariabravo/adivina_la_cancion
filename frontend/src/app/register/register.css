@@ -343,6 +343,24 @@ body {
   font-weight: 500;
 }
 
+/* Mensajes informativos */
+.email-hint {
+  font-size: 0.85rem;
+  color: #1DB954;
+  font-weight: normal;
+  margin-left: 0.5rem;
+}
+
+.info-message {
+  font-size: 0.85rem;
+  color: #4caf50;
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  background: rgba(76, 175, 80, 0.1);
+  border-left: 3px solid #4caf50;
+  border-radius: 0.25rem;
+}
+
 /* Botón de envío (estilo similar a .btn) */
 .submit-button {
   background: var(--spotify-green);

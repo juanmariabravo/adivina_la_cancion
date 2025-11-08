@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { UserService } from '../user-service';
+import { UserService } from '../../services/user-service';
+import { SpotifyService } from '../../services/spotify.service';
 
 interface Level {
   id: number;
@@ -29,6 +30,8 @@ export class Levels implements OnInit {
   dailyCompleted: boolean = false;
   timeRemaining: string = '00:00:00'; // Tiempo restante para que empiece el próximo nivel diario
   isGuest: boolean = false;
+  spotifyRequired: boolean = true;
+  showSpotifyWarning: boolean = false;
 
   // TODO: cargar niveles desde la API
   levels: Level[] = [
@@ -97,12 +100,14 @@ export class Levels implements OnInit {
   ];
 
   constructor(
-    private userService: UserService,
-    private router: Router
+    public userService: UserService,
+    private router: Router,
+    private spotifyService: SpotifyService
   ) {}
 
   ngOnInit(): void {
     this.loadUserData();
+    this.checkSpotifyConnection();
     this.startCountdown();
   }
 
@@ -161,16 +166,40 @@ export class Levels implements OnInit {
     }, 1000);
   }
 
+  private checkSpotifyConnection(): void {
+    if (this.isGuest) {
+      // Los invitados NO necesitan Spotify
+      this.showSpotifyWarning = false;
+      return;
+    }
+
+    // Usuarios autenticados SÍ necesitan Spotify
+    const isConnected = this.spotifyService.isSpotifyConnected();
+    this.showSpotifyWarning = !isConnected;
+  }
+
   startLevel(levelId: number): void {
+    // Invitados solo pueden jugar niveles 1-10 (canciones locales)
+    if (this.isGuest && levelId > 10) {
+      alert('⚠️ Los invitados solo pueden jugar los primeros 10 niveles. Regístrate para acceder a todos los niveles.');
+      this.router.navigate(['/register']);
+      return;
+    }
+
+    // Usuarios autenticados DEBEN tener Spotify conectado
+    if (!this.isGuest && !this.spotifyService.isSpotifyConnected()) {
+      alert('⚠️ Debes conectar tu cuenta de Spotify para jugar. Usa el mismo email que tu cuenta de Spotify.');
+      this.router.navigate(['/profile']);
+      return;
+    }
+
     this.router.navigate(['/game'], { 
       queryParams: { level: levelId } 
     });
   }
 
   startDailyChallenge(): void {
-    this.router.navigate(['/game'], { 
-      queryParams: { mode: 'daily' } 
-    });
+    this.startLevel(0); // Nivel diario tiene ID 0
   }
 
   goToProfile(): void {

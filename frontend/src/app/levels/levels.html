@@ -85,6 +85,25 @@
         <!-- Levels Grid -->
         <section class="levels-section">
             <h2 class="section-title">Niveles Disponibles</h2>
+
+            <!-- Aviso de Spotify requerido -->
+            <div class="spotify-warning" *ngIf="showSpotifyWarning && !isGuest">
+                <div class="warning-content">
+                    <h2>🎵 Conexión con Spotify Requerida</h2>
+                    <p><strong>Importante:</strong> Debes usar el <u>mismo email</u> que tu cuenta de Spotify</p>
+                    <p>Tu email registrado: <strong>{{ userService.getCurrentUser()?.email }}</strong></p>
+                    <button class="connect-spotify-btn" routerLink="/profile">
+                        Conectar con Spotify
+                    </button>
+                </div>
+            </div>
+
+            <!-- Niveles limitados para invitados -->
+            <div class="guest-info" *ngIf="isGuest">
+                <p>🎮 Modo Invitado: Puedes jugar los primeros 10 niveles</p>
+                <p>🎵 <a routerLink="/register">Regístrate con tu email de Spotify</a> para acceder a todos los niveles</p>
+            </div>
+
             <div class="levels-grid">
                 <!-- Level 1 -->
                 <div class="level-card" [class.completed]="levels[0].completed" (click)="startLevel(1)">
