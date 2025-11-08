@@ -5,6 +5,7 @@ import { Register } from './register/register';
 import { Levels } from './levels/levels';
 import { Profile } from './profile/profile';
 import { Game } from './game/game';
+import { Callback } from './callback/callback';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -12,5 +13,6 @@ export const routes: Routes = [
   { path: 'register', component: Register },
   { path: 'levels', component: Levels },
   { path: 'profile', component: Profile },
-  { path: 'game', component: Game }
+  { path: 'game', component: Game },
+  { path: 'callback', component: Callback }
 ];

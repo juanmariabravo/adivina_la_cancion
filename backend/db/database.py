@@ -2,14 +2,19 @@ import sqlite3
 import bcrypt
 import jwt
 import os
+import time
 from datetime import datetime, timedelta
 from typing import Optional
 from models.user import User
 from models.song import Song
+from dotenv import load_dotenv
+
+# Cargar variables de entorno
+load_dotenv()
 
 # Configuración
-SECRET_KEY = os.getenv("SECRET_KEY", "clave-secreta-desarrollo")
-DATABASE_PATH = os.getenv("DATABASE_PATH", "adivina_la_cancion.db")
+SECRET_KEY = os.getenv("SECRET_KEY")
+DATABASE_PATH = os.getenv("DATABASE_PATH")
 
 class Database:
     def __init__(self):
@@ -36,7 +41,10 @@ class Database:
                     is_active BOOLEAN DEFAULT TRUE,
                     total_score INTEGER DEFAULT 0,
                     games_played INTEGER DEFAULT 0,
-                    last_daily_completed TEXT
+                    last_daily_completed TEXT,
+                    spotify_access_token TEXT,
+                    spotify_refresh_token TEXT,
+                    spotify_token_expires_at INTEGER
                 )
             ''')
             
@@ -297,6 +305,71 @@ class Database:
             if song.level_id == level_id:
                 return song
         return None
+    
+    def save_spotify_tokens(self, username: str, access_token: str, refresh_token: str, expires_in: int) -> bool:
+        """Guardar tokens de Spotify del usuario"""
+        conn = self.get_connection()
+        try:
+            expires_at = int(time.time()) + expires_in
+            conn.execute('''
+                UPDATE users 
+                SET spotify_access_token = ?,
+                    spotify_refresh_token = ?,
+                    spotify_token_expires_at = ?
+                WHERE username = ?
+            ''', (access_token, refresh_token, expires_at, username))
+            conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error guardando tokens de Spotify: {e}")
+            return False
+        finally:
+            conn.close()
+    
+    def has_valid_spotify_token(self, username: str) -> bool:
+        """Verificar si el usuario tiene token de Spotify válido"""
+        conn = self.get_connection()
+        try:
+            cursor = conn.execute('''
+                SELECT spotify_access_token, spotify_token_expires_at
+                FROM users 
+                WHERE username = ?
+            ''', (username,))
+            row = cursor.fetchone()
+            
+            if not row or not row['spotify_access_token']:
+                return False
+            
+            # Verificar si el token ha expirado
+            expires_at = row['spotify_token_expires_at']
+            current_time = int(time.time())
+            
+            return current_time < expires_at
+        except Exception as e:
+            print(f"Error verificando token de Spotify: {e}")
+            return False
+        finally:
+            conn.close()
+    
+    def get_spotify_tokens(self, username: str) -> tuple:
+        """Obtener tokens de Spotify del usuario"""
+        conn = self.get_connection()
+        try:
+            cursor = conn.execute('''
+                SELECT spotify_access_token, spotify_refresh_token
+                FROM users 
+                WHERE username = ?
+            ''', (username,))
+            row = cursor.fetchone()
+            
+            if row:
+                return row['spotify_access_token'], row['spotify_refresh_token']
+            return None, None
+        except Exception as e:
+            print(f"Error obteniendo tokens de Spotify: {e}")
+            return None, None
+        finally:
+            conn.close()
 
 # Instancia global de la base de datos
 db = Database()

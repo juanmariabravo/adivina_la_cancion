@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { UserService } from '../user-service';
+import { UserService } from '../../services/user-service';
+import { SpotifyService } from '../../services/spotify.service';
 
 @Component({
   selector: 'app-profile',
@@ -33,13 +34,17 @@ export class Profile implements OnInit {
   averageScore: number = 0;
   rank: number = 0;
   
+  isSpotifyConnected: boolean = false;
+
   constructor(
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private spotifyService: SpotifyService
   ) {}
 
   ngOnInit(): void {
     this.loadUserProfile();
+    this.isSpotifyConnected = this.spotifyService.isSpotifyConnected();
   }
 
   private loadUserProfile(): void {
@@ -160,5 +165,29 @@ export class Profile implements OnInit {
   logout(): void {
     this.userService.logout();
     this.router.navigate(['/']);
+  }
+
+  connectSpotify(): void {
+    if (!this.email) {
+      this.errorMessage = 'Debes iniciar sesión para conectar con Spotify';
+      return;
+    }
+
+    this.spotifyService.getClientId(this.email).subscribe({
+      next: (response) => {
+        // Redirigir directamente sin guardar clientId
+        this.spotifyService.redirectToSpotifyAuth(response.clientId);
+      },
+      error: (err) => {
+        this.errorMessage = 'Error al conectar con Spotify';
+        console.error(err);
+      }
+    });
+  }
+
+  disconnectSpotify(): void {
+    this.spotifyService.disconnectSpotify();
+    this.isSpotifyConnected = false;
+    this.successMessage = 'Desconectado de Spotify';
   }
 }

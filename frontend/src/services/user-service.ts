@@ -6,10 +6,10 @@ import { HttpClient } from '@angular/common/http';
 })
 export class UserService {
 
-  private registerUrl = 'http://localhost:5000/api/v1/auth/register'
-  private loginUrl = 'http://localhost:5000/api/v1/auth/login'
-  private meUrl = 'http://localhost:5000/api/v1/auth/me'
-  private updateProfileUrl = 'http://localhost:5000/api/v1/auth/update-profile'
+  private registerUrl = 'http://127.0.0.1:5000/api/v1/auth/register'
+  private loginUrl = 'http://127.0.0.1:5000/api/v1/auth/login'
+  private meUrl = 'http://127.0.0.1:5000/api/v1/auth/me'
+  private updateProfileUrl = 'http://127.0.0.1:5000/api/v1/auth/update-profile'
 
   constructor(private http: HttpClient) {}
 
@@ -32,25 +32,25 @@ export class UserService {
 
   saveToken(type: string, access_token: string) {
     const token = `${type} ${access_token}`;
-    localStorage.setItem('authToken', token);
+    sessionStorage.setItem('authToken', token);
   }
 
   saveCurrentUser(user: string) {
-    localStorage.setItem('currentUser', JSON.stringify(user));
+    sessionStorage.setItem('currentUser', JSON.stringify(user));
   }
 
   getCurrentUser() {
-    const user = localStorage.getItem('currentUser');
+    const user = sessionStorage.getItem('currentUser');
     return user ? JSON.parse(user) : null;
   }
 
   logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('currentUser');
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('currentUser');
   }
 
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    return sessionStorage.getItem('authToken');
   }
 
   validateToken() {
@@ -77,7 +77,7 @@ export class UserService {
     // Validar token con el backend
     this.validateToken().subscribe({
       next: (userData) => {
-        // Actualizar datos en localStorage
+        // Actualizar datos en sessionStorage
         this.saveCurrentUser(userData);
       },
       error: (err) => {
