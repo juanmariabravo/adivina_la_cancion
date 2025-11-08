@@ -45,8 +45,8 @@ export class UserService {
   }
 
   logout() {
-    sessionStorage.removeItem('authToken');
-    sessionStorage.removeItem('currentUser');
+    // remove everything from sessionStorage
+    sessionStorage.clear();
   }
 
   getToken(): string | null {

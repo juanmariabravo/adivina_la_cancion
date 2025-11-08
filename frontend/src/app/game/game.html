@@ -6,6 +6,12 @@
   </div>
 
   <div class="game-content" *ngIf="currentSong && !gameOver">
+    <!-- Error de audio -->
+    <div class="audio-error" *ngIf="audioError">
+      ⚠️ {{ audioError }}
+      <button class="retry-btn" (click)="startAudioManually()">Reintentar</button>
+    </div>
+
     <!-- Imagen con reveal progresivo -->
     <div class="image-container">
       <img [src]="currentSong.image_url" [class]="'reveal-' + imageQuarters" alt="Album cover">
@@ -14,20 +20,27 @@
     <!-- Pistas textuales -->
     <div class="hints-container">
       <div class="hint" *ngIf="revealedHints.includes('year')">
-        📅 Año: {{ currentSong.hints.year }}
+        📅 Año: {{ currentSong.year }}
       </div>
       <div class="hint" *ngIf="revealedHints.includes('genre')">
-        🎸 Género: {{ currentSong.hints.genre }}
+        🎸 Género: {{ currentSong.genre }}
       </div>
       <div class="hint" *ngIf="revealedHints.includes('album')">
-        💿 Álbum: {{ currentSong.hints.album }}
+        💿 Álbum: {{ currentSong.album }}
       </div>
-      <div class="hint" *ngIf="revealedHints.includes('artist')">
-        🎤 Artista: {{ currentSong.hints.artist }}
+      <div class="hint" *ngIf="revealedHints.includes('artists')">
+        🎤 Artista: {{ currentSong.artists }}
       </div>
       <div class="hint" *ngIf="revealedHints.includes('title_hint')">
-        📝 Título empieza con: {{ currentSong.hints.title_hint }}...
+        📝 El título empieza con: {{ currentSong.title_hint }}...
       </div>
+    </div>
+      
+    <!-- Botón para iniciar audio (primera vez) -->
+    <div class="audio-start" *ngIf="audioReady">
+      <button class="play-audio-btn" (click)="startAudioManually()">
+        ▶ Reproducir Canción
+      </button>
     </div>
 
     <!-- Input respuesta -->
@@ -64,8 +77,8 @@
       <h2>{{ isCorrect ? '🎉 ¡Correcto!' : '❌ Game Over' }}</h2>
       <div class="song-info" *ngIf="showAnswer && currentSong">
         <p><strong>Canción:</strong> {{ currentSong.title }}</p>
-        <p><strong>Artista:</strong> {{ currentSong.artist }}</p>
-        <p><strong>Álbum:</strong> {{ currentSong.hints.album }}</p>
+        <p><strong>Artista:</strong> {{ currentSong.artists }}</p>
+        <p><strong>Álbum:</strong> {{ currentSong.album }}</p>
       </div>
       <p class="score" *ngIf="isCorrect">Puntuación: {{ score }}</p>
       <div class="result-actions">

@@ -9,10 +9,20 @@ from game_service import GameService
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Habilitar CORS para Angular
+
+# Configurar CORS de manera más explícita
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:4200", "http://127.0.0.1:4200"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "expose_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
 
 # Configuración desde variables de entorno
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "clave-secreta-desarrollo-fallback")
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 DEBUG_MODE = os.getenv("DEBUG", "False").lower() == "true"
 PORT = int(os.getenv("PORT", 5000))
 
@@ -83,10 +93,21 @@ def get_spotify_authorization_token():
     return jsonify(payload), status
 
 
-@app.route('/api/v1/levels/<int:level_id>/song', methods=['GET'])
+@app.route('/api/v1/songs/<level_id>', methods=['GET'])
 def get_level_song(level_id):
     payload, status = game_service.get_level_song(level_id, request.headers.get('Authorization'))
     return jsonify(payload), status
+
+
+@app.route('/api/v1/game/validate', methods=['POST'])
+def validate_answer():
+    lev = request.get_json().get('level_id')
+    ans = request.get_json().get('answer')
+    if game_service.validate_answer(lev, ans):
+        return jsonify({"correct": True}), 200
+    else:
+        return jsonify({"correct": False}), 200
+
 
 
 if __name__ == '__main__':

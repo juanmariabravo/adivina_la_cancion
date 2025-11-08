@@ -180,10 +180,23 @@ export class Levels implements OnInit {
 
   startLevel(levelId: number): void {
     // Invitados solo pueden jugar niveles 1-10 (canciones locales)
-    if (this.isGuest && levelId > 10) {
-      alert('⚠️ Los invitados solo pueden jugar los primeros 10 niveles. Regístrate para acceder a todos los niveles.');
-      this.router.navigate(['/register']);
+    if (this.isGuest) {
+      // go to game with levelId levelId + '_local'
+      this.router.navigate(['/game'], { 
+        queryParams: { level: levelId + '_local' } 
+      });
       return;
+    }
+    else if (!this.isGuest && !this.spotifyService.isSpotifyConnected()) {
+      alert('⚠️ Debes conectar tu cuenta de Spotify para jugar. Usa el mismo email que tu cuenta de Spotify.');
+      this.router.navigate(['/profile']);
+      return;
+    }
+    else {
+      // go to game with levelId levelId
+      this.router.navigate(['/game'], { 
+        queryParams: { level: levelId } 
+      });
     }
 
     // Usuarios autenticados DEBEN tener Spotify conectado

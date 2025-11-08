@@ -3,23 +3,23 @@ class Song:
     
     def __init__(
         self,
-        id: int,
+        id: str,
         title: str,
-        artist: str,
+        artists: str,
         album: str,
         year: int,
         genre: str,
-        audio_url: str,
+        audio: str,
         image_url: str,
         level_id: int
     ):
         self.id = id
         self.title = title
-        self.artist = artist
+        self.artists = artists
         self.album = album
         self.year = year
         self.genre = genre
-        self.audio_url = audio_url
+        self.audio = audio
         self.image_url = image_url
         self.level_id = level_id
     
@@ -27,20 +27,20 @@ class Song:
         """Convertir canción a diccionario"""
         song_dict = {
             'id': self.id,
-            'audio_url': self.audio_url,
+            'audio': self.audio,
             'image_url': self.image_url,
             'hints': {
                 'year': self.year,
                 'genre': self.genre,
                 'album': self.album,
-                'artist': self.artist,
+                'artists': self.artists,
                 'title_hint': self.title[:len(self.title)//2]  # Primera mitad del título
             }
         }
         
         if include_answer:
             song_dict['title'] = self.title
-            song_dict['artist'] = self.artist
+            song_dict['artists'] = self.artist
         
         return song_dict
     
@@ -50,11 +50,11 @@ class Song:
         return Song(
             id=data.get('id'),
             title=data.get('title'),
-            artist=data.get('artist'),
+            artists=data.get('artists'),
             album=data.get('album'),
             year=data.get('year'),
             genre=data.get('genre'),
-            audio_url=data.get('audio_url'),
+            audio=data.get('audio'),
             image_url=data.get('image_url'),
             level_id=data.get('level_id')
         )

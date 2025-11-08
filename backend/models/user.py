@@ -13,7 +13,10 @@ class User:
         is_active: bool = True,
         total_score: int = 0,
         games_played: int = 0,
-        last_daily_completed: Optional[str] = None
+        last_daily_completed: Optional[str] = None,
+        spotify_access_token: Optional[str] = None,
+        spotify_refresh_token: Optional[str] = None,
+        spotify_token_expires_at: Optional[int] = None
     ):
         self.username = username
         self.email = email
@@ -23,6 +26,9 @@ class User:
         self.total_score = total_score
         self.games_played = games_played
         self.last_daily_completed = last_daily_completed  # formato: "dd-mm-yyyy"
+        self.spotify_access_token = spotify_access_token
+        self.spotify_refresh_token = spotify_refresh_token
+        self.spotify_token_expires_at = spotify_token_expires_at
     
     def to_public_dict(self) -> dict:
         """Convertir a diccionario público (sin datos sensibles)"""
@@ -65,7 +71,10 @@ class User:
             is_active=data.get('is_active', True),
             total_score=data.get('total_score', 0),
             games_played=data.get('games_played', 0),
-            last_daily_completed=data.get('last_daily_completed')
+            last_daily_completed=data.get('last_daily_completed'),
+            spotify_access_token=data.get('spotify_access_token'),
+            spotify_refresh_token=data.get('spotify_refresh_token'),
+            spotify_token_expires_at=data.get('spotify_token_expires_at')
         )
     
     def __repr__(self) -> str:

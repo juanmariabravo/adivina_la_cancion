@@ -2,8 +2,7 @@ import os
 import base64
 import requests
 from dotenv import load_dotenv
-from db.database import db
-from datetime import datetime
+from database import db
 
 load_dotenv()
 
@@ -205,11 +204,18 @@ class UserService:
 							"registered_email": _get_email(user)
 						}, 403
 
+				# Guardar tokens en la base de datos
+				access_token = token_data.get('access_token')
+				refresh_token = token_data.get('refresh_token')
+				expires_in = token_data.get('expires_in', 3600)
+				
+				db.save_spotify_tokens(_get_username(user), access_token, refresh_token, expires_in)
+
 				spoti_token = {
-					'access_token': token_data.get('access_token'),
+					'access_token': access_token,
 					'token_type': token_data.get('token_type'),
-					'expires_in': token_data.get('expires_in'),
-					'refresh_token': token_data.get('refresh_token'),
+					'expires_in': expires_in,
+					'refresh_token': refresh_token,
 					'scope': token_data.get('scope')
 				}
 
