@@ -126,6 +126,41 @@
     </div>
   </div>
 
+  <!-- Spotify Connection Status -->
+  <div class="spotify-status" *ngIf="!isEditing">
+    <div class="status-header">
+      <h3>🎵 Estado de Spotify</h3>
+      <span 
+        class="status-badge" 
+        [class.connected]="isSpotifyConnected"
+        [class.disconnected]="!isSpotifyConnected"
+      >
+        {{ isSpotifyConnected ? '✅ Conectado' : '❌ No conectado' }}
+      </span>
+    </div>
+    
+    <p *ngIf="!isSpotifyConnected" class="warning-text">
+      ⚠️ Debes conectar Spotify para poder jugar
+    </p>
+    
+    <button 
+      *ngIf="!isSpotifyConnected" 
+      class="spotify-connect-btn"
+      (click)="connectSpotify()"
+    >
+      <span class="spotify-icon">🎵</span>
+      Conectar con Spotify
+    </button>
+    
+    <button 
+      *ngIf="isSpotifyConnected" 
+      class="spotify-disconnect-btn"
+      (click)="disconnectSpotify()"
+    >
+      Desconectar Spotify
+    </button>
+  </div>
+
   <!-- Acciones -->
   <div class="actions-section">
     <button class="action-button" (click)="goToLevels()">
