@@ -1,7 +1,7 @@
 <div class="game-container">
   <div class="game-header">
     <button class="back-button" (click)="goToLevels()">← Volver</button>
-    <h1>Nivel {{ levelId }}</h1>
+    <h1>Nivel {{ level_number }}</h1>
     <div class="attempts">Intento {{ currentAttempt }}/{{ maxAttempts }}</div>
   </div>
 
@@ -20,42 +20,60 @@
     <!-- Pistas textuales -->
     <div class="hints-container">
       <div class="hint" *ngIf="revealedHints.includes('year')">
-        📅 Año: {{ currentSong.year }}
+        Año: {{ currentSong.year }}
       </div>
       <div class="hint" *ngIf="revealedHints.includes('genre')">
-        🎸 Género: {{ currentSong.genre }}
+        Género: {{ currentSong.genre }}
       </div>
       <div class="hint" *ngIf="revealedHints.includes('album')">
-        💿 Álbum: {{ currentSong.album }}
+        Álbum: {{ currentSong.album }}
       </div>
-      <div class="hint" *ngIf="revealedHints.includes('artists')">
-        🎤 Artista: {{ currentSong.artists }}
+      <div class="hint" *ngIf="revealedHints.includes('artist')">
+        Artista/s: {{ currentSong.artists }}
       </div>
       <div class="hint" *ngIf="revealedHints.includes('title_hint')">
-        📝 El título empieza con: {{ currentSong.title_hint }}...
+        El título empieza con: {{ currentSong.title_hint }}...
       </div>
     </div>
-      
-    <!-- Botón para iniciar audio (primera vez) -->
-    <div class="audio-start" *ngIf="audioReady">
+
+      <!-- Botón para iniciar el juego -->
+    <div class="audio-start" *ngIf="audioReady && !gameStarted">
       <button class="play-audio-btn" (click)="startAudioManually()">
-        ▶ Reproducir Canción
+        ▶ Comenzar
       </button>
     </div>
 
-    <!-- Input respuesta -->
-    <div class="answer-section">
+    <!-- Controles de audio (solo cuando el juego ha comenzado) -->
+    <div class="audio-controls" *ngIf="gameStarted && !gameOver">
+      <button 
+        class="replay-audio-btn" 
+        (click)="replayAudio()"
+        [disabled]="!canReplayAudio"
+        [class.disabled]="!canReplayAudio"
+      >
+        🔁
+      </button>
+    </div>
+
+    <!-- Input respuesta (deshabilitado hasta que comience) -->
       <input 
         type="text" 
         [(ngModel)]="userAnswer" 
         placeholder="¿Cuál es el título de la canción?"
         (keyup.enter)="submitAnswer()"
       >
-      <button class="submit-btn" (click)="submitAnswer()">Responder</button>
+      <button 
+        class="submit-btn" 
+        (click)="submitAnswer()"
+        [disabled]="!gameStarted || gameOver"
+      >
+        Responder
+      </button>
       <button 
         class="hint-btn" 
         (click)="nextHint()" 
         *ngIf="currentAttempt < maxAttempts"
+        [disabled]="!gameStarted || gameOver"
       >
         Siguiente Pista
       </button>
@@ -66,24 +84,35 @@
       >
         Me rindo
       </button>
-    </div>
 
     <div class="message" *ngIf="message">{{ message }}</div>
   </div>
 
   <!-- Pantalla de resultado -->
   <div class="result-screen" *ngIf="gameOver">
-    <div class="result-content" [class.correct]="isCorrect">
-      <h2>{{ isCorrect ? '🎉 ¡Correcto!' : '❌ Game Over' }}</h2>
-      <div class="song-info" *ngIf="showAnswer && currentSong">
-        <p><strong>Canción:</strong> {{ currentSong.title }}</p>
-        <p><strong>Artista:</strong> {{ currentSong.artists }}</p>
-        <p><strong>Álbum:</strong> {{ currentSong.album }}</p>
+    <div class="result-card" [class.correct]="isCorrect" [class.incorrect]="!isCorrect">
+      <h2>{{ isCorrect ? '¡Correcto!' : 'Fin del Juego' }}</h2>
+      <p class="result-message">{{ message }}</p>
+      
+      <div class="song-reveal" *ngIf="showAnswer">
+        <img [src]="currentSong!.image_url" alt="Portada" class="reveal-image">
+        <h3>{{ currentSong!.title }}</h3>
+        <p>{{ currentSong!.artists }}</p>
+        <p class="album">{{ currentSong!.album }} ({{ currentSong!.year }})</p>
       </div>
-      <p class="score" *ngIf="isCorrect">Puntuación: {{ score }}</p>
+
+      <div class="score-display" *ngIf="isCorrect">
+        <h3>Puntuación: {{ score }} puntos</h3>
+        <p>Intentos: {{ currentAttempt }}/{{ maxAttempts }}</p>
+      </div>
+
       <div class="result-actions">
-        <button (click)="playAgain()">Jugar de nuevo</button>
-        <button (click)="goToLevels()">Volver a niveles</button>
+        <button class="action-btn primary" (click)="playAgain()">
+          Jugar de Nuevo
+        </button>
+        <button class="action-btn secondary" (click)="goToLevels()">
+          Volver a Niveles
+        </button>
       </div>
     </div>
   </div>
