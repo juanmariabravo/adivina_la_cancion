@@ -52,9 +52,6 @@
                         <span class="input-icon">👤</span>
                     </div>
                     <div class="error-message" *ngIf="usernameInvalid">
-                        <span *ngIf="usernameInput.errors?.['required']">El nombre de usuario es requerido</span>
-                        <span *ngIf="usernameInput.errors?.['minlength']">Mínimo 3 caracteres</span>
-                        <span *ngIf="usernameInput.errors?.['maxlength']">Máximo 20 caracteres</span>
                         <span *ngIf="usernameError">{{ usernameError }}</span>
                     </div>
                 </div>

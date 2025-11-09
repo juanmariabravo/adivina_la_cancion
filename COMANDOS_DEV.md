@@ -6,8 +6,10 @@ deactivate
 
 ## Instalar sqlite browser
 sudo apt install sqlitebrowser
-### abrir IU
-sqlitebrowser
+### abrir IU de la base de datos
+sqlitebrowser adivina_la_cancion.db
 
-## Base de datos sqlite
-
+## Levantar el servidor backend
+(venv) [~/Multimedia/adivina_la_cancion/backend] $ python3 app.py
+## Levantar el servidor frontend
+[~/Multimedia/adivina_la_cancion/frontend] $ ng serve --host 127.0.0.1
