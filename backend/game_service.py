@@ -122,7 +122,7 @@ class GameService:
                         "album": song['album'],
                         "year": song['year'],
                         "genre": song['genre'],
-                        "audio": song['audio'],
+                        "audio": song['audio_codificado'],
                         "image_url": song['image_url']
                     },
                     "source": "local"
