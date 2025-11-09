@@ -31,11 +31,6 @@ export class GameService {
     });
   }
 
-  // Revelar respuesta correcta
-  revealSong(songId: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/game/song/${songId}/reveal`);
-  }
-
   // Enviar puntuación (solo usuarios autenticados)
   submitScore(score: number, authToken: string): Observable<any> {
     const headers = {
