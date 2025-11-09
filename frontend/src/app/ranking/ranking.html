@@ -1,0 +1,112 @@
+<div class="ranking-container">
+  <!-- Header -->
+  <div class="ranking-header">
+    <button class="back-button" routerLink="/levels">
+      <span>←</span> Volver a Niveles
+    </button>
+    <h1 class="ranking-title">🏆 Ranking Global</h1>
+    <p class="ranking-subtitle">Los mejores jugadores de Adivina la Canción</p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando ranking...</p>
+  </div>
+
+  <!-- Ranking Table -->
+  <div class="ranking-content" *ngIf="!loading">
+    <div class="podium" *ngIf="ranking.length >= 3">
+      <!-- 2do lugar -->
+      <div class="podium-place second">
+        <div class="medal">🥈</div>
+        <div class="player-avatar silver">{{ ranking[1]?.username?.charAt(0).toUpperCase() }}</div>
+        <div class="player-name">{{ ranking[1]?.username }}</div>
+        <div class="player-score">{{ ranking[1]?.total_score }} pts</div>
+        <div class="player-games">{{ ranking[1]?.games_played }} partidas</div>
+      </div>
+
+      <!-- 1er lugar -->
+      <div class="podium-place first">
+        <div class="crown">👑</div>
+        <div class="medal">🥇</div>
+        <div class="player-avatar gold">{{ ranking[0]?.username?.charAt(0).toUpperCase() }}</div>
+        <div class="player-name">{{ ranking[0]?.username }}</div>
+        <div class="player-score">{{ ranking[0]?.total_score }} pts</div>
+        <div class="player-games">{{ ranking[0]?.games_played }} partidas</div>
+      </div>
+
+      <!-- 3er lugar -->
+      <div class="podium-place third">
+        <div class="medal">🥉</div>
+        <div class="player-avatar bronze">{{ ranking[2]?.username?.charAt(0).toUpperCase() }}</div>
+        <div class="player-name">{{ ranking[2]?.username }}</div>
+        <div class="player-score">{{ ranking[2]?.total_score }} pts</div>
+        <div class="player-games">{{ ranking[2]?.games_played }} partidas</div>
+      </div>
+    </div>
+
+    <!-- Resto del ranking -->
+    <div class="ranking-list">
+      <h2 class="list-title">Top 10 Jugadores</h2>
+      <div class="ranking-table">
+        <div class="table-header">
+          <div class="col-rank">#</div>
+          <div class="col-player">Jugador</div>
+          <div class="col-score">Puntuación</div>
+          <div class="col-games">Partidas</div>
+          <div class="col-avg">Promedio</div>
+        </div>
+
+        <div 
+          class="table-row" 
+          *ngFor="let player of ranking; let i = index"
+          [class.top-3]="i < 3"
+          [class.highlight]="false"
+        >
+          <div class="col-rank">
+            <span class="rank-number" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+              {{ i + 1 }}
+            </span>
+          </div>
+          <div class="col-player">
+            <div class="player-info">
+              <div class="player-avatar-small" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                {{ player.username.charAt(0).toUpperCase() }}
+              </div>
+              <span class="player-username">{{ player.username }}</span>
+            </div>
+          </div>
+          <div class="col-score">
+            <span class="score-value">{{ player.total_score }}</span>
+            <span class="score-label">pts</span>
+          </div>
+          <div class="col-games">
+            <span class="games-value">{{ player.games_played }}</span>
+          </div>
+          <div class="col-avg">
+            <span class="avg-value">{{ player.games_played > 0 ? (player.total_score / player.games_played).toFixed(1) : '0' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="ranking.length === 0">
+      <div class="empty-icon">🎵</div>
+      <h3>No hay jugadores en el ranking</h3>
+      <p>¡Sé el primero en aparecer aquí!</p>
+      <button class="play-button" routerLink="/levels">Jugar Ahora</button>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="ranking-actions">
+    <button class="action-button" routerLink="/levels">
+      🎮 Jugar
+    </button>
+    <button class="action-button" routerLink="/profile">
+      👤 Mi Perfil
+    </button>
+  </div>
+</div>
