@@ -9,11 +9,8 @@ interface Level {
   title: string;
   description: string;
   difficulty: string;
-  songsCount: number;
   completed: boolean;
   score: number;
-  progress: number;
-  genre?: string;
 }
 
 @Component({
@@ -33,71 +30,20 @@ export class Levels implements OnInit {
   spotifyRequired: boolean = true;
   showSpotifyWarning: boolean = false;
 
-  // TODO: cargar niveles desde la API
-  levels: Level[] = [
-    {
-      id: 1,
-      title: 'Nivel 1 - Principiante',
-      description: 'Adivina una canción clásica',
-      difficulty: 'Fácil',
-      songsCount: 1,
+  // Generar 30 niveles dinámicamente
+  levels: Level[] = Array.from({ length: 30 }, (_, i) => {
+    const levelNum = i + 1;
+    const difficulties = ['Fácil', 'Intermedio', 'Difícil', 'Experto'];
+    
+    return {
+      id: levelNum,
+      title: `NIVEL ${levelNum}`,
+      description: '', // Descripción vacía, no se mostrará
+      difficulty: difficulties[Math.floor((levelNum - 1) / 7.5)],
       completed: false,
-      score: 0,
-      progress: 0
-    },
-    {
-      id: 2,
-      title: 'Nivel 2 - Intermedio',
-      description: 'Canción moderna popular',
-      difficulty: 'Intermedio',
-      songsCount: 1,
-      completed: false,
-      score: 0,
-      progress: 0
-    },
-    {
-      id: 3,
-      title: 'Nivel 3 - Avanzado',
-      description: 'Desafío musical',
-      difficulty: 'Difícil',
-      songsCount: 1,
-      completed: false,
-      score: 0,
-      progress: 0
-    },
-    {
-      id: 4,
-      title: 'Nivel 4 - Experto',
-      description: 'Solo para conocedores',
-      difficulty: 'Experto',
-      songsCount: 1,
-      completed: false,
-      score: 0,
-      progress: 0
-    },
-    {
-      id: 5,
-      title: 'Nivel 5 - Rock',
-      description: 'Un clásico del rock',
-      difficulty: 'Intermedio',
-      songsCount: 1,
-      completed: false,
-      score: 0,
-      progress: 0,
-      genre: 'Rock'
-    },
-    {
-      id: 6,
-      title: 'Nivel 6 - Pop',
-      description: 'Éxito reciente del pop',
-      difficulty: 'Intermedio',
-      songsCount: 1,
-      completed: false,
-      score: 0,
-      progress: 0,
-      genre: 'Pop'
-    }
-  ];
+      score: 0
+    };
+  });
 
   constructor(
     public userService: UserService,
