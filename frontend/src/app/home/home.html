@@ -16,11 +16,15 @@
             <p class="hero-description">Inicia sesión para jugar con tus propias playlists de Spotify</p>
             
             <div class="hero-buttons">
-                <!-- Deja este para invitado (ajusta si quieres otra ruta) -->
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='/levels'">Jugar como Invitado</button>
-                <!-- Botón con onclick para ir a login -->
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='/login'">Iniciar Sesión</button>
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='/register'">Registrarse</button>
+                <button type="button" class="btn btn-secondary" (click)="playAsGuest()">
+                    Jugar como Invitado
+                </button>
+                <button type="button" class="btn btn-secondary" (click)="goToLogin()">
+                    Iniciar Sesión
+                </button>
+                <button type="button" class="btn btn-secondary" (click)="goToRegister()">
+                    Registrarse
+                </button>
             </div>
         </div>
     </section>

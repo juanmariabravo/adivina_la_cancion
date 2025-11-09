@@ -86,6 +86,7 @@ export class Levels implements OnInit {
 
   private setGuestMode(): void {
     this.username = 'Invitado';
+    // deshabilitar botón de perfil
     this.isGuest = true;
     this.totalScore = 0;
     this.gamesPlayed = 0;
@@ -162,7 +163,15 @@ export class Levels implements OnInit {
   }
 
   goToProfile(): void {
+    if (this.isGuest) {
+      // No hacer nada si es invitado
+      return;
+    }
     this.router.navigate(['/profile']);
+  }
+
+  goToLogin(): void {
+    this.router.navigate(['/login']);
   }
 
   goToRanking(): void {
