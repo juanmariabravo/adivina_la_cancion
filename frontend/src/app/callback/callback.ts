@@ -108,8 +108,7 @@ export class Callback implements OnInit {
             setTimeout(() => this.router.navigate(['/levels']), 1000);
           },
           error: (err) => {
-            console.error('Error intercambiando código:', err);
-            this.errorMessage = 'Error al conectar con Spotify';
+            this.errorMessage = 'Error al conectar con Spotify. ' + err.error.error;
             setTimeout(() => this.router.navigate(['/levels']), 3000);
           }
         });
