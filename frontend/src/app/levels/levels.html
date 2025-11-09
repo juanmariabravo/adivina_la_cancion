@@ -70,7 +70,7 @@
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">⏰</span>
-                        <span class="detail-text">Disponible por {{timeRemaining}}</span>
+                        <span class="detail-text">Quedan {{timeRemaining.split(':')[0]}}h {{timeRemaining.split(':')[1]}}m {{timeRemaining.split(':')[2]}}s para el nuevo nivel diario</span>
                     </div>
                 </div>
                 <div class="daily-action">
@@ -98,197 +98,45 @@
                 </div>
             </div>
 
-            <!-- Niveles limitados para invitados -->
-            <div class="guest-info" *ngIf="isGuest">
-                <p>🎮 Modo Invitado: Puedes jugar los primeros 10 niveles</p>
-                <p>🎵 <a routerLink="/register">Regístrate con tu email de Spotify</a> para acceder a todos los niveles</p>
-            </div>
+            <!-- Grid dinámico de niveles -->
+            <div class="levels-grid-modern">
+                <div 
+                    *ngFor="let level of levels; let i = index" 
+                    class="level-card-modern"
+                    [class.completed]="level.completed"
+                    [class.locked]="isGuest && i >= 10"
+                    (click)="startLevel(level.id)"
+                >
+                    <!-- Badge de nivel -->
+                    <div class="level-number">{{ level.id }}</div>
+                    
+                    <!-- Estado -->
+                    <div class="level-status">
+                        <span *ngIf="level.completed" class="status-completed">✅</span>
+                        <span *ngIf="isGuest && i >= 10" class="status-locked">🔒</span>
+                    </div>
 
-            <div class="levels-grid">
-                <!-- Level 1 -->
-                <div class="level-card" [class.completed]="levels[0].completed" (click)="startLevel(1)">
-                    <div class="level-header">
-                        <div class="level-icon">🎵</div>
-                        <div class="level-info">
-                            <h3 class="level-title">Nivel 1 - Principiante</h3>
-                            <p class="level-description">Canciones populares y fáciles</p>
+                    <!-- Contenido -->
+                    <div class="level-content">
+                        <h3 class="level-name">{{ level.title }}</h3>
+                        <p class="level-desc">{{ level.description }}</p>
+                        
+                        <!-- Dificultad -->
+                        <div class="difficulty-badge" [attr.data-difficulty]="level.difficulty.toLowerCase()">
+                            {{ level.difficulty }}
                         </div>
-                        <div class="level-score" *ngIf="levels[0].completed">
-                            <span class="score-icon">⭐</span>
-                            <span class="score-value">{{levels[0].score}}</span>
-                        </div>
-                    </div>
-                    <div class="level-details">
-                        <div class="detail-item">
-                            <span class="detail-icon">🎯</span>
-                            <span class="detail-text">5 canciones</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">⚡</span>
-                            <span class="detail-text">Fácil</span>
-                        </div>
-                    </div>
-                    <div class="level-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" [style.width.%]="levels[0].progress"></div>
-                        </div>
-                        <span class="progress-text">{{levels[0].progress}}% completado</span>
-                    </div>
-                </div>
 
-                <!-- Level 2 -->
-                <div class="level-card" [class.completed]="levels[1].completed" (click)="startLevel(2)">
-                    <div class="level-header">
-                        <div class="level-icon">🎶</div>
-                        <div class="level-info">
-                            <h3 class="level-title">Nivel 2 - Intermedio</h3>
-                            <p class="level-description">Mix de géneros y épocas</p>
-                        </div>
-                        <div class="level-score" *ngIf="levels[1].completed">
-                            <span class="score-icon">⭐</span>
-                            <span class="score-value">{{levels[1].score}}</span>
+                        <!-- Puntuación (si está completado) -->
+                        <div class="level-score-display" *ngIf="level.completed">
+                            <span class="score-label">Puntuación:</span>
+                            <span class="score-number">{{ level.score }}</span>
                         </div>
                     </div>
-                    <div class="level-details">
-                        <div class="detail-item">
-                            <span class="detail-icon">🎯</span>
-                            <span class="detail-text">8 canciones</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">⚡</span>
-                            <span class="detail-text">Intermedio</span>
-                        </div>
-                    </div>
-                    <div class="level-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" [style.width.%]="levels[1].progress"></div>
-                        </div>
-                        <span class="progress-text">{{levels[1].progress}}% completado</span>
-                    </div>
-                </div>
 
-                <!-- Level 3 -->
-                <div class="level-card" [class.completed]="levels[2].completed" (click)="startLevel(3)">
-                    <div class="level-header">
-                        <div class="level-icon">🔥</div>
-                        <div class="level-info">
-                            <h3 class="level-title">Nivel 3 - Avanzado</h3>
-                            <p class="level-description">Canciones desafiantes</p>
-                        </div>
-                        <div class="level-score" *ngIf="levels[2].completed">
-                            <span class="score-icon">⭐</span>
-                            <span class="score-value">{{levels[2].score}}</span>
-                        </div>
-                    </div>
-                    <div class="level-details">
-                        <div class="detail-item">
-                            <span class="detail-icon">🎯</span>
-                            <span class="detail-text">10 canciones</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">⚡</span>
-                            <span class="detail-text">Difícil</span>
-                        </div>
-                    </div>
-                    <div class="level-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" [style.width.%]="levels[2].progress"></div>
-                        </div>
-                        <span class="progress-text">{{levels[2].progress}}% completado</span>
-                    </div>
-                </div>
-
-                <!-- Level 4 -->
-                <div class="level-card" [class.completed]="levels[3].completed" (click)="startLevel(4)">
-                    <div class="level-header">
-                        <div class="level-icon">🎸</div>
-                        <div class="level-info">
-                            <h3 class="level-title">Nivel 4 - Experto</h3>
-                            <p class="level-description">Solo para conocedores</p>
-                        </div>
-                        <div class="level-score" *ngIf="levels[3].completed">
-                            <span class="score-icon">⭐</span>
-                            <span class="score-value">{{levels[3].score}}</span>
-                        </div>
-                    </div>
-                    <div class="level-details">
-                        <div class="detail-item">
-                            <span class="detail-icon">🎯</span>
-                            <span class="detail-text">12 canciones</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">⚡</span>
-                            <span class="detail-text">Experto</span>
-                        </div>
-                    </div>
-                    <div class="level-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" [style.width.%]="levels[3].progress"></div>
-                        </div>
-                        <span class="progress-text">{{levels[3].progress}}% completado</span>
-                    </div>
-                </div>
-
-                <!-- Level 5 - Rock -->
-                <div class="level-card" [class.completed]="levels[4].completed" (click)="startLevel(5)">
-                    <div class="level-header">
-                        <div class="level-icon">🤘</div>
-                        <div class="level-info">
-                            <h3 class="level-title">Modo Rock</h3>
-                            <p class="level-description">Solo canciones de rock</p>
-                        </div>
-                        <div class="level-score" *ngIf="levels[4].completed">
-                            <span class="score-icon">⭐</span>
-                            <span class="score-value">{{levels[4].score}}</span>
-                        </div>
-                    </div>
-                    <div class="level-details">
-                        <div class="detail-item">
-                            <span class="detail-icon">🎯</span>
-                            <span class="detail-text">15 canciones</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">🎸</span>
-                            <span class="detail-text">Género: Rock</span>
-                        </div>
-                    </div>
-                    <div class="level-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" [style.width.%]="levels[4].progress"></div>
-                        </div>
-                        <span class="progress-text">{{levels[4].progress}}% completado</span>
-                    </div>
-                </div>
-
-                <!-- Level 6 - Pop -->
-                <div class="level-card" [class.completed]="levels[5].completed" (click)="startLevel(6)">
-                    <div class="level-header">
-                        <div class="level-icon">🎤</div>
-                        <div class="level-info">
-                            <h3 class="level-title">Modo Pop</h3>
-                            <p class="level-description">Los éxitos del pop</p>
-                        </div>
-                        <div class="level-score" *ngIf="levels[5].completed">
-                            <span class="score-icon">⭐</span>
-                            <span class="score-value">{{levels[5].score}}</span>
-                        </div>
-                    </div>
-                    <div class="level-details">
-                        <div class="detail-item">
-                            <span class="detail-icon">🎯</span>
-                            <span class="detail-text">15 canciones</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">🌟</span>
-                            <span class="detail-text">Género: Pop</span>
-                        </div>
-                    </div>
-                    <div class="level-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" [style.width.%]="levels[5].progress"></div>
-                        </div>
-                        <span class="progress-text">{{levels[5].progress}}% completado</span>
-                    </div>
+                    <!-- Botón de jugar -->
+                    <button class="play-level-btn" *ngIf="!isGuest || i < 10">
+                        <span class="play-icon">▶</span>
+                    </button>
                 </div>
             </div>
         </section>

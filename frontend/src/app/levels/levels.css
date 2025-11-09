@@ -195,18 +195,36 @@ body {
 }
 
 .daily-card {
-  background: var(--gradient-primary);
+  background: rgba(26, 26, 26, 0.8);
+  border: 2px solid #ff8a00;
+  border-radius: 1rem;
   padding: 2rem;
-  border-radius: var(--border-radius);
-  border: 2px solid var(--spotify-green);
   cursor: pointer;
-  transition: var(--transition);
-  box-shadow: var(--shadow-strong);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.daily-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 138, 0, 0.1) 0%, rgba(229, 46, 113, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.daily-card:hover::before {
+  opacity: 1;
 }
 
 .daily-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(29, 185, 84, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(255, 138, 0, 0.4);
+  border-color: #e67a00;
 }
 
 .daily-header {
@@ -228,24 +246,27 @@ body {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
+  color: white;
 }
 
 .daily-description {
-  color: var(--spotify-light-gray);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .daily-badge {
-  background: var(--spotify-green);
-  color: var(--spotify-black);
+  background: rgba(255, 138, 0, 0.2);
+  color: #ff8a00;
   padding: 0.5rem 1rem;
   border-radius: 2rem;
-  font-weight: 700;
-  font-size: 0.8rem;
+  font-weight: bold;
+  font-size: 0.9rem;
+  border: 1px solid #ff8a00;
 }
 
 .daily-badge.completed {
-  background: var(--spotify-light-gray);
-  color: var(--spotify-black);
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  border-color: #4caf50;
 }
 
 .daily-details {
@@ -266,7 +287,7 @@ body {
 }
 
 .detail-text {
-  color: var(--spotify-light-gray);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .daily-action {
@@ -409,26 +430,340 @@ body {
   display: block;
 }
 
-/* Spotify Warning */
-.spotify-warning {
-  max-width: 800px;
-  margin: 0 auto 2rem;
-  background: rgba(29, 185, 84, 0.1);
-  border: 2px solid #1DB954;
-  border-radius: 1rem;
-  padding: 2rem;
-  text-align: center;
-  animation: pulse 2s infinite;
+/* Modern Levels Grid */
+.levels-grid-modern {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem 0;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+.level-card-modern {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(255, 138, 0, 0.3);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.level-card-modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 138, 0, 0.1) 0%, rgba(229, 46, 113, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.level-card-modern:hover::before {
+  opacity: 1;
+}
+
+.level-card-modern:hover:not(.locked) {
+  transform: translateY(-8px) scale(1.02);
+  border-color: #ff8a00;
+  box-shadow: 0 8px 30px rgba(255, 138, 0, 0.4);
+}
+
+.level-card-modern.completed {
+  background: rgba(200, 255, 200, 0.95);
+  border-color: #4caf50;
+}
+
+.level-card-modern.completed:hover {
+  border-color: #1db954;
+  box-shadow: 0 8px 30px rgba(76, 175, 80, 0.4);
+}
+
+.level-card-modern.locked {
+  background: rgba(240, 240, 240, 0.95);
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+  pointer-events: none;
+}
+
+.level-card-modern.locked::before {
+  display: none;
+}
+
+/* Level Number Badge */
+.level-number {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #ff8a00 0%, #e52e71 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 138, 0, 0.4);
+  z-index: 2;
+}
+
+.level-card-modern.completed .level-number {
+  background: linear-gradient(135deg, #4caf50 0%, #1db954 100%);
+}
+
+.level-card-modern.locked .level-number {
+  background: linear-gradient(135deg, #888 0%, #666 100%);
+}
+
+/* Status Badge */
+.level-status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 1.5rem;
+  z-index: 2;
+}
+
+.status-completed {
+  animation: bounce 0.6s ease-in-out;
+}
+
+.status-locked {
+  opacity: 0.6;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Content */
+.level-content {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.level-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0 0 0.5rem;
+  color: #1a1a1a;
+}
+
+.level-desc {
+  display: none; /* Ocultar descripción repetitiva */
+}
+
+.level-card-modern.locked .level-name {
+  color: rgba(26, 26, 26, 0.4);
+}
+
+/* Difficulty Badge */
+.difficulty-badge {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.difficulty-badge[data-difficulty="fácil"] {
+  background: #4caf50;
+}
+
+.difficulty-badge[data-difficulty="intermedio"] {
+  background: #ff9800;
+}
+
+.difficulty-badge[data-difficulty="difícil"] {
+  background: #f44336;
+}
+
+.difficulty-badge[data-difficulty="experto"] {
+  background: #9c27b0;
+}
+
+/* Score Display */
+.level-score-display {
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(255, 138, 0, 0.1);
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.score-label {
+  font-size: 0.75rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.score-number {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ff8a00;
+}
+
+/* Play Button */
+.play-level-btn {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ff8a00 0%, #e52e71 100%);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(255, 138, 0, 0.3);
+  opacity: 0;
+}
+
+.level-card-modern:hover:not(.locked) .play-level-btn {
+  opacity: 1;
+  bottom: -15px;
+}
+
+.play-icon {
+  color: white;
+  font-size: 1rem;
+  margin-left: 2px;
+}
+
+.play-level-btn:hover {
+  transform: translateX(-50%) scale(1.1);
+  box-shadow: 0 6px 20px rgba(255, 138, 0, 0.4);
+}
+
+/* Daily Challenge - Similar Style */
+.daily-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #ff8a00;
+  border-radius: 1rem;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.daily-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 138, 0, 0.1) 0%, rgba(229, 46, 113, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.daily-card:hover::before {
+  opacity: 1;
+}
+
+.daily-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(255, 138, 0, 0.4);
+  border-color: #e67a00;
+}
+
+.daily-title {
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.daily-description {
+  color: #333;
+}
+
+.detail-text {
+  color: #333;
+}
+
+.daily-badge {
+  background: rgba(255, 138, 0, 0.2);
+  color: #ff8a00;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-weight: bold;
+  font-size: 0.9rem;
+  border: 1px solid #ff8a00;
+}
+
+.daily-badge.completed {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  border-color: #4caf50;
+}
+
+.play-button.daily-play {
+  background: linear-gradient(135deg, #ff8a00 0%, #e52e71 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.play-button.daily-play:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 138, 0, 0.4);
+}
+
+/* Spotify Warning */
+.spotify-warning {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #ff8a00;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .warning-content h2 {
-  margin-bottom: 1rem;
-  color: #1DB954;
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  color: #1a1a1a;
+}
+
+.warning-content p {
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.warning-content strong {
+  color: #ff8a00;
 }
 
 .connect-spotify-btn {
@@ -437,24 +772,41 @@ body {
   border: none;
   padding: 1rem 2rem;
   border-radius: 2rem;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s;
   margin-top: 1rem;
+  transition: all 0.3s;
 }
 
 .connect-spotify-btn:hover {
   background: #1ed760;
-  transform: scale(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4);
 }
 
-.level-card.disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
+/* Welcome Section */
+.welcome-title,
+.welcome-subtitle,
+.stat-label,
+.stat-value {
+  color: white;
 }
 
-/* Responsive Design */
+.section-title {
+  color: white;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .levels-grid-modern {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
 @media (max-width: 768px) {
   .levels-content {
     padding: 1rem;
@@ -502,6 +854,25 @@ body {
     flex-direction: column;
     gap: 0.5rem;
   }
+
+  .levels-grid-modern {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .level-number {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .level-name {
+    font-size: 1rem;
+  }
+
+  .level-desc {
+    font-size: 0.75rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -535,5 +906,14 @@ body {
     flex-direction: column;
     text-align: center;
     gap: 0.5rem;
+  }
+
+  .levels-grid-modern {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .level-card-modern {
+    padding: 1rem;
   }
 }
