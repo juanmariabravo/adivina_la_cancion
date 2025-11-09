@@ -26,6 +26,8 @@ interface Song {
 })
 export class Game implements OnInit, OnDestroy {
   levelId: string = '1_local';
+  isGuest: boolean = false;
+  level_number: number = 1;
   currentSong: Song | null = null;
   currentAttempt: number = 1;
   maxAttempts: number = 6;
@@ -38,7 +40,7 @@ export class Game implements OnInit, OnDestroy {
   
   // Pistas reveladas
   revealedHints: string[] = [];
-  audioSeconds: number = 3;
+  audioSeconds: number = 1;
   imageQuarters: number = 1;
   primeras_letras: string = '';
   // Audio
@@ -49,6 +51,8 @@ export class Game implements OnInit, OnDestroy {
   score: number = 0;
   audioReady: boolean = false;
   audioError: string = '';
+  gameStarted: boolean = false; // Nuevo: controlar si el juego ha comenzado
+  canReplayAudio: boolean = false; // Nuevo: permitir repetir audio
   
   private apiUrl = 'http://127.0.0.1:5000/api/v1';
 
@@ -62,6 +66,10 @@ export class Game implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.levelId = params['level'] || '1_local';
+      if (this.levelId.includes('_local')) {
+        this.isGuest = true;
+        this.level_number = parseInt(this.levelId.split('_')[0], 10);
+      }
       this.loadSong();
     });
   }
@@ -111,52 +119,58 @@ export class Game implements OnInit, OnDestroy {
       return;
     }
     
+    this.gameStarted = true; // Habilitar botones
+    this.audioReady = false; // Ocultar botón de comenzar
     this.playAudio();
-    this.audioReady = false; // Ocultar botón de play después del primer clic
+  }
+
+  replayAudio(): void {
+    if (!this.gameStarted || this.gameOver) {
+      return;
+    }
+    this.playAudio();
   }
 
   private playAudio(): void {
     if (!this.currentSong) return;
     
+    this.canReplayAudio = false; // Deshabilitar durante reproducción
+    
     if (this.audio) {
       this.audio.pause();
-      this.audio.currentTime = 0;
+      this.audio.currentTime = 0; // Empezar de cero en siguientes intentos
     }
-    
-    this.audio = new Audio(this.currentSong.audio);
-    
-    // Manejar errores de reproducción
-    this.audio.addEventListener('error', (e) => {
-      console.error('Error reproduciendo audio:', e);
-      this.audioError = 'Error al reproducir el audio. Intenta de nuevo.';
-    });
-    
-    // Intentar reproducir
-    const playPromise = this.audio.play();
-    
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          console.log('Audio reproduciéndose correctamente');
-          this.audioError = '';
+
+    // Si es audio codificado en Base64, comprobar formato
+    const audioSource = this.currentSong.audio;
+    if (audioSource.startsWith('data:audio/')) {
+      const parts = audioSource.split(',');
+      if (parts.length !== 2) {
+        console.error('Data URI inválida: debe tener formato data:audio/mp3;base64,{data}');
+        this.audioError = 'Formato de audio inválido';
+        return;
+      }
+    }
+
+    this.audio = new Audio(audioSource);
+    this.audio.play();
           
-          // Parar después de X segundos
-          setTimeout(() => {
-            if (this.audio) {
-              this.audio.pause();
-              this.audio.currentTime = 0;
-            }
-          }, this.audioSeconds * 1000);
-        })
-        .catch((error) => {
-          console.error('Error al reproducir audio:', error);
-          this.audioError = 'Haz clic en "▶ Reproducir" para escuchar la canción';
-          this.audioReady = true; // Mostrar botón de nuevo
-        });
-    }
+    // Parar después de audioSeconds segundos
+    setTimeout(() => {
+      if (this.audio) {
+        this.audio.pause();
+        this.audio.currentTime = 0;
+      }
+      this.canReplayAudio = true; // Habilitar botón de repetir
+    }, this.audioSeconds * 1000);
   }
 
   submitAnswer(): void {
+    if (!this.gameStarted) {
+      this.message = 'Primero debes comenzar el juego';
+      return;
+    }
+    
     if (!this.userAnswer.trim() || !this.currentSong) {
       this.message = 'Introduce una respuesta';
       return;
@@ -171,6 +185,7 @@ export class Game implements OnInit, OnDestroy {
           this.currentSong = { ...this.currentSong!, ...response.answer };
           this.calculateScore();
           this.message = `¡Correcto! La canción es "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
+          this.playCompleteAudio();
           this.saveScore();
         } else {
           this.message = 'Respuesta incorrecta';
@@ -196,6 +211,11 @@ export class Game implements OnInit, OnDestroy {
   }
 
   nextHint(): void {
+    if (!this.gameStarted) {
+      this.message = 'Haz clic en "Comenzar" para iniciar el juego';
+      return;
+    }
+    
     if (this.currentAttempt >= this.maxAttempts || this.gameOver) {
       return;
     }
@@ -258,27 +278,24 @@ export class Game implements OnInit, OnDestroy {
   private revealAnswer(): void {
     if (!this.currentSong) return;
     
-    this.gameService.revealSong(this.currentSong.id).subscribe({
-      next: (response) => {
-        this.currentSong = { ...this.currentSong!, ...response };
-        this.message = `La canción era: "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
-      },
-      error: (err) => {
-        console.error('Error obteniendo respuesta:', err);
-      }
-    });
+    this.message = `La canción era: "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
+    this.playCompleteAudio();
+
   }
 
   playAgain(): void {
+    this.stopAudio();
     window.location.reload();
   }
 
   goToLevels(): void {
-    this.router.navigate(['/levels']);
+    window.location.href = '/levels';
   }
 
   giveUp(): void {
     if (!this.currentSong) return;
+
+    this.stopAudio();
     
     this.gameOver = true;
     this.isCorrect = false;
@@ -287,5 +304,21 @@ export class Game implements OnInit, OnDestroy {
     this.score = 0; // Sin puntuación por rendirse
     
     this.revealAnswer();
+  }
+
+  private playCompleteAudio(): void {
+    if (!this.currentSong) return;
+    
+    const audioSource = this.currentSong.audio;
+    const completeAudio = new Audio(audioSource);
+    completeAudio.play();
+  }
+
+  private stopAudio(): void {
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this.audio = null;
+    }
   }
 }
