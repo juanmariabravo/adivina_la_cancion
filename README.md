@@ -1,6 +1,6 @@
 # *en desarrollo...*
 Aplicación web en desarrollo como proyecto para la asignatura de Multimedia del cuarto curso del grado en Ingeniería Informática, de la Universidad de Castilla La Mancha.
-<img src="home_adivina.png" alt="Mockup del juego Adivina la Canción" width="600"/>
+<img src="home_adivina.png" alt="Mockup del juego Adivina la Canción" width="*"/>
 <img src="adivina_la_cancion.png" alt="Nivel de Adivina la Canción" width="*"/>
 # 🎵 Adivina la Canción - *¿Cuánto sabes de música?*
 
