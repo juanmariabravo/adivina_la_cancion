@@ -95,7 +95,7 @@ class Database:
         conn = self.get_connection()
         try:
             # Ruta al archivo JSON (en el mismo directorio que database.py)
-            json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'download_songs', 'local_songs.json')
+            json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'songs_local_data&spotify_ids', 'local_songs.json')
 
             if not os.path.exists(json_path):
                 print(f"ERROR: Archivo no encontrado: {json_path}")
@@ -127,6 +127,7 @@ class Database:
                     print(f"Error insertando canción {song.get('id', '?')}: {e}")
             
             conn.commit()
+            print("✅ Canciones locales inicializadas")
             
         except FileNotFoundError as e:
             print(f"Archivo JSON no encontrado: {e}")
@@ -141,18 +142,17 @@ class Database:
         """Inicializar niveles de canciones de Spotify"""
         conn = self.get_connection()
         try:
-            levels = [
-                {'spotify_id': '70LcF31zb1H0PyJoS1Sx1r', 'level_id': 1},
-                {'spotify_id': '3AJwUDP919kvQ9QcozQPxg', 'level_id': 2},
-                {'spotify_id': '42VgiRyg0YjtRVLiPFNxPJ', 'level_id': 3},
-                {'spotify_id': '0nrRP2bk19rLc0orkWPQk2', 'level_id': 4},
-                {'spotify_id': '1mlGScrDQqHqmhdIqE8MmA', 'level_id': 5},
-                {'spotify_id': '3v1dCP3hk2djfWryqfp7sx', 'level_id': 6},
-                {'spotify_id': '2es7AohVgF03LwjmQyaVMl', 'level_id': 7},
-                {'spotify_id': '6jsX9MWN6QAchvWZvZKmdR', 'level_id': 8},
-                {'spotify_id': '5rgy6ghBq1eRApCkeUdJXf', 'level_id': 9},
-                {'spotify_id': '2kZJ5wrpq1gCdHmVEjahoH', 'level_id': 10}
-            ]
+            # Ruta al archivo JSON
+            json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'songs_local_data&spotify_ids', 'spotify_songs.json')
+
+            if not os.path.exists(json_path):
+                print(f"ERROR: Archivo no encontrado: {json_path}")
+                return
+
+            # Leer archivo JSON
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                levels = data.get('levels', [])
             for level in levels:
                 conn.execute('''
                     INSERT OR REPLACE INTO spotify_songs (spotify_id, level_id)

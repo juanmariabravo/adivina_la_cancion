@@ -1,0 +1,196 @@
+{
+  "levels": [
+    {
+      "spotify_id": "6zW80jVqLtgSF1yCtGHiiD",
+      "level_id": -1,
+      "song": "The Shire",
+      "artist": "Howard Shore"
+    },
+    {
+      "spotify_id": "3v1dCP3hk2djfWryqfp7sx",
+      "level_id": 0,
+      "song": "Caminando por la vida",
+      "artist": "Melendi"
+    },
+    {
+      "spotify_id": "6habFhsOp2NvshLv26DqMb",
+      "level_id": 1,
+      "song": "Despacito",
+      "artist": "Luis Fonsi, Daddy Yankee"
+    },
+    {
+      "spotify_id": "3QHMxEOAGD51PDlbFPHLyJ",
+      "level_id": 2,
+      "song": "Vivir mi vida",
+      "artist": "Marc Anthony"
+    },
+    {
+      "spotify_id": "2mmRLk5JaInGBNJNAP2Mc8",
+      "level_id": 3,
+      "song": "Bailando",
+      "artist": "Enrique Iglesias, Sean Paul, Descemer Bueno"
+    },
+    {
+      "spotify_id": "0nrRP2bk19rLc0orkWPQk2",
+      "level_id": 4,
+      "song": "Wake Me Up",
+      "artist": "Avicii"
+    },
+    {
+      "spotify_id": "42VgiRyg0YjtRVLiPFNxPJ",
+      "level_id": 5,
+      "song": "Zapatillas",
+      "artist": "El Canto del Loco"
+    },
+    {
+      "spotify_id": "1mlGScrDQqHqmhdIqE8MmA",
+      "level_id": 6,
+      "song": "Besos en guerra",
+      "artist": "Morat, Juanes"
+    },
+    {
+      "spotify_id": "2a1o6ZejUi8U3wzzOtCOYw",
+      "level_id": 7,
+      "song": "Danza Kuduro",
+      "artist": "Don Omar, Lucenzo"
+    },
+    {
+      "spotify_id": "4Y6cDd4EPHcEbiUKdyvNwM",
+      "level_id": 8,
+      "song": "La Macarena",
+      "artist": "Los del Río"
+    },
+    {
+      "spotify_id": "5gJKsGij5oGt5H5RSFYXPa",
+      "level_id": 9,
+      "song": "Tequila",
+      "artist": "The Champs"
+    },
+    {
+      "spotify_id": "2kZJ5wrpq1gCdHmVEjahoH",
+      "level_id": 10,
+      "song": "Pan y mantequilla",
+      "artist": "Efecto Pasillo"
+    },
+    {
+      "spotify_id": "6jsX9MWN6QAchvWZvZKmdR",
+      "level_id": 11,
+      "song": "La Sevillana",
+      "artist": "Omar Montes, Ana Mena"
+    },
+    {
+      "spotify_id": "5rgy6ghBq1eRApCkeUdJXf",
+      "level_id": 12,
+      "song": "We are young",
+      "artist": "fun."
+    },
+    {
+      "spotify_id": "6mICuAdrwEjh6Y6lroV2Kg",
+      "level_id": 13,
+      "song": "Chantaje",
+      "artist": "Shakira, Maluma"
+    },
+    {
+      "spotify_id": "2es7AohVgF03LwjmQyaVMl",
+      "level_id": 14,
+      "song": "Torero",
+      "artist": "Chayanne"
+    },
+    {
+      "spotify_id": "6b37xrsNCWYIUphFBazqD6",
+      "level_id": 15,
+      "song": "Me Gustas Tú",
+      "artist": "Manu Chao"
+    },
+    {
+      "spotify_id": "3AJwUDP919kvQ9QcozQPxg",
+      "level_id": 16,
+      "song": "Yellow",
+      "artist": "Coldplay"
+    },
+    {
+      "spotify_id": "70LcF31zb1H0PyJoS1Sx1r",
+      "level_id": 17,
+      "song": "Creep",
+      "artist": "Radiohead"
+    },
+    {
+      "spotify_id": "2LsbizbOeNa4x6qsi2jAMb",
+      "level_id": 18,
+      "song": "La Flaca",
+      "artist": "Jarabe de Palo"
+    },
+    {
+      "spotify_id": "7COfe3P7KgfwDwIRB8LIDw",
+      "level_id": 19,
+      "song": "Mi Gente",
+      "artist": "J Balvin, Willy William"
+    },
+    {
+      "spotify_id": "4aVuWgvD0X63hcOCnZtNFA",
+      "level_id": 20,
+      "song": "Hold the Line",
+      "artist": "Toto"
+    },
+    {
+      "spotify_id": "2OsQUeMvXZmJeoA7tdN5T0",
+      "level_id": 21,
+      "song": "Emocional",
+      "artist": "Dani Martín"
+    },
+    {
+      "spotify_id": "4lerOTNr2tFWJCAmmhymhi",
+      "level_id": 22,
+      "song": "No Me Doy Por Vencido",
+      "artist": "Luis Fonsi"
+    },
+    {
+      "spotify_id": "4Ofg5uuH7qqDIXpAJMpXZV",
+      "level_id": 23,
+      "song": "Rayando el Sol",
+      "artist": "Maná"
+    },
+    {
+      "spotify_id": "5ts78ZXMYkosHroNMpUXJr",
+      "level_id": 24,
+      "song": "Quedará En Nuestra Mente",
+      "artist": "Amaia"
+    },
+    {
+      "spotify_id": "1qDrWA6lyx8cLECdZE7TV7",
+      "level_id": 25,
+      "song": "Somebody That I Used To Know",
+      "artist": "Gotye, Kimbra"
+    },
+    {
+      "spotify_id": "3ieBy1I9Kxf5yJsBid2O6s",
+      "level_id": 26,
+      "song": "Cuerda Auxiliar",
+      "artist": "Besmaya"
+    },
+    {
+      "spotify_id": "0yjUKvDF7VwgHp9SUJTZdT",
+      "level_id": 27,
+      "song": "Mirando al cielo",
+      "artist": "Huecco"
+    },
+    {
+      "spotify_id": "5tzOL69W6lCp4gAomIXMnJ",
+      "level_id": 28,
+      "song": "Quédate conmigo",
+      "artist": "Pole., Pilar Moxó"
+    },
+    {
+      "spotify_id": "129lYDVKnWtlJc2PZJviuA",
+      "level_id": 29,
+      "song": "A Dios le Pido",
+      "artist": "Juanes"
+    },
+    {
+      "spotify_id": "0Z4qWi2na4v9mGEC6aoa2g",
+      "level_id": 30,
+      "song": "L.A.H.C.S.G.D.S.M.T.",
+      "artist": "PIBLA"
+    }
+  ]
+}
