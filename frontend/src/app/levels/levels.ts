@@ -30,20 +30,32 @@ export class Levels implements OnInit {
   spotifyRequired: boolean = true;
   showSpotifyWarning: boolean = false;
 
-  // Generar 30 niveles dinámicamente
-  levels: Level[] = Array.from({ length: 30 }, (_, i) => {
-    const levelNum = i + 1;
-    const difficulties = ['Fácil', 'Intermedio', 'Difícil', 'Experto'];
-    
-    return {
-      id: levelNum,
-      title: `NIVEL ${levelNum}`,
-      description: '', // Descripción vacía, no se mostrará
-      difficulty: difficulties[Math.floor((levelNum - 1) / 7.5)],
+  // Generar niveles dinámicamente (Easter Egg + 30 niveles normales)
+  levels: Level[] = [
+    // Easter Egg Level
+    {
+      id: -1,
+      title: 'EASTER EGG',
+      description: '',
+      difficulty: 'Especial',
       completed: false,
       score: 0
-    };
-  });
+    },
+    // Niveles normales 1-30
+    ...Array.from({ length: 30 }, (_, i) => {
+      const levelNum = i + 1;
+      const difficulties = ['Fácil', 'Intermedio', 'Difícil', 'Experto'];
+      
+      return {
+        id: levelNum,
+        title: `NIVEL ${levelNum}`,
+        description: '',
+        difficulty: difficulties[Math.floor((levelNum - 1) / 7.5)],
+        completed: false,
+        score: 0
+      };
+    })
+  ];
 
   constructor(
     public userService: UserService,
@@ -126,9 +138,8 @@ export class Levels implements OnInit {
   }
 
   startLevel(levelId: number): void {
-    // Invitados solo pueden jugar niveles 1-10 (canciones locales)
+    // Invitados solo pueden jugar niveles -1 (Easter Egg) y 1-10 (canciones locales)
     if (this.isGuest) {
-      // go to game with levelId levelId + '_local'
       this.router.navigate(['/game'], { 
         queryParams: { level: levelId + '_local' } 
       });
@@ -140,22 +151,10 @@ export class Levels implements OnInit {
       return;
     }
     else {
-      // go to game with levelId levelId
       this.router.navigate(['/game'], { 
         queryParams: { level: levelId } 
       });
     }
-
-    // Usuarios autenticados DEBEN tener Spotify conectado
-    if (!this.isGuest && !this.spotifyService.isSpotifyConnected()) {
-      alert('⚠️ Debes conectar tu cuenta de Spotify para jugar. Usa el mismo email que tu cuenta de Spotify.');
-      this.router.navigate(['/profile']);
-      return;
-    }
-
-    this.router.navigate(['/game'], { 
-      queryParams: { level: levelId } 
-    });
   }
 
   startDailyChallenge(): void {

@@ -103,47 +103,50 @@
                 </div>
             </div>
 
-            <!-- Grid dinámico de niveles -->
-            <div class="levels-grid-modern">
-                <div 
-                    *ngFor="let level of levels; let i = index" 
-                    class="level-card-modern"
-                    [class.completed]="level.completed"
-                    [class.locked]="isGuest && i >= 10"
-                    (click)="startLevel(level.id)"
-                >
-                    <!-- Badge de nivel -->
-                    <div class="level-number">{{ level.id }}</div>
-                    
-                    <!-- Estado -->
-                    <div class="level-status">
-                        <span *ngIf="level.completed" class="status-completed">✅</span>
-                        <span *ngIf="isGuest && i >= 10" class="status-locked">🔒</span>
-                    </div>
+          <!-- Grid dinámico de niveles -->
+          <div class="levels-grid-modern">
+            <div 
+              *ngFor="let level of levels; let i = index" 
+              class="level-card-modern"
+              [class.completed]="level.completed"
+              [class.locked]="isGuest && level.id > 10"
+              [class.easter-egg]="level.id === -1"
+              (click)="startLevel(level.id)"
+            >
+              <!-- Badge de nivel -->
+              <div class="level-number" [class.easter-number]="level.id === -1">
+                {{ level.id === -1 ? '💍' : level.id }}
+              </div>
+              
+              <!-- Estado -->
+              <div class="level-status">
+                <span *ngIf="level.completed" class="status-completed">✅</span>
+                <span *ngIf="isGuest && level.id > 10" class="status-locked">🔒</span>
+              </div>
 
-                    <!-- Contenido -->
-                    <div class="level-content">
-                        <h3 class="level-name">{{ level.title }}</h3>
-                        <p class="level-desc">{{ level.description }}</p>
-                        
-                        <!-- Dificultad -->
-                        <div class="difficulty-badge" [attr.data-difficulty]="level.difficulty.toLowerCase()">
-                            {{ level.difficulty }}
-                        </div>
-
-                        <!-- Puntuación (si está completado) -->
-                        <div class="level-score-display" *ngIf="level.completed">
-                            <span class="score-label">Puntuación:</span>
-                            <span class="score-number">{{ level.score }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Botón de jugar -->
-                    <button class="play-level-btn" *ngIf="!isGuest || i < 10">
-                        <span class="play-icon">▶</span>
-                    </button>
+              <!-- Contenido -->
+              <div class="level-content">
+                <h3 class="level-name">{{ level.title }}</h3>
+                <p class="level-desc" *ngIf="level.description">{{ level.description }}</p>
+                
+                <!-- Dificultad -->
+                <div class="difficulty-badge" [attr.data-difficulty]="level.difficulty.toLowerCase()">
+                  {{ level.difficulty }}
                 </div>
+
+                <!-- Puntuación (si está completado) -->
+                <div class="level-score-display" *ngIf="level.completed">
+                  <span class="score-label">Puntuación:</span>
+                  <span class="score-number">{{ level.score }}</span>
+                </div>
+              </div>
+
+              <!-- Botón de jugar -->
+              <button class="play-level-btn" *ngIf="!isGuest || level.id <= 10 || level.id === -1">
+                <span class="play-icon">▶</span>
+              </button>
             </div>
+          </div>
         </section>
     </main>
 </div>

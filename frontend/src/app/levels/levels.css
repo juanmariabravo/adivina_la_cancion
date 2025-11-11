@@ -597,3 +597,41 @@ body {
     gap: 16px;
   }
 }
+
+.level-card-modern.easter-egg {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(184, 134, 11, 0.2) 100%);
+  border: 2px solid #FFD700;
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+}
+
+.level-card-modern.easter-egg:hover:not(.locked) {
+  border-color: #FFD700;
+  box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5);
+  transform: translateY(-8px) scale(1.05);
+}
+
+.level-number.easter-number {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { 
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); 
+  }
+  50% { 
+    box-shadow: 0 6px 25px rgba(255, 215, 0, 0.8); 
+  }
+}
+
+.difficulty-badge[data-difficulty="especial"] {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: white;
+  border: 1px solid #FFD700;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
