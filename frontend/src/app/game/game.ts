@@ -70,6 +70,10 @@ export class Game implements OnInit, OnDestroy {
         this.isGuest = true;
         this.level_number = parseInt(this.levelId.split('_')[0], 10);
       }
+      else {
+        this.isGuest = false;
+        this.level_number = parseInt(this.levelId, 10);
+      }
       this.loadSong();
     });
   }
