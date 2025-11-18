@@ -34,6 +34,14 @@ class UserService:
 			email = data['email'].strip().lower()
 			pwd1 = data['pwd1']
 			pwd2 = data['pwd2']
+			spotify_client_id = data.get('spotify_client_id', '').strip()
+			spotify_client_secret = data.get('spotify_client_secret', '').strip()
+
+			# Validar que las credenciales de Spotify sean obligatorias
+			if not spotify_client_id:
+				return {"error": "El Client ID de Spotify es requerido"}, 400
+			if not spotify_client_secret:
+				return {"error": "El Client Secret de Spotify es requerido"}, 400
 
 			if len(username) < 3:
 				return {"error": "El username debe tener al menos 3 caracteres"}, 400
@@ -44,7 +52,7 @@ class UserService:
 			if len(pwd1) < 6:
 				return {"error": "La contraseña debe tener al menos 6 caracteres"}, 400
 
-			success, message = db.create_user(username, email, pwd1)
+			success, message = db.create_user(username, email, pwd1, spotify_client_id, spotify_client_secret)
 
 			if success:
 				user = db.get_user_by_username(username)
@@ -146,10 +154,12 @@ class UserService:
 			if not email:
 				return {"error": "Email requerido"}, 400
 
-			if not SPOTIFY_CLIENT_ID:
-				return {"error": "SPOTIFY_CLIENT_ID no configurado"}, 500
-
-			return {"clientId": SPOTIFY_CLIENT_ID}, 200
+			# Buscar credenciales del usuario
+			user = db.get_user_by_email(email.lower())
+			if user and user.spotify_client_id:
+				return {"clientId": user.spotify_client_id}, 200
+			
+			return {"error": "No tienes credenciales de Spotify configuradas en tu cuenta"}, 400
 		except Exception as e:
 			return {"error": str(e)}, 500
 
@@ -166,10 +176,17 @@ class UserService:
 			if not code or not client_id:
 				return {"error": "Código y clientId requeridos"}, 400
 
-			if client_id != SPOTIFY_CLIENT_ID:
+			# Obtener credenciales del usuario
+			user_client_id = user.spotify_client_id
+			user_client_secret = user.spotify_client_secret
+
+			if not user_client_id or not user_client_secret:
+				return {"error": "No tienes credenciales de Spotify configuradas en tu cuenta"}, 400
+
+			if client_id != user_client_id:
 				return {"error": "Client ID inválido"}, 401
 
-			credentials = f"{SPOTIFY_CLIENT_ID}:{SPOTIFY_CLIENT_SECRET}"
+			credentials = f"{user_client_id}:{user_client_secret}"
 			credentials_b64 = base64.b64encode(credentials.encode()).decode()
 
 			headers = {

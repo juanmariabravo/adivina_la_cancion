@@ -44,7 +44,9 @@ class Database:
                     last_daily_completed TEXT,
                     spotify_access_token TEXT,
                     spotify_refresh_token TEXT,
-                    spotify_token_expires_at INTEGER
+                    spotify_token_expires_at INTEGER,
+                    spotify_client_id TEXT,
+                    spotify_client_secret TEXT
                 )
             ''')
             
@@ -165,7 +167,7 @@ class Database:
         finally:
             conn.close()
 
-    def create_user(self, username: str, email: str, password: str) -> tuple[bool, str]:
+    def create_user(self, username: str, email: str, password: str, spotify_client_id: str = None, spotify_client_secret: str = None) -> tuple[bool, str]:
         """
         Crear nuevo usuario.
         Retorna (éxito, mensaje) para feedback específico.
@@ -185,9 +187,9 @@ class Database:
             
             # Insertar usuario
             conn.execute('''
-                INSERT INTO users (username, email, hashed_password)
-                VALUES (?, ?, ?)
-            ''', (username, email, hashed_password))
+                INSERT INTO users (username, email, hashed_password, spotify_client_id, spotify_client_secret)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (username, email, hashed_password, spotify_client_id, spotify_client_secret))
             
             conn.commit()
             return True, "Usuario creado exitosamente"
@@ -203,7 +205,7 @@ class Database:
         try:
             cursor = conn.execute('''
                 SELECT username, email, hashed_password, created_at, is_active, total_score, games_played, last_daily_completed,
-                       spotify_access_token, spotify_refresh_token, spotify_token_expires_at
+                       spotify_access_token, spotify_refresh_token, spotify_token_expires_at, spotify_client_id, spotify_client_secret
                 FROM users WHERE username = ?
             ''', (username,))
             row = cursor.fetchone()
@@ -220,7 +222,7 @@ class Database:
         try:
             cursor = conn.execute('''
                 SELECT username, email, hashed_password, created_at, is_active, total_score, games_played, last_daily_completed,
-                       spotify_access_token, spotify_refresh_token, spotify_token_expires_at
+                       spotify_access_token, spotify_refresh_token, spotify_token_expires_at, spotify_client_id, spotify_client_secret
                 FROM users WHERE email = ?
             ''', (email,))
             row = cursor.fetchone()

@@ -358,6 +358,14 @@ body {
   margin-left: 0.5rem;
 }
 
+.help-hint {
+  font-size: 0.8rem;
+  color: #1DB954;
+  font-weight: normal;
+  margin-left: 0.5rem;
+  opacity: 0.8;
+}
+
 .info-message {
   font-size: 0.85rem;
   color: #4caf50;
@@ -487,4 +495,118 @@ body {
   .register-title {
     font-size: 28px;
   }
+}
+
+/* Estilos para la sección de Spotify */
+.spotify-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  border-radius: var(--border-radius);
+  color: white;
+  box-shadow: var(--shadow-soft);
+}
+
+.section-header {
+  margin-bottom: 1.5rem;
+}
+
+.section-header h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.section-description {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.help-details {
+  margin-top: 1rem;
+}
+
+.help-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  transition: var(--transition);
+}
+
+.help-details summary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.help-content {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.help-content ol {
+  padding-left: 1.5rem;
+}
+
+.help-content li {
+  margin-bottom: 0.5rem;
+}
+
+.help-content a {
+  color: var(--spotify-green);
+  text-decoration: underline;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.help-content a:hover {
+  color: #1ed760;
+  background: rgba(29, 185, 84, 0.1);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.help-content code {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  color: #333;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Ajustar colores de inputs en la sección Spotify */
+.spotify-section .form-group label {
+  color: white;
+  font-weight: 600;
+}
+
+.spotify-section .input-container {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.spotify-section .input-container:focus-within {
+  border-color: white;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.spotify-section input {
+  background: transparent;
+  color: white;
+}
+
+.spotify-section input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.spotify-section .input-icon {
+  color: white;
 }

@@ -17,6 +17,8 @@ export class Register {
   email = '';
   pwd1 = '';
   pwd2 = '';
+  spotifyClientId = '';
+  spotifyClientSecret = '';
   
   // Estados
   loading = false;
@@ -27,6 +29,8 @@ export class Register {
   usernameError = '';
   emailError = '';
   confirmPasswordError = '';
+  spotifyClientIdError = '';
+  spotifyClientSecretError = '';
   
   // Mensajes de éxito
   successMessage = '';
@@ -37,6 +41,8 @@ export class Register {
   @ViewChild('emailInput') emailInput!: NgModel;
   @ViewChild('passwordInput') passwordInput!: NgModel;
   @ViewChild('confirmPasswordInput') confirmPasswordInput!: NgModel;
+  @ViewChild('spotifyClientIdInput') spotifyClientIdInput!: NgModel;
+  @ViewChild('spotifyClientSecretInput') spotifyClientSecretInput!: NgModel;
 
   constructor(private service: UserService, private router: Router) {}
 
@@ -55,6 +61,14 @@ export class Register {
 
   get confirmPasswordInvalid(): boolean {
     return (this.confirmPasswordInput?.invalid && this.confirmPasswordInput?.touched) || !!this.confirmPasswordError;
+  }
+
+  get spotifyClientIdInvalid(): boolean {
+    return (this.spotifyClientIdInput?.invalid && this.spotifyClientIdInput?.touched) || !!this.spotifyClientIdError;
+  }
+
+  get spotifyClientSecretInvalid(): boolean {
+    return (this.spotifyClientSecretInput?.invalid && this.spotifyClientSecretInput?.touched) || !!this.spotifyClientSecretError;
   }
 
   // Validación de fuerza de contraseña
@@ -119,6 +133,30 @@ export class Register {
     }
   }
 
+  validateSpotifyClientId(): void {
+    this.spotifyClientIdError = '';
+    
+    if (!this.spotifyClientId) return;
+    
+    if (this.spotifyClientId.length < 10) {
+      this.spotifyClientIdError = 'Client ID muy corto';
+    } else if (!this.spotifyClientId.match(/^[a-zA-Z0-9]+$/)) {
+      this.spotifyClientIdError = 'Formato de Client ID inválido';
+    }
+  }
+
+  validateSpotifyClientSecret(): void {
+    this.spotifyClientSecretError = '';
+    
+    if (!this.spotifyClientSecret) return;
+    
+    if (this.spotifyClientSecret.length < 10) {
+      this.spotifyClientSecretError = 'Client Secret muy corto';
+    } else if (!this.spotifyClientSecret.match(/^[a-zA-Z0-9]+$/)) {
+      this.spotifyClientSecretError = 'Formato de Client Secret inválido';
+    }
+  }
+
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
@@ -128,10 +166,14 @@ export class Register {
            !this.emailInvalid && 
            !this.passwordInvalid && 
            !this.confirmPasswordInvalid &&
+           !this.spotifyClientIdInvalid &&
+           !this.spotifyClientSecretInvalid &&
            this.username.length > 0 &&
            this.email.length > 0 &&
            this.pwd1.length > 0 &&
            this.pwd2.length > 0 &&
+           this.spotifyClientId.length > 0 &&
+           this.spotifyClientSecret.length > 0 &&
            this.pwd1 === this.pwd2;
   }
 
@@ -145,11 +187,15 @@ export class Register {
     if (this.emailInput) this.emailInput.control.markAsTouched();
     if (this.passwordInput) this.passwordInput.control.markAsTouched();
     if (this.confirmPasswordInput) this.confirmPasswordInput.control.markAsTouched();
+    if (this.spotifyClientIdInput) this.spotifyClientIdInput.control.markAsTouched();
+    if (this.spotifyClientSecretInput) this.spotifyClientSecretInput.control.markAsTouched();
     
     // Ejecutar validaciones
     this.validateUsername();
     this.validateEmail();
     this.validateConfirmPassword();
+    this.validateSpotifyClientId();
+    this.validateSpotifyClientSecret();
     
     // Verificar si el formulario es válido
     if (!this.isFormValid()) {
@@ -159,7 +205,7 @@ export class Register {
 
     this.loading = true;
 
-    this.service.register(this.username, this.email, this.pwd1, this.pwd2).subscribe({
+    this.service.register(this.username, this.email, this.pwd1, this.pwd2, this.spotifyClientId, this.spotifyClientSecret).subscribe({
       next: (response: any) => {
         this.loading = false;
         this.successMessage = '¡Cuenta creada exitosamente! Redirigiendo...';
@@ -169,6 +215,8 @@ export class Register {
         this.email = '';
         this.pwd1 = '';
         this.pwd2 = '';
+        this.spotifyClientId = '';
+        this.spotifyClientSecret = '';
 
         // Guardar datos de la respuesta
         this.service.saveCurrentUser(response.user);

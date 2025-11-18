@@ -13,12 +13,14 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  register(username: string, email: string, pwd1: string, pwd2: string) {
+  register(username: string, email: string, pwd1: string, pwd2: string, spotifyClientId?: string, spotifyClientSecret?: string) {
     let info = {
       username : username,
       email : email,
       pwd1 : pwd1, 
-      pwd2 : pwd2
+      pwd2 : pwd2,
+      spotify_client_id: spotifyClientId,
+      spotify_client_secret: spotifyClientSecret
     };
     const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
     return this.http.post<any>(this.registerUrl, info, { headers });

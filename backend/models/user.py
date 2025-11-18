@@ -16,7 +16,9 @@ class User:
         last_daily_completed: Optional[str] = None,
         spotify_access_token: Optional[str] = None,
         spotify_refresh_token: Optional[str] = None,
-        spotify_token_expires_at: Optional[int] = None
+        spotify_token_expires_at: Optional[int] = None,
+        spotify_client_id: Optional[str] = None,
+        spotify_client_secret: Optional[str] = None
     ):
         self.username = username
         self.email = email
@@ -29,6 +31,8 @@ class User:
         self.spotify_access_token = spotify_access_token
         self.spotify_refresh_token = spotify_refresh_token
         self.spotify_token_expires_at = spotify_token_expires_at
+        self.spotify_client_id = spotify_client_id
+        self.spotify_client_secret = spotify_client_secret
     
     def to_public_dict(self) -> dict:
         """Convertir a diccionario público (sin datos sensibles)"""
@@ -74,7 +78,9 @@ class User:
             last_daily_completed=data.get('last_daily_completed'),
             spotify_access_token=data.get('spotify_access_token'),
             spotify_refresh_token=data.get('spotify_refresh_token'),
-            spotify_token_expires_at=data.get('spotify_token_expires_at')
+            spotify_token_expires_at=data.get('spotify_token_expires_at'),
+            spotify_client_id=data.get('spotify_client_id'),
+            spotify_client_secret=data.get('spotify_client_secret')
         )
     
     def __repr__(self) -> str:

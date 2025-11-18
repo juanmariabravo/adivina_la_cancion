@@ -145,6 +145,67 @@
                     </div>
                 </div>
 
+                <!-- Spotify Client ID -->
+                <div class="form-group">
+                    <label for="spotifyClientId">
+                        Spotify Client ID *
+                    </label>
+                    <div class="input-container" [class.error]="spotifyClientIdInvalid">
+                        <input 
+                            type="text" 
+                            id="spotifyClientId" 
+                            [(ngModel)]="spotifyClientId"
+                            name="spotifyClientId"
+                            placeholder="Tu Client ID de Spotify"
+                            required
+                            (blur)="validateSpotifyClientId()"
+                            #spotifyClientIdInput="ngModel"
+                        >
+                        <span class="input-icon">🎵</span>
+                    </div>
+                    <div class="error-message" *ngIf="spotifyClientIdInvalid">
+                        <span *ngIf="spotifyClientIdInput.errors?.['required']">El Client ID de Spotify es requerido</span>
+                        <span *ngIf="spotifyClientIdError">{{ spotifyClientIdError }}</span>
+                    </div>
+                </div>
+
+                <!-- Spotify Client Secret -->
+                <div class="form-group">
+                    <label for="spotifyClientSecret">
+                        Spotify Client Secret *
+                    </label>
+                    <div class="input-container" [class.error]="spotifyClientSecretInvalid">
+                        <input 
+                            type="password" 
+                            id="spotifyClientSecret" 
+                            [(ngModel)]="spotifyClientSecret"
+                            name="spotifyClientSecret"
+                            placeholder="Tu Client Secret de Spotify"
+                            required
+                            (blur)="validateSpotifyClientSecret()"
+                            #spotifyClientSecretInput="ngModel"
+                        >
+                        <span class="input-icon">🔐</span>
+                    </div>
+                    <div class="error-message" *ngIf="spotifyClientSecretInvalid">
+                        <span *ngIf="spotifyClientSecretInput.errors?.['required']">El Client Secret de Spotify es requerido</span>
+                        <span *ngIf="spotifyClientSecretError">{{ spotifyClientSecretError }}</span>
+                    </div>
+                    <details class="help-details">
+                        <summary>¿Cómo obtener mis credenciales de Spotify?</summary>
+                        <div class="help-content">
+                            <ol>
+                                <li>Ve a <a href="https://developer.spotify.com/dashboard" target="_blank">Spotify Developer Dashboard</a></li>
+                                <li>Inicia sesión con tu cuenta de Spotify</li>
+                                <li>Haz clic en "Create an App"</li>
+                                <li>Completa el formulario con el nombre de tu aplicación</li>
+                                <li>En la configuración de la app, añade esta URL de redirección: <code>http://127.0.0.1:4200/callback</code></li>
+                                <li>Copia el Client ID y Client Secret y pégalos aquí</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
                 <!-- Mensajes de error general -->
                 <div *ngIf="formError" class="error-message general-error">
                     {{ formError }}
