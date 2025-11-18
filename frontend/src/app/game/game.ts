@@ -37,6 +37,7 @@ export class Game implements OnInit, OnDestroy {
   gameOver: boolean = false;
   isCorrect: boolean = false;
   showAnswer: boolean = false;
+  loadingError: boolean = false;
   
   // Pistas reveladas
   revealedHints: string[] = [];
@@ -87,31 +88,44 @@ export class Game implements OnInit, OnDestroy {
 
   private loadSong(): void {
     const token = this.userService.getToken();
+    this.message = 'Cargando nivel...';
+    this.loadingError = false;
     
     this.gameService.getSongForLevel(this.levelId, token || undefined).subscribe({
       next: (response) => {
+        this.message = '';
         if (response.song) {
           this.currentSong = response.song;
           this.audioReady = true; // Audio listo, esperar interacción del usuario
           this.primeras_letras = this.currentSong!.title.substring(0, 3) + '...';
           this.currentSong!.title_hint = this.primeras_letras;
         } else {
-          this.message = 'No hay canción en este nivel';
+          this.loadingError = true;
+          this.message = 'No hay canción disponible en este nivel';
         }
       },
       error: (err) => {
         console.error('Error cargando canción:', err);
+        this.loadingError = true;
+        this.audioReady = false;
+        this.gameStarted = false;
         
         if (err.status === 403) {
           if (err.error?.spotify_required) {
-            this.message = 'Debes conectar Spotify para este nivel';
-            setTimeout(() => this.router.navigate(['/profile']), 2000);
+            this.message = 'Debes conectar Spotify para acceder a este nivel';
           } else if (err.error?.upgrade_required) {
             this.message = 'Regístrate para jugar más niveles';
-            setTimeout(() => this.router.navigate(['/register']), 2000);
+          } else {
+            this.message = 'No tienes permisos para acceder a este nivel';
           }
+        } else if (err.status === 404) {
+          this.message = 'Este nivel no existe o no está disponible';
+        } else if (err.status === 401) {
+          this.message = 'Tu sesión ha expirado. Por favor, inicia sesión de nuevo';
+        } else if (err.status === 0) {
+          this.message = 'Error de conexión. Verifica que el servidor esté funcionando';
         } else {
-          this.message = 'Error al cargar el nivel';
+          this.message = 'Error al cargar el nivel. Inténtalo de nuevo más tarde';
         }
       }
     });
@@ -122,7 +136,7 @@ export class Game implements OnInit, OnDestroy {
       this.message = 'Esperando que cargue la canción...';
       return;
     }
-    
+     
     this.gameStarted = true; // Habilitar botones
     this.audioReady = false; // Ocultar botón de comenzar
     this.playAudio();
@@ -292,9 +306,7 @@ export class Game implements OnInit, OnDestroy {
     window.location.reload();
   }
 
-  goToLevels(): void {
-    window.location.href = '/levels';
-  }
+
 
   giveUp(): void {
     if (!this.currentSong) return;
@@ -324,5 +336,26 @@ export class Game implements OnInit, OnDestroy {
       this.audio.currentTime = 0;
       this.audio = null;
     }
+  }
+
+  goToLevels(): void {
+    this.router.navigate(['/levels']);
+  }
+
+  goToProfile(): void {
+    this.router.navigate(['/profile']);
+  }
+
+  goToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  retryLoadSong(): void {
+    this.loadingError = false;
+    this.message = 'Cargando nivel...';
+    // wait half second to show the message
+    setTimeout(() => {
+      this.loadSong();
+    }, 500);
   }
 }

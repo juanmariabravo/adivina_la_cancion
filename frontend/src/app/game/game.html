@@ -5,7 +5,40 @@
     <div class="attempts">Intento {{ currentAttempt }}/{{ maxAttempts }}</div>
   </div>
 
-  <div class="game-content" *ngIf="currentSong && !gameOver">
+  <!-- Pantalla de carga -->
+  <div class="loading-screen" *ngIf="!currentSong && !loadingError && message === 'Cargando nivel...'">
+    <div class="loading-card">
+      <div class="loading-spinner"></div>
+      <h2>Cargando nivel {{ level_number }}...</h2>
+      <p>Por favor espera un momento</p>
+    </div>
+  </div>
+
+  <!-- Pantalla de error de carga -->
+  <div class="error-screen" *ngIf="loadingError">
+    <div class="error-card">
+      <div class="error-icon">⚠️</div>
+      <h2>No se pudo cargar el nivel</h2>
+      <p class="error-message">{{ message }}</p>
+      
+      <div class="error-actions">
+        <button class="action-btn primary" (click)="retryLoadSong()">
+          🔄 Reintentar
+        </button>
+        <button class="action-btn secondary" (click)="goToLevels()">
+          ← Volver a Niveles
+        </button>
+        <button class="action-btn tertiary" (click)="goToProfile()" *ngIf="message.includes('Spotify')">
+          👤 Ir a Perfil
+        </button>
+        <button class="action-btn tertiary" (click)="goToLogin()" *ngIf="message.includes('sesión')">
+          🔑 Iniciar Sesión
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-content" *ngIf="currentSong && !gameOver && !loadingError">
     <!-- Error de audio -->
     <div class="audio-error" *ngIf="audioError">
       ⚠️ {{ audioError }}
