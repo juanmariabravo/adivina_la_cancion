@@ -12,7 +12,7 @@ class User:
         created_at: Optional[datetime] = None,
         is_active: bool = True,
         total_score: int = 0,
-        games_played: int = 0,
+        levels_completed: str = '',
         last_daily_completed: Optional[str] = None,
         spotify_access_token: Optional[str] = None,
         spotify_refresh_token: Optional[str] = None,
@@ -26,7 +26,7 @@ class User:
         self.created_at = created_at or datetime.utcnow()
         self.is_active = is_active
         self.total_score = total_score
-        self.games_played = games_played
+        self.levels_completed = levels_completed
         self.last_daily_completed = last_daily_completed  # formato: "dd-mm-yyyy"
         self.spotify_access_token = spotify_access_token
         self.spotify_refresh_token = spotify_refresh_token
@@ -40,7 +40,7 @@ class User:
             'username': self.username,
             'email': self.email,
             'total_score': self.total_score,
-            'games_played': self.games_played,
+            'levels_completed': self.levels_completed,
             'daily_completed': self.is_daily_completed_today()
         }
     
@@ -54,7 +54,27 @@ class User:
     def add_score(self, score: int) -> None:
         """Agregar puntuación al total"""
         self.total_score += score
-        self.games_played += 1
+    
+    def is_level_completed(self, level_id: str) -> bool:
+        """Verificar si un nivel ya está completado"""
+        if not self.levels_completed:
+            return False
+        completed_levels = self.levels_completed.split(',')
+        return level_id in completed_levels
+    
+    def complete_level(self, level_id: str) -> None:
+        """Marcar un nivel como completado"""
+        if not self.is_level_completed(level_id):
+            if self.levels_completed:
+                self.levels_completed += f',{level_id}'
+            else:
+                self.levels_completed = level_id
+    
+    def get_completed_levels_count(self) -> int:
+        """Obtener número de niveles completados"""
+        if not self.levels_completed:
+            return 0
+        return len(self.levels_completed.split(','))
     
     def reset_daily_status(self) -> None:
         """Resetear el estado del desafío diario"""
@@ -74,7 +94,7 @@ class User:
             created_at=data.get('created_at'),
             is_active=data.get('is_active', True),
             total_score=data.get('total_score', 0),
-            games_played=data.get('games_played', 0),
+            levels_completed=data.get('levels_completed', ''),
             last_daily_completed=data.get('last_daily_completed'),
             spotify_access_token=data.get('spotify_access_token'),
             spotify_refresh_token=data.get('spotify_refresh_token'),

@@ -40,7 +40,7 @@ class Database:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     is_active BOOLEAN DEFAULT TRUE,
                     total_score INTEGER DEFAULT 0,
-                    games_played INTEGER DEFAULT 0,
+                    levels_completed TEXT DEFAULT '',
                     last_daily_completed TEXT,
                     spotify_access_token TEXT,
                     spotify_refresh_token TEXT,
@@ -218,7 +218,7 @@ class Database:
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT username, email, hashed_password, created_at, is_active, total_score, games_played, last_daily_completed,
+                SELECT username, email, hashed_password, created_at, is_active, total_score, levels_completed, last_daily_completed,
                        spotify_access_token, spotify_refresh_token, spotify_token_expires_at, spotify_client_id, spotify_client_secret
                 FROM users WHERE username = ?
             ''', (username,))
@@ -235,7 +235,7 @@ class Database:
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT username, email, hashed_password, created_at, is_active, total_score, games_played, last_daily_completed,
+                SELECT username, email, hashed_password, created_at, is_active, total_score, levels_completed, last_daily_completed,
                        spotify_access_token, spotify_refresh_token, spotify_token_expires_at, spotify_client_id, spotify_client_secret
                 FROM users WHERE email = ?
             ''', (email,))
@@ -275,20 +275,52 @@ class Database:
             print("Token inválido")
             return None
     
-    def update_user_score(self, username: str, score: int) -> bool:
-        """Actualizar puntuación del usuario"""
+    def update_user_score(self, username: str, score: int, level_id: str) -> tuple[bool, str]:
+        """
+        Actualizar puntuación del usuario solo si el nivel no está completado
+        Retorna (éxito, mensaje)
+        """
         conn = self.get_connection()
         try:
+            # Obtener usuario actual
+            user = self.get_user_by_username(username)
+            if not user:
+                return False, "Usuario no encontrado"
+            
+            # Verificar si el nivel ya está completado
+            if user.is_level_completed(level_id):
+                # Mensaje específico para nivel diario
+                if level_id == "0":
+                    return False, "Desafío diario ya completado hoy"
+                else:
+                    return False, "Nivel ya completado anteriormente"
+            
+            # Verificación adicional para el nivel diario usando el método específico
+            if level_id == "0" and user.is_daily_completed_today():
+                return False, "Desafío diario ya completado hoy"
+            
+            # Marcar nivel como completado y actualizar puntuación
+            user.complete_level(level_id)
+            
+            # Si es el nivel diario (nivel 0), marcarlo también como diario completado
+            if level_id == "0":
+                user.complete_daily()
+            
             conn.execute('''
                 UPDATE users 
-                SET total_score = total_score + ?, games_played = games_played + 1
+                SET total_score = total_score + ?, levels_completed = ?, last_daily_completed = ?
                 WHERE username = ?
-            ''', (score, username))
+            ''', (score, user.levels_completed, user.last_daily_completed, username))
             conn.commit()
-            return True
+            
+            # Mensaje específico para nivel diario
+            if level_id == "0":
+                return True, "¡Desafío diario completado! Puntuación actualizada"
+            else:
+                return True, "Puntuación actualizada y nivel completado"
         except Exception as e:
             print(f"Error actualizando puntuación: {e}")
-            return False
+            return False, f"Error actualizando puntuación: {str(e)}"
         finally:
             conn.close()
     
@@ -297,7 +329,7 @@ class Database:
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT username, total_score, games_played
+                SELECT username, total_score, levels_completed
                 FROM users 
                 WHERE is_active = TRUE
                 ORDER BY total_score DESC

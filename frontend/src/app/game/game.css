@@ -311,6 +311,24 @@ button:disabled {
   margin: 0;
 }
 
+.already-completed-message {
+  text-align: center;
+}
+
+.already-completed-message h3 {
+  font-size: 24px;
+  color: #6c757d;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.already-completed-message p {
+  font-size: 16px;
+  color: #6c757d;
+  margin: 0;
+  opacity: 0.8;
+}
+
 .result-actions {
   display: flex;
   gap: 16px;

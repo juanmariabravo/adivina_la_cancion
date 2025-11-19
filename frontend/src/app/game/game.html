@@ -135,8 +135,14 @@
       </div>
 
       <div class="score-display" *ngIf="isCorrect">
-        <h3>Puntuación: {{ score }} puntos</h3>
-        <p>Intentos: {{ currentAttempt }}/{{ maxAttempts }}</p>
+        <div *ngIf="!alreadyCompleted">
+          <h3>Puntuación: {{ score }} puntos</h3>
+          <p>Intentos: {{ currentAttempt }}/{{ maxAttempts }}</p>
+        </div>
+        <div *ngIf="alreadyCompleted" class="already-completed-message">
+          <h3>ℹ️ Este nivel ya ha sido completado anteriormente</h3>
+          <p>No se han añadido puntos adicionales</p>
+        </div>
       </div>
 
       <div class="result-actions">

@@ -49,7 +49,7 @@ def get_current_user():
     return jsonify(payload), status
 
 
-@app.route('/api/v1/game/score', methods=['POST'])
+@app.route('/api/v1/game/submit-score', methods=['POST'])
 def update_score():
     payload, status = game_service.update_score(request.headers.get('Authorization'), request.get_json())
     return jsonify(payload), status

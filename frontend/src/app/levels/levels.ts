@@ -23,7 +23,7 @@ interface Level {
 export class Levels implements OnInit {
   username: string = '';
   totalScore: number = 0;
-  gamesPlayed: number = 0;
+  levelsCompleted: number = 0;
   dailyCompleted: boolean = false;
   timeRemaining: string = '00:00:00'; // Tiempo restante para que empiece el próximo nivel diario
   isGuest: boolean = false;
@@ -79,7 +79,7 @@ export class Levels implements OnInit {
           this.isGuest = false;
           this.username = userData.username;
           this.totalScore = userData.total_score || 0;
-          this.gamesPlayed = userData.games_played || 0;
+          this.levelsCompleted = userData.levels_completed ? userData.levels_completed.split(',').length : 0;
           this.dailyCompleted = userData.daily_completed || false;
           
           // Guardar datos actualizados
@@ -101,7 +101,7 @@ export class Levels implements OnInit {
     // deshabilitar botón de perfil
     this.isGuest = true;
     this.totalScore = 0;
-    this.gamesPlayed = 0;
+    this.levelsCompleted = 0;
     this.dailyCompleted = false;
   }
 

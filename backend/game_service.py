@@ -57,22 +57,37 @@ class GameService:
                 return {"error": "Puntuación requerida"}, 400
 
             score = data['score']
-            if db.update_user_score(_get_username(user), score):
+            level_id = data.get('level_id', '')
+            
+            success, message = db.update_user_score(_get_username(user), score, level_id)
+            if success:
                 updated_user = db.get_user_by_username(_get_username(user))
-                # assume updated_user returns dict-like
                 return {
-                    "message": "Puntuación actualizada",
-                    "total_score": updated_user.get('total_score') if isinstance(updated_user, dict) else getattr(updated_user, 'total_score', None),
-                    "games_played": updated_user.get('games_played') if isinstance(updated_user, dict) else getattr(updated_user, 'games_played', None)
+                    "message": message,
+                    "total_score": updated_user.total_score if updated_user else 0,
+                    "levels_completed": updated_user.get_completed_levels_count() if updated_user else 0
                 }, 200
             else:
-                return {"error": "Error actualizando puntuación"}, 500
+                # Si el nivel ya está completado, devolver info pero no error
+                if "ya completado" in message:
+                    updated_user = db.get_user_by_username(_get_username(user))
+                    return {
+                        "message": message,
+                        "total_score": updated_user.total_score if updated_user else 0,
+                        "levels_completed": updated_user.get_completed_levels_count() if updated_user else 0,
+                        "already_completed": True
+                    }, 200
+                else:
+                    return {"error": message}, 500
         except Exception as e:
             return {"error": str(e)}, 500
 
     def get_ranking(self, limit: int = 10):
         try:
             ranking = db.get_ranking(limit)
+            for user in ranking:
+                str_levels_completed = user.get('levels_completed', '')
+                user['levels_completed'] = len(str_levels_completed.split(',')) if str_levels_completed else 0
             return {"ranking": ranking}, 200
         except Exception as e:
             return {"error": str(e)}, 500

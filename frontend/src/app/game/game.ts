@@ -38,6 +38,7 @@ export class Game implements OnInit, OnDestroy {
   isCorrect: boolean = false;
   showAnswer: boolean = false;
   loadingError: boolean = false;
+  alreadyCompleted: boolean = false;
   
   // Pistas reveladas
   revealedHints: string[] = [];
@@ -52,8 +53,8 @@ export class Game implements OnInit, OnDestroy {
   score: number = 0;
   audioReady: boolean = false;
   audioError: string = '';
-  gameStarted: boolean = false; // Nuevo: controlar si el juego ha comenzado
-  canReplayAudio: boolean = false; // Nuevo: permitir repetir audio
+  gameStarted: boolean = false; // controlar si el juego ha comenzado
+  canReplayAudio: boolean = false; // permitir repetir audio
   
   private apiUrl = 'http://127.0.0.1:5000/api/v1';
 
@@ -75,6 +76,10 @@ export class Game implements OnInit, OnDestroy {
         this.isGuest = false;
         this.level_number = parseInt(this.levelId, 10);
       }
+      
+      // Verificar si el nivel ya está completado
+      this.checkIfLevelCompleted();
+      
       this.loadSong();
     });
   }
@@ -99,6 +104,9 @@ export class Game implements OnInit, OnDestroy {
           this.audioReady = true; // Audio listo, esperar interacción del usuario
           this.primeras_letras = this.currentSong!.title.substring(0, 3) + '...';
           this.currentSong!.title_hint = this.primeras_letras;
+          
+          // Volver a verificar el estado después de cargar la canción
+          this.checkIfLevelCompleted();
         } else {
           this.loadingError = true;
           this.message = 'No hay canción disponible en este nivel';
@@ -202,7 +210,7 @@ export class Game implements OnInit, OnDestroy {
           this.showAnswer = true;
           this.currentSong = { ...this.currentSong!, ...response.answer };
           this.calculateScore();
-          this.message = `¡Correcto! La canción es "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
+          this.message = `La canción es "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
           this.playCompleteAudio();
           this.saveScore();
         } else {
@@ -283,14 +291,41 @@ export class Game implements OnInit, OnDestroy {
       return;
     }
     
-    this.gameService.submitScore(this.score, token).subscribe({
-      next: (response) => {
-        console.log('Puntuación guardada:', response);
-      },
-      error: (err) => {
-        console.error('Error guardando puntuación:', err);
-      }
-    });
+    // Si ya sabemos que está completado, no enviar la petición
+    if (!this.alreadyCompleted) {
+
+      this.gameService.submitScore(this.score, this.levelId, token).subscribe({
+        next: (response) => {
+          if (response.already_completed) {
+            this.alreadyCompleted = true;
+          } else {
+            console.log('Puntuación guardada:', response);
+            
+            // Actualizar los datos del usuario en sessionStorage
+            const currentUser = this.userService.getCurrentUser();
+            if (currentUser) {
+              // Agregar el nivel a la lista de completados
+              if (currentUser.levels_completed) {
+                currentUser.levels_completed += `,${this.levelId}`;
+              } else {
+                currentUser.levels_completed = this.levelId;
+              }
+              
+              // Actualizar el total score si viene en la respuesta
+              if (response.total_score !== undefined) {
+                currentUser.total_score = response.total_score;
+              }
+              
+              // Guardar los datos actualizados
+              this.userService.saveCurrentUser(currentUser);
+            }
+          }
+        },
+        error: (err) => {
+          console.error('Error guardando puntuación:', err);
+        }
+      });
+    }
   }
 
   private revealAnswer(): void {
@@ -339,11 +374,12 @@ export class Game implements OnInit, OnDestroy {
   }
 
   goToLevels(): void {
-    this.router.navigate(['/levels']);
+    //this.router.navigate(['/levels']); No cancela la reproducción de audio, así que se usa window.location.reload()
+    window.location.href = '/levels';
   }
 
   goToProfile(): void {
-    this.router.navigate(['/profile']);
+    window.location.href = '/profile';
   }
 
   goToLogin(): void {
@@ -357,5 +393,24 @@ export class Game implements OnInit, OnDestroy {
     setTimeout(() => {
       this.loadSong();
     }, 500);
+  }
+
+  private checkIfLevelCompleted(): void {
+    // Solo verificar para usuarios autenticados (no invitados)
+    if (this.isGuest) {
+      this.alreadyCompleted = false;
+      return;
+    }
+
+    const currentUser = this.userService.getCurrentUser();
+    
+    if (!currentUser || !currentUser.levels_completed) {
+      this.alreadyCompleted = false;
+      return;
+    }
+
+    // Verificar si el levelId actual está en la lista de niveles completados
+    const completedLevels = currentUser.levels_completed.split(',');
+    this.alreadyCompleted = completedLevels.includes(this.levelId);
   }
 }

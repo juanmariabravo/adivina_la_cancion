@@ -23,7 +23,7 @@
         <div class="player-avatar silver">{{ ranking[1]?.username?.charAt(0).toUpperCase() }}</div>
         <div class="player-name">{{ ranking[1]?.username }}</div>
         <div class="player-score">{{ ranking[1]?.total_score }} pts</div>
-        <div class="player-games">{{ ranking[1]?.games_played }} partidas</div>
+        <div class="player-games">{{ ranking[1]?.levels_completed }} partidas</div>
       </div>
 
       <!-- 1er lugar -->
@@ -33,7 +33,7 @@
         <div class="player-avatar gold">{{ ranking[0]?.username?.charAt(0).toUpperCase() }}</div>
         <div class="player-name">{{ ranking[0]?.username }}</div>
         <div class="player-score">{{ ranking[0]?.total_score }} pts</div>
-        <div class="player-games">{{ ranking[0]?.games_played }} partidas</div>
+        <div class="player-games">{{ ranking[0]?.levels_completed }} partidas</div>
       </div>
 
       <!-- 3er lugar -->
@@ -42,7 +42,7 @@
         <div class="player-avatar bronze">{{ ranking[2]?.username?.charAt(0).toUpperCase() }}</div>
         <div class="player-name">{{ ranking[2]?.username }}</div>
         <div class="player-score">{{ ranking[2]?.total_score }} pts</div>
-        <div class="player-games">{{ ranking[2]?.games_played }} partidas</div>
+        <div class="player-games">{{ ranking[2]?.levels_completed }} partidas</div>
       </div>
     </div>
 
@@ -54,8 +54,7 @@
           <div class="col-rank">#</div>
           <div class="col-player">Jugador</div>
           <div class="col-score">Puntuación</div>
-          <div class="col-games">Partidas</div>
-          <div class="col-avg">Promedio</div>
+          <div class="col-games">Niveles completados</div>
         </div>
 
         <div 
@@ -82,10 +81,7 @@
             <span class="score-label">pts</span>
           </div>
           <div class="col-games">
-            <span class="games-value">{{ player.games_played }}</span>
-          </div>
-          <div class="col-avg">
-            <span class="avg-value">{{ player.games_played > 0 ? (player.total_score / player.games_played).toFixed(1) : '0' }}</span>
+            <span class="games-value">{{ player.levels_completed }}</span>
           </div>
         </div>
       </div>

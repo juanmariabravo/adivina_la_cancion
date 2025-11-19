@@ -215,7 +215,7 @@ body {
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-bottom: 24px;
+  margin-bottom: 5px;
 }
 
 .daily-icon {
@@ -245,6 +245,21 @@ body {
 
 .daily-badge.completed {
   background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);
+}
+
+/* Daily Details Section */
+
+
+.daily-details .daily-header {
+  margin-bottom: 12px;
+}
+
+/* Daily Action Section */
+.daily-action {
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 138, 0, 0.1);
 }
 
 .play-button {

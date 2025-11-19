@@ -32,14 +32,14 @@ export class GameService {
   }
 
   // Enviar puntuación (solo usuarios autenticados)
-  submitScore(score: number, authToken: string): Observable<any> {
+  submitScore(score: number, levelId: string, authToken: string): Observable<any> {
     const headers = {
       'Content-Type': 'application/json',
       'Authorization': authToken
     };
 
-    return this.http.post<any>(`${this.apiUrl}/game/submit-score`, 
-      { score }, 
+    return this.http.post<any>(`${this.apiUrl}/game/submit-score`,
+      { score: score, level_id: levelId },
       { headers }
     );
   }
