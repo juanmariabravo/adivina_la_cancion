@@ -148,7 +148,8 @@ class GameService:
                 
                 spotify_track_id = song.get('spotify_id')
                 
-                if song.get('title'): # si título existe, significa que la canción está completa
+                # si ya tiene los datos guardados en la BD, devolverlos directamente
+                if song.get('title') and song.get('artists') and song.get('album') and song.get('year') and song.get('genre') and song.get('audio') and song.get('image_url'):
                     return {
                         "song": {
                             "id": spotify_track_id,
@@ -160,7 +161,7 @@ class GameService:
                             "audio": song['audio'],
                             "image_url": song['image_url']
                         },
-                        "source": "spotify"
+                        "source": "database"
                     }, 200
                 else: # si solo tiene spotify_id, obtener datos desde Spotify API
                     # Obtener token de Spotify del usuario

@@ -3,7 +3,6 @@
 - Integrar algo relacionado con "El Señor de los Anillos"' (Nivel Easter Egg con "The Shire")
 
 #### Falta por hacer:
-- Que si un nivel ya se ha pedido antes, se quede guardado en la base de datos y no se pida otra vez. Prueba: después de abrir un nivel, borrar accessToken del sessionStorage y volver a abrir el nivel.
 - Añadir ayuda (misma que en la Gramola).
 - Arreglar puntuaciones y ranking
 - Arreglar Género de las canciones (no Unknown)
@@ -19,11 +18,6 @@ Ejemplos: > We are Young (feat. Janelle Monáe) -> We are Young
 #### Otros objetivos secundarios
 - Que el usuario pueda jugar con sus propias playlists
 
-### últimas mejoras realizadas
-- Añadido nivel easter egg de "The Shire" (El Señor de los Anillos)
-- Añadidos los 30 niveles de Spotify
-- Añadido ranking global: pero falta que funcione la puntuación
-
 ## DUDAS
-- Cómo hacer que cada día se cambie de nivel automáticamente (que al rcargar el backend se establezca uno random y ya)
+- Cómo hacer que cada día se cambie de nivel automáticamente (que al recargar el backend se establezca uno random y ya)
 - Fecha de entrega final. 14 de diciembre

@@ -79,6 +79,19 @@ class Database:
                 )
             ''')
 
+            # # Añadir nuevas columnas si la tabla ya existe (para bases de datos existentes)
+            # try:
+            #     conn.execute('ALTER TABLE users ADD COLUMN spotify_client_id TEXT')
+            # except sqlite3.OperationalError as e:
+            #     if "duplicate column name" not in str(e).lower():
+            #         print(f"⚠️ Error añadiendo spotify_client_id: {e}")
+                
+            # try:
+            #     conn.execute('ALTER TABLE users ADD COLUMN spotify_client_secret TEXT')
+            # except sqlite3.OperationalError as e:
+            #     if "duplicate column name" not in str(e).lower():
+            #         print(f"⚠️ Error añadiendo spotify_client_secret: {e}")
+
             conn.commit()
             
             # Insertar canciones locales
@@ -86,7 +99,7 @@ class Database:
             # Insertar IDs de canciones de Spotify
             self.init_spotify_songs_levels()
             
-            print("✅ Base de datos inicializada correctamente")
+            print("✅ Base de datos inicializada correctamente en "+ DATABASE_PATH)
         except Exception as e:
             print(f"❌ Error inicializando base de datos: {e}")
         finally:
@@ -156,8 +169,9 @@ class Database:
                 data = json.load(f)
                 levels = data.get('levels', [])
             for level in levels:
+                # cambiar IGNORE por REPLACE si se desea cambiar la canción de un nivel
                 conn.execute('''
-                    INSERT OR REPLACE INTO spotify_songs (spotify_id, level_id)
+                    INSERT OR IGNORE INTO spotify_songs (spotify_id, level_id)
                     VALUES (?, ?)
                 ''', (level['spotify_id'], level['level_id']))
             conn.commit()
@@ -381,7 +395,7 @@ class Database:
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT spotify_id, level_id
+                SELECT spotify_id, title, artists, album, year, genre, audio, image_url, level_id
                 FROM spotify_songs
                 WHERE level_id = ?
                 LIMIT 1
