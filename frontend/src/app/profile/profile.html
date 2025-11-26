@@ -28,11 +28,11 @@
         <span class="info-value">{{ totalScore }}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">🎮 Partidas Jugadas:</span>
+        <span class="info-label">🎮 Niveles Jugados:</span>
         <span class="info-value">{{ gamesPlayed }}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">📊 Promedio por Partida:</span>
+        <span class="info-label">📊 Promedio por Nivel:</span>
         <span class="info-value">{{ averageScore }}</span>
       </div>
       <div class="info-item">
@@ -56,33 +56,18 @@
 
       <div class="form-group">
         <label for="editUsername">Nuevo Nombre de Usuario (opcional):</label>
-        <input 
-          type="text" 
-          id="editUsername" 
-          [(ngModel)]="editUsername"
-          placeholder="Mínimo 3 caracteres"
-          minlength="3"
-        >
+        <input type="text" id="editUsername" [(ngModel)]="editUsername" placeholder="Mínimo 3 caracteres" minlength="3">
       </div>
 
       <div class="form-group">
         <label for="editPassword">Nueva Contraseña (opcional):</label>
-        <input 
-          type="password" 
-          id="editPassword" 
-          [(ngModel)]="editPassword"
-          placeholder="Mínimo 6 caracteres"
-        >
+        <input type="password" id="editPassword" [(ngModel)]="editPassword" placeholder="Mínimo 6 caracteres">
       </div>
 
       <div class="form-group">
         <label for="editPasswordConfirm">Confirmar Contraseña:</label>
-        <input 
-          type="password" 
-          id="editPasswordConfirm" 
-          [(ngModel)]="editPasswordConfirm"
-          placeholder="Repite la contraseña"
-        >
+        <input type="password" id="editPasswordConfirm" [(ngModel)]="editPasswordConfirm"
+          placeholder="Repite la contraseña">
       </div>
 
       <div class="edit-actions">
@@ -130,33 +115,21 @@
   <div class="spotify-status" *ngIf="!isEditing">
     <div class="status-header">
       <h3>🎵 Estado de Spotify</h3>
-      <span 
-        class="status-badge" 
-        [class.connected]="isSpotifyConnected"
-        [class.disconnected]="!isSpotifyConnected"
-      >
+      <span class="status-badge" [class.connected]="isSpotifyConnected" [class.disconnected]="!isSpotifyConnected">
         {{ isSpotifyConnected ? '✅ Conectado' : '❌ No conectado' }}
       </span>
     </div>
-    
+
     <p *ngIf="!isSpotifyConnected" class="warning-text">
       ⚠️ Debes conectar Spotify para poder jugar
     </p>
-    
-    <button 
-      *ngIf="!isSpotifyConnected" 
-      class="spotify-connect-btn"
-      (click)="connectSpotify()"
-    >
+
+    <button *ngIf="!isSpotifyConnected" class="spotify-connect-btn" (click)="connectSpotify()">
       <span class="spotify-icon">🎵</span>
       Conectar con Spotify
     </button>
-    
-    <button 
-      *ngIf="isSpotifyConnected" 
-      class="spotify-disconnect-btn"
-      (click)="disconnectSpotify()"
-    >
+
+    <button *ngIf="isSpotifyConnected" class="spotify-disconnect-btn" (click)="disconnectSpotify()">
       Desconectar Spotify
     </button>
   </div>

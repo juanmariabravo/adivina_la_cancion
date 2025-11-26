@@ -23,7 +23,7 @@
         <div class="player-avatar silver">{{ ranking[1]?.username?.charAt(0).toUpperCase() }}</div>
         <div class="player-name">{{ ranking[1]?.username }}</div>
         <div class="player-score">{{ ranking[1]?.total_score }} pts</div>
-        <div class="player-games">{{ ranking[1]?.levels_completed }} partidas</div>
+        <div class="player-games">{{ ranking[1]?.levels_completed }} niveles jugados</div>
       </div>
 
       <!-- 1er lugar -->
@@ -33,7 +33,7 @@
         <div class="player-avatar gold">{{ ranking[0]?.username?.charAt(0).toUpperCase() }}</div>
         <div class="player-name">{{ ranking[0]?.username }}</div>
         <div class="player-score">{{ ranking[0]?.total_score }} pts</div>
-        <div class="player-games">{{ ranking[0]?.levels_completed }} partidas</div>
+        <div class="player-games">{{ ranking[0]?.levels_completed }} niveles jugados</div>
       </div>
 
       <!-- 3er lugar -->
@@ -42,7 +42,7 @@
         <div class="player-avatar bronze">{{ ranking[2]?.username?.charAt(0).toUpperCase() }}</div>
         <div class="player-name">{{ ranking[2]?.username }}</div>
         <div class="player-score">{{ ranking[2]?.total_score }} pts</div>
-        <div class="player-games">{{ ranking[2]?.levels_completed }} partidas</div>
+        <div class="player-games">{{ ranking[2]?.levels_completed }} niveles jugados</div>
       </div>
     </div>
 
@@ -57,12 +57,8 @@
           <div class="col-games">Niveles completados</div>
         </div>
 
-        <div 
-          class="table-row" 
-          *ngFor="let player of ranking; let i = index"
-          [class.top-3]="i < 3"
-          [class.highlight]="false"
-        >
+        <div class="table-row" *ngFor="let player of ranking; let i = index" [class.top-3]="i < 3"
+          [class.highlight]="false">
           <div class="col-rank">
             <span class="rank-number" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
               {{ i + 1 }}

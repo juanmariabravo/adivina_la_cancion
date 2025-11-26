@@ -134,7 +134,7 @@
         <p class="album">{{ currentSong!.album }} ({{ currentSong!.year }})</p>
       </div>
 
-      <div class="score-display" *ngIf="isCorrect">
+      <div class="score-display" *ngIf="isCorrect && !isGuest">
         <div *ngIf="!alreadyCompleted">
           <h3>Puntuación: {{ score }} puntos</h3>
           <p>Intentos: {{ currentAttempt }}/{{ maxAttempts }}</p>
