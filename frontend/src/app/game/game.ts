@@ -32,14 +32,13 @@ export class Game implements OnInit, OnDestroy {
   currentAttempt: number = 1;
   maxAttempts: number = 6;
   userAnswer: string = '';
-  
+
   // Estado del juego
   gameOver: boolean = false;
   isCorrect: boolean = false;
   showAnswer: boolean = false;
   loadingError: boolean = false;
-  alreadyCompleted: boolean = false;
-  
+
   // Pistas reveladas
   revealedHints: string[] = [];
   audioSeconds: number = 1;
@@ -47,7 +46,7 @@ export class Game implements OnInit, OnDestroy {
   primeras_letras: string = '';
   // Audio
   audio: HTMLAudioElement | null = null;
-  
+
   // Mensajes
   message: string = '';
   score: number = 0;
@@ -55,7 +54,7 @@ export class Game implements OnInit, OnDestroy {
   audioError: string = '';
   gameStarted: boolean = false; // controlar si el juego ha comenzado
   canReplayAudio: boolean = false; // permitir repetir audio
-  
+
   private apiUrl = 'http://127.0.0.1:5000/api/v1';
 
   constructor(
@@ -63,7 +62,7 @@ export class Game implements OnInit, OnDestroy {
     private router: Router,
     private userService: UserService,
     private gameService: GameService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -76,10 +75,6 @@ export class Game implements OnInit, OnDestroy {
         this.isGuest = false;
         this.level_number = parseInt(this.levelId, 10);
       }
-      
-      // Verificar si el nivel ya está completado
-      this.checkIfLevelCompleted();
-      
       this.loadSong();
     });
   }
@@ -95,7 +90,7 @@ export class Game implements OnInit, OnDestroy {
     const token = this.userService.getToken();
     this.message = 'Cargando nivel...';
     this.loadingError = false;
-    
+
     this.gameService.getSongForLevel(this.levelId, token || undefined).subscribe({
       next: (response) => {
         this.message = '';
@@ -104,9 +99,6 @@ export class Game implements OnInit, OnDestroy {
           this.audioReady = true; // Audio listo, esperar interacción del usuario
           this.primeras_letras = this.currentSong!.title.substring(0, 3) + '...';
           this.currentSong!.title_hint = this.primeras_letras;
-          
-          // Volver a verificar el estado después de cargar la canción
-          this.checkIfLevelCompleted();
         } else {
           this.loadingError = true;
           this.message = 'No hay canción disponible en este nivel';
@@ -117,7 +109,7 @@ export class Game implements OnInit, OnDestroy {
         this.loadingError = true;
         this.audioReady = false;
         this.gameStarted = false;
-        
+
         if (err.status === 403) {
           if (err.error?.spotify_required) {
             this.message = 'Debes conectar Spotify para acceder a este nivel';
@@ -144,7 +136,7 @@ export class Game implements OnInit, OnDestroy {
       this.message = 'Esperando que cargue la canción...';
       return;
     }
-     
+
     this.gameStarted = true; // Habilitar botones
     this.audioReady = false; // Ocultar botón de comenzar
     this.playAudio();
@@ -157,11 +149,20 @@ export class Game implements OnInit, OnDestroy {
     this.playAudio();
   }
 
+  // Timeout para detener el audio
+  private audioTimeout: any;
+
   private playAudio(): void {
     if (!this.currentSong) return;
-    
+
+    // Limpiar timeout anterior si existe
+    if (this.audioTimeout) {
+      clearTimeout(this.audioTimeout);
+      this.audioTimeout = null;
+    }
+
     this.canReplayAudio = false; // Deshabilitar durante reproducción
-    
+
     if (this.audio) {
       this.audio.pause();
       this.audio.currentTime = 0; // Empezar de cero en siguientes intentos
@@ -180,14 +181,15 @@ export class Game implements OnInit, OnDestroy {
 
     this.audio = new Audio(audioSource);
     this.audio.play();
-          
+
     // Parar después de audioSeconds segundos
-    setTimeout(() => {
+    this.audioTimeout = setTimeout(() => {
       if (this.audio) {
         this.audio.pause();
         this.audio.currentTime = 0;
       }
       this.canReplayAudio = true; // Habilitar botón de repetir
+      this.audioTimeout = null;
     }, this.audioSeconds * 1000);
   }
 
@@ -196,12 +198,12 @@ export class Game implements OnInit, OnDestroy {
       this.message = 'Primero debes comenzar el juego';
       return;
     }
-    
+
     if (!this.userAnswer.trim() || !this.currentSong) {
       this.message = 'Introduce una respuesta';
       return;
     }
-    
+
     this.gameService.validateAnswer(this.levelId, this.userAnswer).subscribe({
       next: (response) => {
         if (response.correct) {
@@ -216,7 +218,7 @@ export class Game implements OnInit, OnDestroy {
         } else {
           this.message = 'Respuesta incorrecta';
           this.userAnswer = '';
-          
+
           if (this.currentAttempt < this.maxAttempts) {
             setTimeout(() => {
               this.nextHint();
@@ -241,14 +243,14 @@ export class Game implements OnInit, OnDestroy {
       this.message = 'Haz clic en "Comenzar" para iniciar el juego';
       return;
     }
-    
+
     if (this.currentAttempt >= this.maxAttempts || this.gameOver) {
       return;
     }
-    
+
     this.currentAttempt++;
     this.audioSeconds += 2;
-    
+
     // Revelar pistas según intento
     switch (this.currentAttempt) {
       case 2:
@@ -275,7 +277,7 @@ export class Game implements OnInit, OnDestroy {
         this.message = `Pista ${this.currentAttempt}/${this.maxAttempts}: Última pista!`;
         break;
     }
-    
+
     this.playAudio(); // Reproducir automáticamente en siguientes intentos (ya tiene permiso)
   }
 
@@ -286,51 +288,38 @@ export class Game implements OnInit, OnDestroy {
 
   private saveScore(): void {
     const token = this.userService.getToken();
-    if (!token) {
-      console.log('Invitado - puntuación no guardada');
+    if (this.isGuest) { // si es invitado no enviamos la puntuación,
+      // pero sí añadimos el nivel completado al session storage
+      let local_completed_levels = sessionStorage.getItem('completed_levels');
+      let completedLevels: string[] = [];
+      if (local_completed_levels) {
+        completedLevels = local_completed_levels.split(',');
+      }
+      if (!completedLevels.includes(this.level_number.toString())) {
+        completedLevels.push(this.level_number.toString());
+        sessionStorage.setItem('completed_levels', completedLevels.join(','));
+      }
+      return;
+    } else if (!token) { // si es usuario registrado pero no hay token, redirigimos al login
+      console.error('No hay token de autenticación disponible. Inicia sesión para guardar la puntuación.');
+      this.router.navigate(['/login']);
       return;
     }
-    
-    // Si ya sabemos que está completado, no enviar la petición
-    if (!this.alreadyCompleted) {
-
+    // Si es usuario registrado, enviamos la puntuación al backend
       this.gameService.submitScore(this.score, this.levelId, token).subscribe({
         next: (response) => {
-          if (response.already_completed) {
-            this.alreadyCompleted = true;
-          } else {
-            console.log('Puntuación guardada:', response);
-            
-            // Actualizar los datos del usuario en sessionStorage
-            const currentUser = this.userService.getCurrentUser();
-            if (currentUser) {
-              // Agregar el nivel a la lista de completados
-              if (currentUser.levels_completed) {
-                currentUser.levels_completed += `,${this.levelId}`;
-              } else {
-                currentUser.levels_completed = this.levelId;
-              }
-              
-              // Actualizar el total score si viene en la respuesta
-              if (response.total_score !== undefined) {
-                currentUser.total_score = response.total_score;
-              }
-              
-              // Guardar los datos actualizados
-              this.userService.saveCurrentUser(currentUser);
-            }
-          }
+          console.log('Puntuación enviada:', response);
         },
         error: (err) => {
-          console.error('Error guardando puntuación:', err);
+          console.error('Error enviando puntuación:', err);
         }
       });
-    }
+
   }
 
   private revealAnswer(): void {
     if (!this.currentSong) return;
-    
+
     this.message = `La canción era: "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
     this.playCompleteAudio();
 
@@ -341,31 +330,40 @@ export class Game implements OnInit, OnDestroy {
     window.location.reload();
   }
 
-
-
   giveUp(): void {
     if (!this.currentSong) return;
 
     this.stopAudio();
-    
+
     this.gameOver = true;
     this.isCorrect = false;
     this.showAnswer = true;
     this.message = 'Te has rendido';
     this.score = 0; // Sin puntuación por rendirse
-    
+
     this.revealAnswer();
   }
 
   private playCompleteAudio(): void {
     if (!this.currentSong) return;
-    
+
+    // Detener audio anterior y limpiar timeout
+    if (this.audioTimeout) {
+      clearTimeout(this.audioTimeout);
+      this.audioTimeout = null;
+    }
+    this.stopAudio();
+
     const audioSource = this.currentSong.audio;
-    const completeAudio = new Audio(audioSource);
-    completeAudio.play();
+    this.audio = new Audio(audioSource);
+    this.audio.play();
   }
 
   private stopAudio(): void {
+    if (this.audioTimeout) {
+      clearTimeout(this.audioTimeout);
+      this.audioTimeout = null;
+    }
     if (this.audio) {
       this.audio.pause();
       this.audio.currentTime = 0;
@@ -395,22 +393,16 @@ export class Game implements OnInit, OnDestroy {
     }, 500);
   }
 
-  private checkIfLevelCompleted(): void {
-    // Solo verificar para usuarios autenticados (no invitados)
+  nextLevel(): void {
+    const nextLevelNum = this.level_number + 1;
+    let nextLevelId = nextLevelNum.toString();
+
     if (this.isGuest) {
-      this.alreadyCompleted = false;
-      return;
+      nextLevelId += '_local';
     }
 
-    const currentUser = this.userService.getCurrentUser();
-    
-    if (!currentUser || !currentUser.levels_completed) {
-      this.alreadyCompleted = false;
-      return;
-    }
-
-    // Verificar si el levelId actual está en la lista de niveles completados
-    const completedLevels = currentUser.levels_completed.split(',');
-    this.alreadyCompleted = completedLevels.includes(this.levelId);
+    // Navegar al siguiente nivel
+    // Usamos window.location.href para forzar una recarga completa y asegurar que se reinicia todo el estado
+    window.location.href = `/game?level=${nextLevelId}`;
   }
 }
