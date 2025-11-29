@@ -14,16 +14,16 @@ import { UserService } from '../../services/user-service';
 export class Login implements OnInit {
   // Formulario reactivo
   loginForm: FormGroup;
-  
+
   // Estados
   loading = false;
   showPassword = false;
-  
+
   // Mensajes de error
   formError = '';
   emailError = '';
   passwordError = '';
-  
+
   // Mensaje de éxito
   successMessage = '';
 
@@ -93,9 +93,9 @@ export class Login implements OnInit {
   // Métodos de validación
   validateEmail(): void {
     this.emailError = '';
-    
+
     if (!this.emailControl?.value) return;
-    
+
     if (this.emailControl?.errors?.['email']) {
       this.emailError = 'Formato de email inválido';
     }
@@ -103,9 +103,9 @@ export class Login implements OnInit {
 
   validatePassword(): void {
     this.passwordError = '';
-    
+
     if (!this.passwordControl?.value) return;
-    
+
     if (this.passwordControl?.errors?.['minlength']) {
       this.passwordError = 'Mínimo 6 caracteres';
     }
@@ -116,10 +116,10 @@ export class Login implements OnInit {
   }
 
   isFormValid(): boolean {
-    return !this.emailInvalid && 
-           !this.passwordInvalid &&
-           this.emailControl?.value?.length > 0 &&
-           this.passwordControl?.value?.length > 0;
+    return !this.emailInvalid &&
+      !this.passwordInvalid &&
+      this.emailControl?.value?.length > 0 &&
+      this.passwordControl?.value?.length > 0;
   }
 
   onSubmit(): void {
@@ -128,15 +128,15 @@ export class Login implements OnInit {
     this.successMessage = '';
     this.emailError = '';
     this.passwordError = '';
-    
+
     // Marcar todos los campos como touched para mostrar errores
     this.emailControl?.markAsTouched();
     this.passwordControl?.markAsTouched();
-    
+
     // Ejecutar validaciones
     this.validateEmail();
     this.validatePassword();
-    
+
     // Verificar si el formulario es válido
     if (!this.isFormValid()) {
       this.formError = 'Por favor, corrige los errores del formulario.';
@@ -159,14 +159,14 @@ export class Login implements OnInit {
       next: (response: any) => {
         this.loading = false;
         this.successMessage = '¡Sesión iniciada correctamente! Redirigiendo...';
-        
+
         // Limpiar formulario
         this.loginForm.reset();
 
         // Guardar datos de la respuesta
         this.service.saveCurrentUser(response.user);
         this.service.saveToken(response.token_type, response.access_token);
-        
+
         // Redirigir después de 1.5 segundos
         setTimeout(() => {
           this.router.navigate(['/levels']);
@@ -174,7 +174,7 @@ export class Login implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        
+
         if (error.status === 401) {
           this.formError = 'Email o contraseña incorrectos.';
         } else if (error.status === 400) {
@@ -184,7 +184,7 @@ export class Login implements OnInit {
         } else {
           this.formError = error.error?.error || 'Error del servidor. Intenta más tarde.';
         }
-        
+
         // Limpiar contraseña en caso de error
         this.loginForm.patchValue({ password: '' });
         this.passwordControl?.markAsUntouched();
@@ -193,6 +193,6 @@ export class Login implements OnInit {
   }
 
   loginAsGuest(): void {
-    this.router.navigate(['/game']);
+    this.router.navigate(['/levels']);
   }
 }
