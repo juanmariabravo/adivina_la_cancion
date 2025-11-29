@@ -103,9 +103,12 @@ body {
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0, 0) rotate(0deg);
   }
+
   50% {
     transform: translate(30px, 30px) rotate(5deg);
   }
@@ -129,6 +132,7 @@ body {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -174,12 +178,19 @@ body {
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
+
   40% {
     transform: translateY(-10px);
   }
+
   60% {
     transform: translateY(-5px);
   }
@@ -257,6 +268,8 @@ body {
 .input-icon {
   position: absolute;
   right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 1.1rem;
   opacity: 0.7;
   pointer-events: none;
@@ -273,6 +286,7 @@ body {
   font-size: 18px;
   color: #666;
   transition: color 0.3s;
+  z-index: 2;
 }
 
 .toggle-password:hover {
@@ -419,8 +433,13 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Footer del card */

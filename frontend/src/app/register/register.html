@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Adivina la Canción</title>
 </head>
+
 <body>
     <div class="register-container">
         <!-- Background con efecto musical -->
         <div class="background-effects">
-            <div class="floating-note">🎵</div>
-            <div class="floating-note">🎶</div>
-            <div class="floating-note">🎵</div>
-            <div class="floating-note">🎶</div>
+            <div class="floating-note"><i class="fa-solid fa-music"></i></div>
+            <div class="floating-note"><i class="fa-solid fa-headphones"></i></div>
+            <div class="floating-note"><i class="fa-solid fa-music"></i></div>
+            <div class="floating-note"><i class="fa-solid fa-headphones"></i></div>
         </div>
 
         <!-- Card de registro -->
@@ -20,11 +22,11 @@
             <!-- Header -->
             <div class="card-header">
                 <a routerLink="/" class="back-button">
-                    <span class="back-arrow">←</span>
+                    <span class="back-arrow"><i class="fa-solid fa-arrow-left"></i></span>
                     Volver al inicio
                 </a>
                 <div class="logo-section">
-                    <div class="logo">🎵</div>
+                    <div class="logo"><i class="fa-solid fa-music"></i></div>
                     <h1>Crear Cuenta</h1>
                     <p>Únete a la comunidad musical</p>
                 </div>
@@ -32,24 +34,15 @@
 
             <!-- Formulario -->
             <form class="register-form" id="registerForm" (ngSubmit)="onRegister()" #registerForm="ngForm" novalidate>
-                
+
                 <!-- Username -->
                 <div class="form-group">
                     <label for="username">Nombre de usuario</label>
                     <div class="input-container" [class.error]="usernameInvalid">
-                        <input 
-                            type="text" 
-                            id="username"
-                            [(ngModel)]="username"
-                            name="username"
-                            placeholder="Elige tu nombre de usuario"
-                            required
-                            minlength="3"
-                            maxlength="20"
-                            (blur)="validateUsername()"
-                            #usernameInput="ngModel"
-                        >
-                        <span class="input-icon">👤</span>
+                        <input type="text" id="username" [(ngModel)]="username" name="username"
+                            placeholder="Elige tu nombre de usuario" required minlength="3" maxlength="20"
+                            (blur)="validateUsername()" #usernameInput="ngModel">
+                        <span class="input-icon"><i class="fa-solid fa-user"></i></span>
                     </div>
                     <div class="error-message" *ngIf="usernameInvalid">
                         <span *ngIf="usernameError">{{ usernameError }}</span>
@@ -59,29 +52,22 @@
                 <!-- Email -->
                 <div class="form-group">
                     <label for="email">
-                      Email *
-                      <span class="email-hint">📧 Usa tu email de Spotify</span>
+                        Email *
+                        <span class="email-hint"><i class="fa-solid fa-envelope"></i> Usa tu email de Spotify</span>
                     </label>
                     <div class="input-container" [class.error]="emailInvalid">
-                        <input 
-                            type="email" 
-                            id="email" 
-                            [(ngModel)]="email"
-                            name="email"
-                            placeholder="Introduce tu correo"
-                            required
-                            email
-                            (blur)="validateEmail()"
-                            #emailInput="ngModel"
-                        >
-                        <span class="input-icon">📧</span>
+                        <input type="email" id="email" [(ngModel)]="email" name="email"
+                            placeholder="Introduce tu correo" required email (blur)="validateEmail()"
+                            #emailInput="ngModel">
+                        <span class="input-icon"><i class="fa-solid fa-envelope"></i></span>
                     </div>
                     <div class="error-message" *ngIf="emailInvalid">
                         <span *ngIf="emailInput.errors?.['required']">El email es requerido</span>
                         <span *ngIf="emailError">{{ emailError }}</span>
                     </div>
                     <div class="info-message">
-                      ℹ️ Debes usar el mismo email que tu cuenta de Spotify para jugar
+                        <i class="fa-solid fa-circle-info"></i> Debes usar el mismo email que tu cuenta de Spotify para
+                        jugar
                     </div>
                 </div>
 
@@ -89,31 +75,19 @@
                 <div class="form-group">
                     <label for="password">Contraseña</label>
                     <div class="input-container" [class.error]="passwordInvalid">
-                        <input 
-                            [type]="showPassword ? 'text' : 'password'" 
-                            id="password" 
-                            [(ngModel)]="pwd1"
-                            name="password"
-                            placeholder="Crea una contraseña segura"
-                            required
-                            minlength="6"
-                            #passwordInput="ngModel"
-                        >
-                        <span class="input-icon">🔒</span>
-                        <button 
-                            type="button" 
-                            class="toggle-password" 
-                            (click)="togglePasswordVisibility()"
-                            [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-                        >
-                            {{ showPassword ? '👁️‍🗨️' : '👁️' }}
+                        <input [type]="showPassword ? 'text' : 'password'" id="password" [(ngModel)]="pwd1"
+                            name="password" placeholder="Crea una contraseña segura" required minlength="6"
+                            #passwordInput="ngModel">
+                        <button type="button" class="toggle-password" (click)="togglePasswordVisibility()"
+                            [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                            <i class="fa-solid" [class.fa-eye-slash]="showPassword" [class.fa-eye]="!showPassword"></i>
                         </button>
                     </div>
                     <div class="error-message" *ngIf="passwordInvalid">
                         <span *ngIf="passwordInput.errors?.['required']">La contraseña es requerida</span>
                         <span *ngIf="passwordInput.errors?.['minlength']">Mínimo 6 caracteres</span>
                     </div>
-                    
+
                     <!-- Indicador de fuerza de contraseña -->
                     <div class="password-strength" *ngIf="pwd1.length > 0">
                         <div class="strength-bar">
@@ -127,17 +101,10 @@
                 <div class="form-group">
                     <label for="confirmPassword">Confirmar contraseña</label>
                     <div class="input-container" [class.error]="confirmPasswordInvalid">
-                        <input 
-                            [type]="showPassword ? 'text' : 'password'" 
-                            id="confirmPassword" 
-                            [(ngModel)]="pwd2"
-                            name="confirmPassword"
-                            placeholder="Repite tu contraseña"
-                            required
-                            (input)="validateConfirmPassword()"
-                            #confirmPasswordInput="ngModel"
-                        >
-                        <span class="input-icon">✅</span>
+                        <input [type]="showPassword ? 'text' : 'password'" id="confirmPassword" [(ngModel)]="pwd2"
+                            name="confirmPassword" placeholder="Repite tu contraseña" required
+                            (input)="validateConfirmPassword()" #confirmPasswordInput="ngModel">
+                        <span class="input-icon"><i class="fa-solid fa-check-circle"></i></span>
                     </div>
                     <div class="error-message" *ngIf="confirmPasswordInvalid">
                         <span *ngIf="confirmPasswordInput.errors?.['required']">Confirma tu contraseña</span>
@@ -151,20 +118,14 @@
                         Spotify Client ID *
                     </label>
                     <div class="input-container" [class.error]="spotifyClientIdInvalid">
-                        <input 
-                            type="text" 
-                            id="spotifyClientId" 
-                            [(ngModel)]="spotifyClientId"
-                            name="spotifyClientId"
-                            placeholder="Tu Client ID de Spotify"
-                            required
-                            (blur)="validateSpotifyClientId()"
-                            #spotifyClientIdInput="ngModel"
-                        >
-                        <span class="input-icon">🎵</span>
+                        <input type="text" id="spotifyClientId" [(ngModel)]="spotifyClientId" name="spotifyClientId"
+                            placeholder="Tu Client ID de Spotify" required (blur)="validateSpotifyClientId()"
+                            #spotifyClientIdInput="ngModel">
+                        <span class="input-icon"><i class="fa-brands fa-spotify"></i></span>
                     </div>
                     <div class="error-message" *ngIf="spotifyClientIdInvalid">
-                        <span *ngIf="spotifyClientIdInput.errors?.['required']">El Client ID de Spotify es requerido</span>
+                        <span *ngIf="spotifyClientIdInput.errors?.['required']">El Client ID de Spotify es
+                            requerido</span>
                         <span *ngIf="spotifyClientIdError">{{ spotifyClientIdError }}</span>
                     </div>
                 </div>
@@ -175,31 +136,28 @@
                         Spotify Client Secret *
                     </label>
                     <div class="input-container" [class.error]="spotifyClientSecretInvalid">
-                        <input 
-                            type="password" 
-                            id="spotifyClientSecret" 
-                            [(ngModel)]="spotifyClientSecret"
-                            name="spotifyClientSecret"
-                            placeholder="Tu Client Secret de Spotify"
-                            required
-                            (blur)="validateSpotifyClientSecret()"
-                            #spotifyClientSecretInput="ngModel"
-                        >
-                        <span class="input-icon">🔐</span>
+                        <input type="password" id="spotifyClientSecret" [(ngModel)]="spotifyClientSecret"
+                            name="spotifyClientSecret" placeholder="Tu Client Secret de Spotify" required
+                            (blur)="validateSpotifyClientSecret()" #spotifyClientSecretInput="ngModel">
+                        <span class="input-icon"><i class="fa-solid fa-key"></i></span>
                     </div>
                     <div class="error-message" *ngIf="spotifyClientSecretInvalid">
-                        <span *ngIf="spotifyClientSecretInput.errors?.['required']">El Client Secret de Spotify es requerido</span>
+                        <span *ngIf="spotifyClientSecretInput.errors?.['required']">El Client Secret de Spotify es
+                            requerido</span>
                         <span *ngIf="spotifyClientSecretError">{{ spotifyClientSecretError }}</span>
                     </div>
                     <details class="help-details">
                         <summary>¿Cómo obtener mis credenciales de Spotify?</summary>
                         <div class="help-content">
                             <ol>
-                                <li>Ve a <a href="https://developer.spotify.com/dashboard" target="_blank">Spotify Developer Dashboard</a></li>
+                                <li>Ve a <a href="https://developer.spotify.com/dashboard" target="_blank">Spotify
+                                        Developer Dashboard</a></li>
                                 <li>Inicia sesión con tu cuenta de Spotify</li>
                                 <li>Haz clic en "Create an App"</li>
                                 <li>Completa el formulario con el nombre de tu aplicación</li>
-                                <li>En la configuración de la app, añade esta URL de redirección: <code>http://127.0.0.1:4200/callback</code></li>
+                                <li>En la configuración de la app, añade esta URL de redirección:
+                                    <code>http://127.0.0.1:4200/callback</code>
+                                </li>
                                 <li>Copia el Client ID y Client Secret y pégalos aquí</li>
                             </ol>
                         </div>
@@ -214,17 +172,13 @@
                 <!-- Mensaje de éxito -->
                 <div *ngIf="successMessage" class="success-message">
                     <div class="success-content">
-                        <span class="success-icon">✅</span>
+                        <span class="success-icon"><i class="fa-solid fa-check-circle"></i></span>
                         <span class="success-text">{{ successMessage }}</span>
                     </div>
                 </div>
 
                 <!-- Botón de registro -->
-                <button 
-                    type="submit" 
-                    class="submit-button" 
-                    [disabled]="loading || !isFormValid()"
-                >
+                <button type="submit" class="submit-button" [disabled]="loading || !isFormValid()">
                     <span class="button-text">
                         {{ loading ? 'Creando cuenta...' : 'Crear Cuenta' }}
                     </span>
@@ -239,4 +193,5 @@
         </div>
     </div>
 </body>
+
 </html>

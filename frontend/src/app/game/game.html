@@ -1,6 +1,6 @@
 <div class="game-container">
   <div class="game-header">
-    <button class="back-button" (click)="goToLevels()">← Volver</button>
+    <button class="back-button" (click)="goToLevels()"><i class="fa-solid fa-arrow-left"></i> Volver</button>
     <h1>Nivel {{ level_number }}</h1>
     <div class="attempts">Intento {{ currentAttempt }}/{{ maxAttempts }}</div>
   </div>
@@ -17,22 +17,22 @@
   <!-- Pantalla de error de carga -->
   <div class="error-screen" *ngIf="loadingError">
     <div class="error-card">
-      <div class="error-icon">⚠️</div>
+      <div class="error-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
       <h2>No se pudo cargar el nivel</h2>
       <p class="error-message">{{ message }}</p>
-      
+
       <div class="error-actions">
         <button class="action-btn primary" (click)="retryLoadSong()">
-          🔄 Reintentar
+          <i class="fa-solid fa-rotate-right"></i> Reintentar
         </button>
         <button class="action-btn secondary" (click)="goToLevels()">
-          ← Volver a Niveles
+          <i class="fa-solid fa-arrow-left"></i> Volver a Niveles
         </button>
         <button class="action-btn tertiary" (click)="goToProfile()" *ngIf="message.includes('Spotify')">
-          👤 Ir a Perfil
+          <i class="fa-solid fa-user"></i> Ir a Perfil
         </button>
         <button class="action-btn tertiary" (click)="goToLogin()" *ngIf="message.includes('sesión')">
-          🔑 Iniciar Sesión
+          <i class="fa-solid fa-key"></i> Iniciar Sesión
         </button>
       </div>
     </div>
@@ -41,7 +41,7 @@
   <div class="game-content" *ngIf="currentSong && !gameOver && !loadingError">
     <!-- Error de audio -->
     <div class="audio-error" *ngIf="audioError">
-      ⚠️ {{ audioError }}
+      <i class="fa-solid fa-triangle-exclamation"></i> {{ audioError }}
       <button class="retry-btn" (click)="startAudioManually()">Reintentar</button>
     </div>
 
@@ -69,54 +69,34 @@
       </div>
     </div>
 
-      <!-- Botón para iniciar el juego -->
+    <!-- Botón para iniciar el juego -->
     <div class="audio-start" *ngIf="audioReady && !gameStarted">
       <button class="play-audio-btn" (click)="startAudioManually()">
-        ▶ Comenzar
+        <i class="fa-solid fa-play"></i> Comenzar
       </button>
     </div>
 
     <!-- Controles de audio (solo cuando el juego ha comenzado) -->
     <div class="audio-controls" *ngIf="gameStarted && !gameOver">
-      <button 
-        class="replay-audio-btn" 
-        (click)="replayAudio()"
-        [disabled]="!canReplayAudio"
-        [class.disabled]="!canReplayAudio"
-      >
-        🔁
+      <button class="replay-audio-btn" (click)="replayAudio()" [disabled]="!canReplayAudio"
+        [class.disabled]="!canReplayAudio">
+        <i class="fa-solid fa-rotate-left"></i>
       </button>
     </div>
 
     <!-- Input respuesta (deshabilitado hasta que comience) -->
-      <input 
-        type="text" 
-        [(ngModel)]="userAnswer" 
-        placeholder="¿Cuál es el título de la canción?"
-        (keyup.enter)="submitAnswer()"
-      >
-      <button 
-        class="submit-btn" 
-        (click)="submitAnswer()"
-        [disabled]="!gameStarted || gameOver"
-      >
-        Responder
-      </button>
-      <button 
-        class="hint-btn" 
-        (click)="nextHint()" 
-        *ngIf="currentAttempt < maxAttempts"
-        [disabled]="!gameStarted || gameOver"
-      >
-        Siguiente Pista
-      </button>
-      <button 
-        class="give-up-btn" 
-        (click)="giveUp()" 
-        *ngIf="currentAttempt === maxAttempts"
-      >
-        Me rindo
-      </button>
+    <input type="text" [(ngModel)]="userAnswer" placeholder="¿Cuál es el título de la canción?"
+      (keyup.enter)="submitAnswer()">
+    <button class="submit-btn" (click)="submitAnswer()" [disabled]="!gameStarted || gameOver">
+      Responder
+    </button>
+    <button class="hint-btn" (click)="nextHint()" *ngIf="currentAttempt < maxAttempts"
+      [disabled]="!gameStarted || gameOver">
+      Siguiente Pista
+    </button>
+    <button class="give-up-btn" (click)="giveUp()" *ngIf="currentAttempt === maxAttempts">
+      Me rindo
+    </button>
 
     <div class="message" *ngIf="message">{{ message }}</div>
   </div>
@@ -126,7 +106,7 @@
     <div class="result-card" [class.correct]="isCorrect" [class.incorrect]="!isCorrect">
       <h2>{{ isCorrect ? '¡Correcto!' : 'Fin del Juego' }}</h2>
       <p class="result-message">{{ message }}</p>
-      
+
       <div class="song-reveal" *ngIf="showAnswer">
         <img [src]="currentSong!.image_url" alt="Portada" class="reveal-image">
         <h3>{{ currentSong!.title }}</h3>
@@ -140,18 +120,17 @@
           <p>Intentos: {{ currentAttempt }}/{{ maxAttempts }}</p>
         </div>
         <div *ngIf="alreadyCompleted" class="already-completed-message">
-          <h3>ℹ️ Este nivel ya ha sido completado anteriormente</h3>
-          <p>No se han añadido puntos adicionales</p>
+          <h3><i class="fa-solid fa-circle-info"></i> Este nivel ya ha sido jugado antes</h3>
+          <p>No se añadirán puntos adicionales a tu puntuación total.</p>
         </div>
       </div>
 
       <div class="result-actions">
-        <button class="action-btn primary" (click)="playAgain()">
-          Jugar de Nuevo
-        </button>
-        <button class="action-btn secondary" (click)="goToLevels()">
-          Volver a Niveles
-        </button>
+        <div class="actions">
+          <button (click)="playAgain()" class="action-btn secondary">Jugar de nuevo</button>
+          <button (click)="nextLevel()" class="action-btn primary">Siguiente Nivel</button>
+          <button (click)="goToLevels()" class="action-btn secondary">Volver a niveles</button>
+        </div>
       </div>
     </div>
   </div>

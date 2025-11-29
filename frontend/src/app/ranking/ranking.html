@@ -2,9 +2,9 @@
   <!-- Header -->
   <div class="ranking-header">
     <button class="back-button" routerLink="/levels">
-      <span>←</span> Volver a Niveles
+      <span><i class="fa-solid fa-arrow-left"></i></span> Volver a Niveles
     </button>
-    <h1 class="ranking-title">🏆 Ranking Global</h1>
+    <h1 class="ranking-title"><i class="fa-solid fa-trophy"></i> Ranking Global</h1>
     <p class="ranking-subtitle">Los mejores jugadores de Adivina la Canción</p>
   </div>
 
@@ -19,7 +19,7 @@
     <div class="podium" *ngIf="ranking.length >= 3">
       <!-- 2do lugar -->
       <div class="podium-place second">
-        <div class="medal">🥈</div>
+        <div class="medal"><i class="fa-solid fa-medal" style="color: #C0C0C0;"></i></div>
         <div class="player-avatar silver">{{ ranking[1]?.username?.charAt(0).toUpperCase() }}</div>
         <div class="player-name">{{ ranking[1]?.username }}</div>
         <div class="player-score">{{ ranking[1]?.total_score }} pts</div>
@@ -28,8 +28,8 @@
 
       <!-- 1er lugar -->
       <div class="podium-place first">
-        <div class="crown">👑</div>
-        <div class="medal">🥇</div>
+        <div class="crown"><i class="fa-solid fa-crown" style="color: #FFD700;"></i></div>
+        <div class="medal"><i class="fa-solid fa-medal" style="color: #FFD700;"></i></div>
         <div class="player-avatar gold">{{ ranking[0]?.username?.charAt(0).toUpperCase() }}</div>
         <div class="player-name">{{ ranking[0]?.username }}</div>
         <div class="player-score">{{ ranking[0]?.total_score }} pts</div>
@@ -38,7 +38,7 @@
 
       <!-- 3er lugar -->
       <div class="podium-place third">
-        <div class="medal">🥉</div>
+        <div class="medal"><i class="fa-solid fa-medal" style="color: #CD7F32;"></i></div>
         <div class="player-avatar bronze">{{ ranking[2]?.username?.charAt(0).toUpperCase() }}</div>
         <div class="player-name">{{ ranking[2]?.username }}</div>
         <div class="player-score">{{ ranking[2]?.total_score }} pts</div>
@@ -85,7 +85,7 @@
 
     <!-- Empty State -->
     <div class="empty-state" *ngIf="ranking.length === 0">
-      <div class="empty-icon">🎵</div>
+      <div class="empty-icon"><i class="fa-solid fa-music"></i></div>
       <h3>No hay jugadores en el ranking</h3>
       <p>¡Sé el primero en aparecer aquí!</p>
       <button class="play-button" routerLink="/levels">Jugar Ahora</button>
@@ -95,10 +95,10 @@
   <!-- Actions -->
   <div class="ranking-actions">
     <button class="action-button" routerLink="/levels">
-      🎮 Jugar
+      <i class="fa-solid fa-gamepad"></i> Jugar
     </button>
     <button class="action-button" routerLink="/profile">
-      👤 Mi Perfil
+      <i class="fa-solid fa-user"></i> Mi Perfil
     </button>
   </div>
 </div>

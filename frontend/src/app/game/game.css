@@ -331,12 +331,20 @@ button:disabled {
 
 .result-actions {
   display: flex;
-  gap: 16px;
+  justify-content: center;
   margin-top: 32px;
 }
 
+.actions {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
 .action-btn {
-  flex: 1;
+  min-width: 160px;
   padding: 16px 32px;
   border: none;
   border-radius: 16px;
@@ -397,8 +405,13 @@ button:disabled {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-card h2 {
@@ -484,24 +497,27 @@ button:disabled {
   .game-container {
     padding: 16px;
   }
-  
+
   .game-header {
     flex-direction: column;
     gap: 16px;
   }
-  
-  .result-card, .error-card, .loading-card {
+
+  .result-card,
+  .error-card,
+  .loading-card {
     padding: 32px 24px;
   }
-  
-  .result-actions, .error-actions {
+
+  .result-actions,
+  .error-actions {
     flex-direction: column;
   }
-  
+
   .error-actions {
     width: 100%;
   }
-  
+
   .action-btn {
     width: 100%;
     justify-content: center;

@@ -1,12 +1,12 @@
 <div class="login-container">
     <!-- Music Notes Animation -->
     <div class="music-notes">
-        <div class="note">🎵</div>
-        <div class="note">🎶</div>
-        <div class="note">🎵</div>
-        <div class="note">🎶</div>
-        <div class="note">🎵</div>
-        <div class="note">🎶</div>
+        <div class="note"><i class="fa-solid fa-music"></i></div>
+        <div class="note"><i class="fa-solid fa-headphones"></i></div>
+        <div class="note"><i class="fa-solid fa-music"></i></div>
+        <div class="note"><i class="fa-solid fa-headphones"></i></div>
+        <div class="note"><i class="fa-solid fa-music"></i></div>
+        <div class="note"><i class="fa-solid fa-headphones"></i></div>
     </div>
 
     <!-- Login Card -->
@@ -14,11 +14,11 @@
         <!-- Header -->
         <div class="card-header">
             <a routerLink="/" class="back-button">
-                <span class="back-arrow">←</span>
+                <span class="back-arrow"><i class="fa-solid fa-arrow-left"></i></span>
                 Volver al inicio
             </a>
             <div class="logo-section">
-                <div class="logo">🎵</div>
+                <div class="logo"><i class="fa-solid fa-music"></i></div>
                 <h1>Iniciar Sesión</h1>
                 <p>Bienvenido de vuelta</p>
             </div>
@@ -26,31 +26,26 @@
 
         <!-- Login Form -->
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-            
+
             <!-- Email Field -->
             <div class="form-group">
                 <label for="email">Correo electrónico</label>
                 <div class="input-container" [class.error]="emailInvalid">
-                    <input 
-                        type="email" 
-                        id="email" 
-                        formControlName="email"
-                        placeholder="Introduce tu correo"
-                        (blur)="validateEmail()"
-                    >
-                    <span class="input-icon">📧</span>
+                    <input type="email" id="email" formControlName="email" placeholder="Introduce tu correo"
+                        (blur)="validateEmail()">
+                    <span class="input-icon"><i class="fa-solid fa-envelope"></i></span>
                 </div>
                 @if (emailInvalid) {
-                    <div class="error-message">
-                        @if (emailControl?.errors?.['required']) {
-                            <span>El email es requerido</span>
-                        }
-                        @if (emailControl?.errors?.['email']) {
-                        }
-                        @if (emailError) {
-                            <span>{{ emailError }}</span>
-                        }
-                    </div>
+                <div class="error-message">
+                    @if (emailControl?.errors?.['required']) {
+                    <span>El email es requerido</span>
+                    }
+                    @if (emailControl?.errors?.['email']) {
+                    }
+                    @if (emailError) {
+                    <span>{{ emailError }}</span>
+                    }
+                </div>
                 }
             </div>
 
@@ -58,66 +53,52 @@
             <div class="form-group">
                 <label for="password">Contraseña</label>
                 <div class="input-container" [class.error]="passwordInvalid">
-                    <input 
-                        [type]="showPassword ? 'text' : 'password'" 
-                        id="password" 
-                        formControlName="password"
-                        placeholder="Introduce tu contraseña"
-                        (blur)="validatePassword()"
-                    >
-                    <span class="input-icon">🔒</span>
-                    <button 
-                        type="button" 
-                        class="toggle-password" 
-                        (click)="togglePasswordVisibility()"
-                        [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-                    >
-                        {{ showPassword ? '👁️‍🗨️' : '👁️' }}
+                    <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"
+                        placeholder="Introduce tu contraseña" (blur)="validatePassword()">
+                    <button type="button" class="toggle-password" (click)="togglePasswordVisibility()"
+                        [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                        <i class="fa-solid" [class.fa-eye-slash]="showPassword" [class.fa-eye]="!showPassword"></i>
                     </button>
                 </div>
                 @if (passwordInvalid) {
-                    <div class="error-message">
-                        @if (passwordControl?.errors?.['required']) {
-                            <span>La contraseña es requerida</span>
-                        }
-                        @if (passwordControl?.errors?.['minlength']) {
-                            <span>Mínimo 6 caracteres</span>
-                        }
-                        @if (passwordError) {
-                            <span>{{ passwordError }}</span>
-                        }
-                    </div>
+                <div class="error-message">
+                    @if (passwordControl?.errors?.['required']) {
+                    <span>La contraseña es requerida</span>
+                    }
+                    @if (passwordControl?.errors?.['minlength']) {
+                    <span>Mínimo 6 caracteres</span>
+                    }
+                    @if (passwordError) {
+                    <span>{{ passwordError }}</span>
+                    }
+                </div>
                 }
             </div>
 
             <!-- General Error Message -->
             @if (formError) {
-                <div class="error-message general-error">
-                    {{ formError }}
-                </div>
+            <div class="error-message general-error">
+                {{ formError }}
+            </div>
             }
 
             <!-- Success Message -->
             @if (successMessage) {
-                <div class="success-message">
-                    <div class="success-content">
-                        <span class="success-icon">✅</span>
-                        <span class="success-text">{{ successMessage }}</span>
-                    </div>
+            <div class="success-message">
+                <div class="success-content">
+                    <span class="success-icon"><i class="fa-solid fa-check-circle"></i></span>
+                    <span class="success-text">{{ successMessage }}</span>
                 </div>
+            </div>
             }
 
             <!-- Submit Button -->
-            <button 
-                type="submit" 
-                class="submit-button"
-                [disabled]="loading || !isFormValid()"
-            >
+            <button type="submit" class="submit-button" [disabled]="loading || !isFormValid()">
                 <span class="button-text">
                     {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
                 </span>
                 @if (loading) {
-                    <div class="loading-spinner"></div>
+                <div class="loading-spinner"></div>
                 }
             </button>
         </form>
@@ -127,12 +108,8 @@
             <div class="guest-divider">
                 <span>¿Solo quieres probar?</span>
             </div>
-            <button 
-                type="button" 
-                class="guest-button"
-                (click)="loginAsGuest()"
-            >
-                <span class="guest-icon">🎮</span>
+            <button type="button" class="guest-button" (click)="loginAsGuest()">
+                <span class="guest-icon"><i class="fa-solid fa-gamepad"></i></span>
                 Jugar como invitado
             </button>
         </div>

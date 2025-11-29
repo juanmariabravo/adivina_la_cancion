@@ -2,7 +2,7 @@
   <!-- Header -->
   <div class="profile-header">
     <button class="back-button" routerLink="/levels">
-      <span>←</span> Volver a Niveles
+      <span><i class="fa-solid fa-arrow-left"></i></span> Volver a Niveles
     </button>
     <h1 class="profile-title">Mi Perfil</h1>
   </div>
@@ -20,37 +20,38 @@
     <!-- Información del Usuario -->
     <div class="user-info-section" *ngIf="!isEditing">
       <div class="info-item">
-        <span class="info-label">📧 Email:</span>
+        <span class="info-label"><i class="fa-solid fa-envelope"></i> Email:</span>
         <span class="info-value">{{ email }}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">🏆 Puntuación Total:</span>
+        <span class="info-label"><i class="fa-solid fa-trophy"></i> Puntuación Total:</span>
         <span class="info-value">{{ totalScore }}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">🎮 Niveles Jugados:</span>
+        <span class="info-label"><i class="fa-solid fa-gamepad"></i> Niveles Jugados:</span>
         <span class="info-value">{{ gamesPlayed }}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">📊 Promedio por Nivel:</span>
+        <span class="info-label"><i class="fa-solid fa-chart-line"></i> Promedio por Nivel:</span>
         <span class="info-value">{{ averageScore }}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">🎯 Desafío Diario:</span>
+        <span class="info-label"><i class="fa-solid fa-calendar-day"></i> Desafío Diario:</span>
         <span class="info-value" [class.completed]="dailyCompleted">
-          {{ dailyCompleted ? '✅ Completado Hoy' : '⏳ Pendiente' }}
+          <ng-container *ngIf="dailyCompleted"><i class="fa-solid fa-check-circle"></i> Completado Hoy</ng-container>
+          <ng-container *ngIf="!dailyCompleted"><i class="fa-solid fa-hourglass-half"></i> Pendiente</ng-container>
         </span>
       </div>
 
       <button class="edit-button" (click)="toggleEdit()">
-        ✏️ Editar Perfil
+        <i class="fa-solid fa-pen-to-square"></i> Editar Perfil
       </button>
     </div>
 
     <!-- Formulario de Edición -->
     <div class="edit-section" *ngIf="isEditing">
       <div class="info-item" style="margin-bottom: 1rem;">
-        <span class="info-label">📧 Email:</span>
+        <span class="info-label"><i class="fa-solid fa-envelope"></i> Email:</span>
         <span class="info-value">{{ email }}</span>
       </div>
 
@@ -72,20 +73,20 @@
 
       <div class="edit-actions">
         <button class="save-button" (click)="saveChanges()">
-          💾 Guardar Cambios
+          <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
         </button>
         <button class="cancel-button" (click)="cancelEdit()">
-          ❌ Cancelar
+          <i class="fa-solid fa-xmark"></i> Cancelar
         </button>
       </div>
     </div>
 
     <!-- Mensajes -->
     <div *ngIf="successMessage" class="success-message">
-      ✅ {{ successMessage }}
+      <i class="fa-solid fa-check-circle"></i> {{ successMessage }}
     </div>
     <div *ngIf="errorMessage" class="error-message">
-      ❌ {{ errorMessage }}
+      <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage }}
     </div>
   </div>
 
@@ -94,17 +95,17 @@
     <h3>Estadísticas</h3>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon">🎵</div>
-        <div class="stat-label">Canciones Adivinadas</div>
+        <div class="stat-icon"><i class="fa-solid fa-music"></i></div>
+        <div class="stat-label">Niveles Jugados</div>
         <div class="stat-value">{{ gamesPlayed }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">⭐</div>
+        <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
         <div class="stat-label">Mejor Puntuación</div>
         <div class="stat-value">{{ totalScore }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">📈</div>
+        <div class="stat-icon"><i class="fa-solid fa-chart-simple"></i></div>
         <div class="stat-label">Promedio</div>
         <div class="stat-value">{{ averageScore }}</div>
       </div>
@@ -114,18 +115,19 @@
   <!-- Spotify Connection Status -->
   <div class="spotify-status" *ngIf="!isEditing">
     <div class="status-header">
-      <h3>🎵 Estado de Spotify</h3>
+      <h3><i class="fa-brands fa-spotify"></i> Estado de Spotify</h3>
       <span class="status-badge" [class.connected]="isSpotifyConnected" [class.disconnected]="!isSpotifyConnected">
-        {{ isSpotifyConnected ? '✅ Conectado' : '❌ No conectado' }}
+        <ng-container *ngIf="isSpotifyConnected"><i class="fa-solid fa-check-circle"></i> Conectado</ng-container>
+        <ng-container *ngIf="!isSpotifyConnected"><i class="fa-solid fa-circle-xmark"></i> No conectado</ng-container>
       </span>
     </div>
 
     <p *ngIf="!isSpotifyConnected" class="warning-text">
-      ⚠️ Debes conectar Spotify para poder jugar
+      <i class="fa-solid fa-triangle-exclamation"></i> Debes conectar Spotify para poder jugar
     </p>
 
     <button *ngIf="!isSpotifyConnected" class="spotify-connect-btn" (click)="connectSpotify()">
-      <span class="spotify-icon">🎵</span>
+      <span class="spotify-icon"><i class="fa-brands fa-spotify"></i></span>
       Conectar con Spotify
     </button>
 
@@ -137,13 +139,13 @@
   <!-- Acciones -->
   <div class="actions-section">
     <button class="action-button" (click)="goToLevels()">
-      🎮 Jugar
+      <i class="fa-solid fa-gamepad"></i> Jugar
     </button>
     <button class="action-button" (click)="goToRanking()">
-      🏆 Ver Ranking
+      <i class="fa-solid fa-trophy"></i> Ver Ranking
     </button>
     <button class="action-button logout" (click)="logout()">
-      🚪 Cerrar Sesión
+      <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
     </button>
   </div>
 </div>
