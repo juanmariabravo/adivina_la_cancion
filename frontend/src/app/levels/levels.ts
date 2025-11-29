@@ -10,6 +10,7 @@ interface Level {
   description: string;
   difficulty: string;
   completed: boolean;
+  played: boolean;
   score: number;
 }
 
@@ -39,19 +40,21 @@ export class Levels implements OnInit {
       description: '',
       difficulty: 'Especial',
       completed: false,
+      played: false,
       score: 0
     },
     // Niveles normales 1-30
     ...Array.from({ length: 30 }, (_, i) => {
       const levelNum = i + 1;
       const difficulties = ['Fácil', 'Intermedio', 'Difícil', 'Experto'];
-      
+
       return {
         id: levelNum,
         title: `NIVEL ${levelNum}`,
         description: '',
         difficulty: difficulties[Math.floor((levelNum - 1) / 7.5)],
         completed: false,
+        played: false,
         score: 0
       };
     })
@@ -61,7 +64,7 @@ export class Levels implements OnInit {
     public userService: UserService,
     private router: Router,
     private spotifyService: SpotifyService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadUserData();
@@ -71,17 +74,33 @@ export class Levels implements OnInit {
 
   private loadUserData(): void {
     const token = this.userService.getToken();
-    
+
     if (token) {
       // Validar y actualizar datos del usuario
       this.userService.validateToken().subscribe({
         next: (userData) => {
-          this.isGuest = false;
+          this.isGuest = false; // si hay token, no es invitado
           this.username = userData.username;
           this.totalScore = userData.total_score || 0;
-          this.levelsCompleted = userData.levels_completed ? userData.levels_completed.split(',').length : 0;
+
+          // Procesar niveles completados
+          const completedLevelsStr = userData.levels_completed || '';
+          const completedLevels = completedLevelsStr ? completedLevelsStr.split(',') : [];
+          this.levelsCompleted = completedLevels.length;
+
+          // Procesar niveles jugados
+          const playedLevelsStr = userData.played_levels || '';
+          const playedLevels = playedLevelsStr ? playedLevelsStr.split(',') : [];
+
           this.dailyCompleted = userData.daily_completed || false;
-          
+
+          // Actualizar estado de los niveles
+          this.levels.forEach(level => {
+            const levelIdStr = level.id.toString();
+            level.completed = completedLevels.includes(levelIdStr);
+            level.played = playedLevels.includes(levelIdStr);
+          });
+
           // Guardar datos actualizados
           this.userService.saveCurrentUser(userData);
         },
@@ -101,8 +120,11 @@ export class Levels implements OnInit {
     // deshabilitar botón de perfil
     this.isGuest = true;
     this.totalScore = 0;
-    this.levelsCompleted = 0;
     this.dailyCompleted = false;
+    // calcular niveles jugados completados, del sessionStorage
+    const completedLevelsStr = sessionStorage.getItem('completed_levels') || '';
+    const completedLevels = completedLevelsStr ? completedLevelsStr.split(',') : [];
+    this.levelsCompleted = completedLevels.length;
   }
 
   private startCountdown(): void {
@@ -140,8 +162,8 @@ export class Levels implements OnInit {
   startLevel(levelId: number): void {
     // Invitados solo pueden jugar niveles -1 (Easter Egg) y 1-10 (canciones locales)
     if (this.isGuest) {
-      this.router.navigate(['/game'], { 
-        queryParams: { level: levelId + '_local' } 
+      this.router.navigate(['/game'], {
+        queryParams: { level: levelId + '_local' }
       });
       return;
     }
@@ -151,8 +173,8 @@ export class Levels implements OnInit {
       return;
     }
     else {
-      this.router.navigate(['/game'], { 
-        queryParams: { level: levelId } 
+      this.router.navigate(['/game'], {
+        queryParams: { level: levelId }
       });
     }
   }

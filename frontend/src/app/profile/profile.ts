@@ -19,28 +19,28 @@ export class Profile implements OnInit {
   gamesPlayed: number = 0;
   dailyCompleted: boolean = false;
   createdAt: string = '';
-  
+
   // Estado de edición
   isEditing: boolean = false;
   editUsername: string = '';
   editPassword: string = '';
   editPasswordConfirm: string = '';
-  
+
   // Mensajes
   successMessage: string = '';
   errorMessage: string = '';
-  
+
   // Estadísticas adicionales
   averageScore: number = 0;
   rank: number = 0;
-  
+
   isSpotifyConnected: boolean = false;
 
   constructor(
     private userService: UserService,
     private router: Router,
     private spotifyService: SpotifyService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadUserProfile();
@@ -53,19 +53,23 @@ export class Profile implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    
+
     this.userService.validateToken().subscribe({
       next: (userData) => {
         this.username = userData.username;
         this.email = userData.email;
         this.totalScore = userData.total_score || 0;
-        this.gamesPlayed = userData.games_played || 0;
+
+        // Calcular niveles jugados
+        const playedLevelsStr = userData.played_levels || '';
+        this.gamesPlayed = playedLevelsStr ? playedLevelsStr.split(',').length : 0;
+
         this.dailyCompleted = userData.daily_completed || false;
         this.createdAt = userData.created_at || '';
-        
+
         // Calcular promedio
-        this.averageScore = this.gamesPlayed > 0 
-          ? Math.round(this.totalScore / this.gamesPlayed) 
+        this.averageScore = this.gamesPlayed > 0
+          ? Math.round(this.totalScore / this.gamesPlayed)
           : 0;
       },
       error: (err) => {
@@ -125,17 +129,17 @@ export class Profile implements OnInit {
       next: (response) => {
         this.successMessage = response.message || 'Perfil actualizado correctamente';
         this.isEditing = false;
-        
+
         // Si cambió el username, actualizar datos locales
         if (hasUsernameChange) {
           this.username = this.editUsername;
-          
+
           // Si el backend devuelve un nuevo token, actualizarlo
           if (response.access_token && response.token_type) {
             this.userService.saveToken(response.token_type, response.access_token);
           }
         }
-        
+
         // Actualizar usuario en localStorage
         this.userService.saveCurrentUser(response.user);
       },
