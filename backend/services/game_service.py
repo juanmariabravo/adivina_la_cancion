@@ -119,15 +119,17 @@ class GameService:
 
             if user.is_level_played(level_id):
                 return {"error": "Nivel ya jugado"}, 400
+            user.mark_level_played(level_id)
             user.complete_level(level_id)
+            user.add_score(score) # Update score in memory
+
             if level_id == "0":
                 user.complete_daily(level_id)
             
-            success, message = db.update_user_score(_get_username(user), score, level_id)
-            if success:
-                return {"message": message, "total_score": user.total_score}, 200
+            if db.save_user(user):
+                return {"message": "Puntuación actualizada", "total_score": user.total_score}, 200
             else:
-                return {"error": message}, 400
+                return {"error": "Error guardando usuario"}, 500
         except Exception as e:
             return {"error": str(e)}, 500
 

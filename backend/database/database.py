@@ -288,32 +288,7 @@ class Database:
             print("Token inválido")
             return None
     
-    def update_user_score(self, username: str, score: int, level_id: str) -> tuple[bool, str]:
-        """
-        Actualizar puntuación del usuario
-        Retorna (bool éxito, mensaje)
-        """
-        conn = self.get_connection()
-        try:
-            # Obtener usuario actual
-            user = self.get_user_by_username(username)
-            if not user:
-                return False, "Usuario no encontrado"
 
-            conn.execute('''
-                UPDATE users 
-                SET total_score = total_score + ?, levels_completed = ?, played_levels = ?, last_daily_completed = ?
-                WHERE username = ?
-            ''', (score, user.levels_completed, user.played_levels, user.last_daily_completed, username))
-            conn.commit()
-            
-            return True, "Puntuación actualizada"
-        except Exception as e:
-            print(f"Error actualizando puntuación: {e}")
-            return False, f"Error actualizando puntuación: {str(e)}"
-        finally:
-            conn.close()
-    
     def get_ranking(self, limit: int = 10) -> list:
         """Obtener ranking de usuarios"""
         conn = self.get_connection()
