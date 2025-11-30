@@ -164,8 +164,11 @@ export class Login implements OnInit {
         this.loginForm.reset();
 
         // Guardar datos de la respuesta
-        this.service.saveCurrentUser(response.user);
         this.service.saveToken(response.token_type, response.access_token);
+
+        // Guardar email en sessionStorage para obtener clientId luego
+        const currentUser = { email: email };
+        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
 
         // Redirigir después de 1.5 segundos
         setTimeout(() => {

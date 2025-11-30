@@ -8,14 +8,14 @@ import { Observable } from 'rxjs';
 export class GameService {
   private apiUrl = 'http://127.0.0.1:5000/api/v1';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // Obtener canción de un nivel
   getSongForLevel(levelId: string, authToken?: string): Observable<any> {
     const headers: any = {
       'Content-Type': 'application/json'
     };
-    
+
     if (authToken) {
       headers['Authorization'] = authToken;
     }
@@ -59,5 +59,16 @@ export class GameService {
     return this.http.get<any>(`${this.apiUrl}/ranking`, {
       params: { limit: limit.toString() }
     });
+  }
+
+  markAsPlayed(levelId: string, authToken: string): Observable<any> {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': authToken
+    };
+
+    return this.http.post<any>(`${this.apiUrl}/game/mark-level-played`, {
+      level_id: levelId
+    }, { headers });
   }
 }

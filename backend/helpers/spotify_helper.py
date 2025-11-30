@@ -1,5 +1,5 @@
 import requests
-from spotify_preview import get_spotify_preview_url
+from helpers.spotify_preview import get_spotify_preview_url
 from typing import Optional
 
 class SpotifyHelper:

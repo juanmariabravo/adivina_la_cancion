@@ -11,14 +11,14 @@ export class UserService {
   private meUrl = 'http://127.0.0.1:5000/api/v1/auth/me'
   private updateProfileUrl = 'http://127.0.0.1:5000/api/v1/auth/update-profile'
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   register(username: string, email: string, pwd1: string, pwd2: string, spotifyClientId?: string, spotifyClientSecret?: string) {
     let info = {
-      username : username,
-      email : email,
-      pwd1 : pwd1, 
-      pwd2 : pwd2,
+      username: username,
+      email: email,
+      pwd1: pwd1,
+      pwd2: pwd2,
       spotify_client_id: spotifyClientId,
       spotify_client_secret: spotifyClientSecret
     };
@@ -37,22 +37,17 @@ export class UserService {
     sessionStorage.setItem('authToken', token);
   }
 
-  saveCurrentUser(user: string) {
-    sessionStorage.setItem('currentUser', JSON.stringify(user));
-  }
-
-  getCurrentUser() {
-    const user = sessionStorage.getItem('currentUser');
-    return user ? JSON.parse(user) : null;
-  }
-
   logout() {
     // remove everything from sessionStorage
     sessionStorage.clear();
   }
 
-  getToken(): string | null {
-    return sessionStorage.getItem('authToken');
+  getToken(): string {
+    const token = sessionStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('No token found');
+    }
+    return token;
   }
 
   validateToken() {
@@ -61,32 +56,12 @@ export class UserService {
       throw new Error('No token found');
     }
 
-    const headers = { 
+    const headers = {
       'Content-Type': 'application/json',
       'Authorization': token
     };
 
     return this.http.get<any>(this.meUrl, { headers });
-  }
-
-  refreshUserData() {
-    const token = this.getToken();
-    if (!token) {
-      this.logout();
-      return;
-    }
-
-    // Validar token con el backend
-    this.validateToken().subscribe({
-      next: (userData) => {
-        // Actualizar datos en sessionStorage
-        this.saveCurrentUser(userData);
-      },
-      error: (err) => {
-        console.error('Token inválido o expirado:', err);
-        this.logout();
-      }
-    });
   }
 
   updateProfile(username?: string, password?: string) {
@@ -99,7 +74,7 @@ export class UserService {
     if (username) payload.username = username;
     if (password) payload.password = password;
 
-    const headers = { 
+    const headers = {
       'Content-Type': 'application/json',
       'Authorization': token
     };

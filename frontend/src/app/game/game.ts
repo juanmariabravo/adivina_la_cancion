@@ -56,6 +56,7 @@ export class Game implements OnInit, OnDestroy {
   canReplayAudio: boolean = false; // permitir repetir audio
 
   private apiUrl = 'http://127.0.0.1:5000/api/v1';
+  alreadyPlayed: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -65,14 +66,13 @@ export class Game implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+
     this.route.queryParams.subscribe(params => {
-      this.levelId = params['level'] || '1_local';
-      if (this.levelId.includes('_local')) {
-        this.isGuest = true;
+      this.levelId = params['level'];
+      this.loadUserData();
+      if (this.isGuest) {
         this.level_number = parseInt(this.levelId.split('_')[0], 10);
-      }
-      else {
-        this.isGuest = false;
+      } else {
         this.level_number = parseInt(this.levelId, 10);
       }
       this.loadSong();
@@ -83,6 +83,29 @@ export class Game implements OnInit, OnDestroy {
     if (this.audio) {
       this.audio.pause();
       this.audio = null;
+    }
+  }
+
+  private loadUserData(): void {
+    const token = this.userService.getToken();
+
+    if (token) {
+      // Validar y actualizar datos del usuario
+      this.userService.validateToken().subscribe({
+        next: (userData) => {
+          this.isGuest = false; // si hay token, no es invitado
+
+          // Procesar niveles jugados
+          const playedLevelsStr = userData.played_levels || '';
+          const playedLevels = playedLevelsStr ? playedLevelsStr.split(',') : [];
+        },
+        error: (err) => {
+          console.error('Token inválido o expirado:', err);
+          this.userService.logout();
+        }
+      });
+    } else {
+      this.isGuest = true;
     }
   }
 
@@ -215,6 +238,10 @@ export class Game implements OnInit, OnDestroy {
           this.message = `La canción es "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
           this.playCompleteAudio();
           this.saveScore();
+          this.gameService.markAsPlayed(this.levelId, this.userService.getToken()).subscribe({
+            next: () => console.log('Nivel marcado como jugado'),
+            error: (err) => console.error('Error marcando nivel como jugado', err)
+          });
         } else {
           this.message = 'Respuesta incorrecta';
           this.userAnswer = '';
@@ -306,14 +333,19 @@ export class Game implements OnInit, OnDestroy {
       return;
     }
     // Si es usuario registrado, enviamos la puntuación al backend
-      this.gameService.submitScore(this.score, this.levelId, token).subscribe({
-        next: (response) => {
-          console.log('Puntuación enviada:', response);
-        },
-        error: (err) => {
-          console.error('Error enviando puntuación:', err);
+    this.gameService.submitScore(this.score, this.levelId, token).subscribe({
+      next: (response) => {
+        console.log('Puntuación enviada:', response);
+      },
+      error: (err) => {
+        if (err.status === 400 && err.error && err.error.error === 'Nivel ya jugado') {
+          this.alreadyPlayed = true;
+          console.warn('Nivel ya jugado por este usuario. Puntuación no actualizada.');
+          return;
         }
-      });
+        console.error('Error enviando puntuación:', err);
+      }
+    });
 
   }
 
@@ -322,7 +354,10 @@ export class Game implements OnInit, OnDestroy {
 
     this.message = `La canción era: "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
     this.playCompleteAudio();
-
+    this.gameService.markAsPlayed(this.levelId, this.userService.getToken()).subscribe({
+      next: () => console.log('Nivel marcado como jugado'),
+      error: (err) => console.error('Error marcando nivel como jugado', err)
+    });
   }
 
   playAgain(): void {

@@ -1,10 +1,15 @@
 from difflib import SequenceMatcher
-from database import db
+from database.database import db
 from dotenv import load_dotenv
+import os
+import json
+import random
+import re
 
-from spotify_helper import SpotifyHelper
+from helpers.spotify_helper import SpotifyHelper
 
 load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 
 def _get_username(user):
@@ -14,6 +19,25 @@ def _get_username(user):
 
 
 class GameService:
+    def __init__(self):
+        self.set_daily_song()
+
+    def set_daily_song(self):
+        # Cargar lista de canciones para el desafío diario desde JSON está en backend/songs_local_data&spotify_ids/possible_daily_songs.json
+        json_path = os.path.join(os.path.dirname(__file__), '..', 'songs_local_data&spotify_ids', 'possible_daily_songs.json')
+        try:
+            with open(json_path, 'r') as f:
+                self.daily_songs = json.load(f)
+        except Exception as e:
+            print(f"Error cargando canciones diarias: {e}")
+            # Fallback a una lista mínima si falla la carga
+            self.daily_songs = ["4blQLWBwNYjL3Z0x8ctMBq"]
+            
+        self.daily_song_id = random.choice(self.daily_songs)
+        print(f"Canción del día seleccionada: {self.daily_song_id}")
+        db.delete_daily_songs()
+        db.init_daily_song_level(self.daily_song_id)
+
     def validate_answer(self, level_id: str, user_answer: str) -> bool:
         """Validar respuesta del usuario"""
         if level_id.endswith('_local'):
@@ -25,15 +49,14 @@ class GameService:
             song_name = db.get_local_song_by_level(level_num).get('title')
             if not song_name:
                 return False
-            
         else:
             song_name = db.get_song_title_by_level(int(level_id))
             if not song_name:
                 return False
             
         # Normalizar ambas cadenas para comparación
-        normalized_answer = user_answer.lower().strip()
-        normalized_title = song_name.lower().strip()
+        normalized_answer = self._clean_title(user_answer)
+        normalized_title = self._clean_title(song_name)
         
         # Comparación exacta
         if normalized_answer == normalized_title:
@@ -41,7 +64,42 @@ class GameService:
         
         # Comparación con 90% de similitud usando SequenceMatcher: si la respuesta es muy parecida al título se considera correcta
         similarity = SequenceMatcher(None, normalized_answer, normalized_title).ratio()
-        return similarity >= 0.90
+        return similarity >= 0.85
+
+    def _clean_title(self, title: str) -> str:
+        # Convertir a minúsculas
+        title = title.lower()
+        # Eliminar contenido entre paréntesis o corchetes (ej: (Remix), [Live])
+        title = re.sub(r'[\(\[].*?[\)\]]', '', title)
+        # Cuando haya un guion, quitar el guion y todo lo que sigue
+        title = re.sub(r'-.*', '', title)
+        # Eliminar "feat." y todo lo que sigue
+        title = re.sub(r'\b(feat|ft|featuring)\b.*', '', title)
+        # Reemplazar guiones bajos por espacios
+        title = re.sub(r'_', ' ', title)
+        # Eliminar espacios extra
+        title = re.sub(r'\s+', ' ', title).strip()
+        return title
+
+    def mark_level_played(self, auth_header, data):
+        try:
+            if not auth_header or not auth_header.lower().startswith('bearer '):
+                return {"error": "Token requerido"}, 401
+
+            token = auth_header.split(' ')[1]
+            user = db.verify_token(token)
+            if not user:
+                return {"error": "Token inválido"}, 401
+
+            if not data or 'level_id' not in data:
+                return {"error": "Nivel requerido"}, 400
+
+            level_id = data['level_id']
+            user.mark_level_played(level_id)
+            db.save_user(user)
+            return {"message": "Nivel marcado como jugado"}, 200
+        except Exception as e:
+            return {"error": str(e)}, 500
 
     def update_score(self, auth_header, data):
         try:
@@ -58,27 +116,18 @@ class GameService:
 
             score = data['score']
             level_id = data.get('level_id', '')
+
+            if user.is_level_played(level_id):
+                return {"error": "Nivel ya jugado"}, 400
+            user.complete_level(level_id)
+            if level_id == "0":
+                user.complete_daily(level_id)
             
             success, message = db.update_user_score(_get_username(user), score, level_id)
             if success:
-                updated_user = db.get_user_by_username(_get_username(user))
-                return {
-                    "message": message,
-                    "total_score": updated_user.total_score if updated_user else 0,
-                    "levels_completed": updated_user.get_completed_levels_count() if updated_user else 0
-                }, 200
+                return {"message": message, "total_score": user.total_score}, 200
             else:
-                # Si el nivel ya está completado, devolver info pero no error
-                if "ya completado" in message:
-                    updated_user = db.get_user_by_username(_get_username(user))
-                    return {
-                        "message": message,
-                        "total_score": updated_user.total_score if updated_user else 0,
-                        "levels_completed": updated_user.get_completed_levels_count() if updated_user else 0,
-                        "already_completed": True
-                    }, 200
-                else:
-                    return {"error": message}, 500
+                return {"error": message}, 400
         except Exception as e:
             return {"error": str(e)}, 500
 
@@ -102,10 +151,9 @@ class GameService:
             if not user:
                 return {"error": "Token inválido"}, 401
 
-            if db.mark_daily_completed(_get_username(user)):
-                return {"message": "Desafío diario completado"}, 200
-            else:
-                return {"error": "Error marcando daily como completado"}, 500
+            user.complete_daily()
+            db.save_user(user)
+            return {"message": "Desafío diario completado"}, 200
         except Exception as e:
             return {"error": str(e)}, 500
 
@@ -154,20 +202,17 @@ class GameService:
                 if not user:
                     return {"error": "Token inválido"}, 401
 
-
                 # Buscar canción en tabla spotify_songs
-                song = db.get_spotify_song_by_level(level_id)
+                song = db.get_spotify_song_by_level(int(level_id))
                 
                 if not song:
                     return {"error": "Nivel no disponible"}, 404
                 
-                spotify_track_id = song.get('spotify_id')
-                
                 # si ya tiene los datos guardados en la BD, devolverlos directamente
-                if song.get('title') and song.get('artists') and song.get('album') and song.get('year') and song.get('genre') and song.get('audio') and song.get('image_url'):
+                if song and song.get('title') and song.get('artists') and song.get('album') and song.get('year') and song.get('genre') and song.get('audio') and song.get('image_url'):
                     return {
                         "song": {
-                            "id": spotify_track_id,
+                            "id": song['spotify_id'],
                             "title": song['title'],
                             "artists": song['artists'],
                             "album": song['album'],
@@ -187,22 +232,14 @@ class GameService:
                         return {"error": "No hay conexión de Spotify disponible"}, 403
                     
                     spotiHelper = SpotifyHelper()
-                    spotify_data = spotiHelper.get_track_info(spotify_track_id, spotify_token)
+                    spotify_data = spotiHelper.get_track_info(song['spotify_id'], spotify_token)
                     
                     if not spotify_data:
                         return {"error": "Nivel no disponible"}, 404
 
                     # Guardar datos obtenidos en la base de datos para futuras consultas
-                    db.update_spotify_song(
-                        spotify_track_id,
-                        spotify_data['title'],
-                        spotify_data['artists'],
-                        spotify_data['album'],
-                        spotify_data['year'],
-                        spotify_data['genre'],
-                        spotify_data['audio'],
-                        spotify_data['image_url']
-                    )
+                    spotify_data['level_id'] = int(level_id)
+                    db.add_spotify_song(spotify_data)
 
                     return {
                         "song": {
@@ -213,9 +250,12 @@ class GameService:
                             "year": spotify_data['year'],
                             "genre": spotify_data['genre'],
                             "audio": spotify_data['audio'],
-                            "image_url": spotify_data['image_url']
+                            "image_url": spotify_data['image_url'],
+                            "level_id": spotify_data['level_id']
                         },
                         "source": "spotify"
                     }, 200
+                
+
         except Exception as e:
             return {"error": str(e)}, 500

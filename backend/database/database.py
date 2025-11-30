@@ -41,6 +41,7 @@ class Database:
                     is_active BOOLEAN DEFAULT TRUE,
                     total_score INTEGER DEFAULT 0,
                     levels_completed TEXT DEFAULT '',
+                    played_levels TEXT DEFAULT '',
                     last_daily_completed TEXT,
                     spotify_access_token TEXT,
                     spotify_refresh_token TEXT,
@@ -79,19 +80,6 @@ class Database:
                 )
             ''')
 
-            # # Añadir nuevas columnas si la tabla ya existe (para bases de datos existentes)
-            # try:
-            #     conn.execute('ALTER TABLE users ADD COLUMN spotify_client_id TEXT')
-            # except sqlite3.OperationalError as e:
-            #     if "duplicate column name" not in str(e).lower():
-            #         print(f"⚠️ Error añadiendo spotify_client_id: {e}")
-                
-            # try:
-            #     conn.execute('ALTER TABLE users ADD COLUMN spotify_client_secret TEXT')
-            # except sqlite3.OperationalError as e:
-            #     if "duplicate column name" not in str(e).lower():
-            #         print(f"⚠️ Error añadiendo spotify_client_secret: {e}")
-
             conn.commit()
             
             # Insertar canciones locales
@@ -109,8 +97,12 @@ class Database:
         """Inicializar canciones locales (niveles 1-10 para invitados)"""
         conn = self.get_connection()
         try:
-            # Ruta al archivo JSON (en el mismo directorio que database.py)
-            json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'songs_local_data&spotify_ids', 'local_songs.json')
+            # Ruta al archivo JSON
+            json_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                '..', 'songs_local_data&spotify_ids', 'local_songs.json'
+            )
+            json_path = os.path.normpath(json_path)
 
             if not os.path.exists(json_path):
                 print(f"ERROR: Archivo no encontrado: {json_path}")
@@ -158,7 +150,11 @@ class Database:
         conn = self.get_connection()
         try:
             # Ruta al archivo JSON
-            json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'songs_local_data&spotify_ids', 'spotify_songs.json')
+            json_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                '..', 'songs_local_data&spotify_ids', 'spotify_songs.json'
+            )
+            json_path = os.path.normpath(json_path)
 
             if not os.path.exists(json_path):
                 print(f"ERROR: Archivo no encontrado: {json_path}")
@@ -218,7 +214,7 @@ class Database:
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT username, email, hashed_password, created_at, is_active, total_score, levels_completed, last_daily_completed,
+                SELECT username, email, hashed_password, created_at, is_active, total_score, levels_completed, played_levels, last_daily_completed,
                        spotify_access_token, spotify_refresh_token, spotify_token_expires_at, spotify_client_id, spotify_client_secret
                 FROM users WHERE username = ?
             ''', (username,))
@@ -235,7 +231,7 @@ class Database:
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT username, email, hashed_password, created_at, is_active, total_score, levels_completed, last_daily_completed,
+                SELECT username, email, hashed_password, created_at, is_active, total_score, levels_completed, played_levels, last_daily_completed,
                        spotify_access_token, spotify_refresh_token, spotify_token_expires_at, spotify_client_id, spotify_client_secret
                 FROM users WHERE email = ?
             ''', (email,))
@@ -246,7 +242,24 @@ class Database:
             return None
         finally:
             conn.close()
-    
+
+    def get_user_by_client_id(self, client_id: str) -> Optional[User]:
+        """Obtener usuario por client_id de Spotify"""
+        conn = self.get_connection()
+        try:
+            cursor = conn.execute('''
+                SELECT username, email, hashed_password, created_at, is_active, total_score, levels_completed, played_levels, last_daily_completed,
+                       spotify_access_token, spotify_refresh_token, spotify_token_expires_at, spotify_client_id, spotify_client_secret
+                FROM users WHERE spotify_client_id = ?
+                LIMIT 1
+            ''', (client_id,))
+            row = cursor.fetchone()
+            return User.from_dict(dict(row)) if row else None
+        except Exception as e:
+            print(f"Error obteniendo usuario por client_id: {e}")
+            return None
+        finally:
+            conn.close()
     def validate_credentials(self, email: str, password: str) -> Optional[User]:
         """Validar credenciales de usuario"""
         user = self.get_user_by_email(email)
@@ -277,8 +290,8 @@ class Database:
     
     def update_user_score(self, username: str, score: int, level_id: str) -> tuple[bool, str]:
         """
-        Actualizar puntuación del usuario solo si el nivel no está completado
-        Retorna (éxito, mensaje)
+        Actualizar puntuación del usuario
+        Retorna (bool éxito, mensaje)
         """
         conn = self.get_connection()
         try:
@@ -286,38 +299,15 @@ class Database:
             user = self.get_user_by_username(username)
             if not user:
                 return False, "Usuario no encontrado"
-            
-            # Verificar si el nivel ya está completado
-            if user.is_level_completed(level_id):
-                # Mensaje específico para nivel diario
-                if level_id == "0":
-                    return False, "Desafío diario ya completado hoy"
-                else:
-                    return False, "Nivel ya completado anteriormente"
-            
-            # Verificación adicional para el nivel diario usando el método específico
-            if level_id == "0" and user.is_daily_completed_today():
-                return False, "Desafío diario ya completado hoy"
-            
-            # Marcar nivel como completado y actualizar puntuación
-            user.complete_level(level_id)
-            
-            # Si es el nivel diario (nivel 0), marcarlo también como diario completado
-            if level_id == "0":
-                user.complete_daily()
-            
+
             conn.execute('''
                 UPDATE users 
-                SET total_score = total_score + ?, levels_completed = ?, last_daily_completed = ?
+                SET total_score = total_score + ?, levels_completed = ?, played_levels = ?, last_daily_completed = ?
                 WHERE username = ?
-            ''', (score, user.levels_completed, user.last_daily_completed, username))
+            ''', (score, user.levels_completed, user.played_levels, user.last_daily_completed, username))
             conn.commit()
             
-            # Mensaje específico para nivel diario
-            if level_id == "0":
-                return True, "¡Desafío diario completado! Puntuación actualizada"
-            else:
-                return True, "Puntuación actualizada y nivel completado"
+            return True, "Puntuación actualizada"
         except Exception as e:
             print(f"Error actualizando puntuación: {e}")
             return False, f"Error actualizando puntuación: {str(e)}"
@@ -339,24 +329,6 @@ class Database:
         except Exception as e:
             print(f"Error obteniendo ranking: {e}")
             return []
-        finally:
-            conn.close()
-    
-    def mark_daily_completed(self, username: str) -> bool:
-        """Marcar desafío diario como completado hoy"""
-        conn = self.get_connection()
-        try:
-            today = datetime.now().strftime("%d-%m-%Y")
-            conn.execute('''
-                UPDATE users 
-                SET last_daily_completed = ?
-                WHERE username = ?
-            ''', (today, username))
-            conn.commit()
-            return True
-        except Exception as e:
-            print(f"Error marcando daily completado: {e}")
-            return False
         finally:
             conn.close()
     
@@ -495,6 +467,39 @@ class Database:
         finally:
             conn.close()
 
+    def delete_daily_songs(self) -> bool:
+        """Eliminar todas las canciones diarias almacenadas (aquellas con level_id = 0)"""
+        conn = self.get_connection()
+        try:
+            conn.execute('''
+                DELETE FROM spotify_songs 
+                WHERE level_id = 0
+            ''')
+            conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error eliminando canciones diarias: {e}")
+            return False
+        finally:
+            conn.close()
+    
+    def init_daily_song_level(self, spotify_id: str) -> bool:
+        """Inicializar canción diaria en la base de datos con level_id = 0"""
+        conn = self.get_connection()
+        try:
+            conn.execute('''
+                INSERT OR REPLACE INTO spotify_songs 
+                (spotify_id, level_id)
+                VALUES (?, 0)
+            ''', (spotify_id,))
+            conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error inicializando canción diaria: {e}")
+            return False
+        finally:
+            conn.close()
+
     def save_spotify_tokens(self, username: str, access_token: str, refresh_token: str, expires_in: int) -> bool:
         """
         Guardar tokens de Spotify para un usuario.
@@ -520,75 +525,60 @@ class Database:
         finally:
             conn.close()
     
-    def refresh_spotify_token(self, username: str) -> Optional[str]:
-        """
-        Renovar el access token de Spotify usando el refresh token.
-        Retorna el nuevo access token o None si falla.
-        """
-        import requests
-        import base64
-        
-        user = self.get_user_by_username(username)
-        if not user or not user.spotify_refresh_token:
-            print(f"No hay refresh token para el usuario {username}")
-            return None
-        
+    def save_user(self, user: User) -> bool:
+        """Actualizar datos del usuario en la base de datos"""
+        conn = self.get_connection()
         try:
-            # Credenciales de la app de Spotify
-            client_id = os.getenv('SPOTIFY_CLIENT_ID')
-            client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
-            
-            credentials = f"{client_id}:{client_secret}"
-            credentials_b64 = base64.b64encode(credentials.encode()).decode()
-            
-            headers = {
-                'Authorization': f'Basic {credentials_b64}',
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-            
-            data = {
-                'grant_type': 'refresh_token',
-                'refresh_token': user.spotify_refresh_token
-            }
-            
-            response = requests.post('https://accounts.spotify.com/api/token', headers=headers, data=data)
-            
-            if response.status_code == 200:
-                token_data = response.json()
-                new_access_token = token_data.get('access_token')
-                expires_in = token_data.get('expires_in', 3600)
-                
-                # El refresh_token puede o no cambiar
-                new_refresh_token = token_data.get('refresh_token', user.spotify_refresh_token)
-                
-                # Guardar nuevos tokens
-                self.save_spotify_tokens(username, new_access_token, new_refresh_token, expires_in)
-                
-                return new_access_token
-            else:
-                print(f"Error renovando token de Spotify: {response.status_code} - {response.text}")
-                return None
+            conn.execute('''
+                UPDATE users 
+                SET email = ?, hashed_password = ?, is_active = ?, total_score = ?, levels_completed = ?, played_levels = ?, last_daily_completed = ?,
+                    spotify_access_token = ?, spotify_refresh_token = ?, spotify_token_expires_at = ?, spotify_client_id = ?, spotify_client_secret = ?
+                WHERE username = ?
+            ''', (
+                user.email,
+                user.hashed_password,
+                user.is_active,
+                user.total_score,
+                user.levels_completed,
+                user.played_levels,
+                user.last_daily_completed,
+                user.spotify_access_token,
+                user.spotify_refresh_token,
+                user.spotify_token_expires_at,
+                user.spotify_client_id,
+                user.spotify_client_secret,
+                user.username
+            ))
+            conn.commit()
+            return True
         except Exception as e:
-            print(f"Error renovando token de Spotify: {e}")
-            return None
-    
+            print(f"Error actualizando usuario: {e}")
+            return False
+        finally:
+            conn.close()
+
     def get_spotify_access_token(self, username: str) -> Optional[str]:
-        """
-        Obtener access token de Spotify válido para un usuario.
-        Si el token ha expirado, lo renueva automáticamente.
-        """
-        user = self.get_user_by_username(username)
-        if not user or not user.spotify_access_token:
+        """Obtener access token de Spotify para un usuario"""
+        conn = self.get_connection()
+        try:
+            cursor = conn.execute('''
+                SELECT spotify_access_token, spotify_token_expires_at
+                FROM users
+                WHERE username = ?
+            ''', (username,))
+            row = cursor.fetchone()
+            if row:
+                access_token = row['spotify_access_token']
+                expires_at = row['spotify_token_expires_at']
+                # Verificar si el token ha expirado
+                if expires_at and expires_at > int(time.time()):
+                    return access_token
             return None
-        
-        # Verificar si el token ha expirado (con margen de 60 segundos)
-        current_time = int(time.time())
-        if user.spotify_token_expires_at and current_time >= (user.spotify_token_expires_at - 60):
-            # Token expirado o por expirar, renovarlo
-            print(f"Token de Spotify expirado para {username}, renovando...")
-            return self.refresh_spotify_token(username)
-        
-        return user.spotify_access_token
+        except Exception as e:
+            print(f"Error obteniendo access token de Spotify: {e}")
+            return None
+        finally:
+            conn.close()
 
 # Instancia global de la base de datos
 db = Database()

@@ -1,27 +1,19 @@
 import os
-import base64
-import requests
 from dotenv import load_dotenv
-from database import db
+from database.database import db
 
 load_dotenv()
 
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
 SPOTIFY_REDIRECT_URI = os.getenv('SPOTIFY_REDIRECT_URI')
-SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/api/token'
+SPOTIFY_TOKEN_URL = os.getenv('SPOTIFY_TOKEN_URL')
 
 
 def _get_username(user):
 	if user is None:
 		return None
 	return getattr(user, 'username', None) or (user.get('username') if isinstance(user, dict) else None)
-
-
-def _get_email(user):
-	if user is None:
-		return None
-	return getattr(user, 'email', None) or (user.get('email') if isinstance(user, dict) else None)
 
 
 class UserService:
@@ -162,88 +154,3 @@ class UserService:
 			return {"error": "No tienes credenciales de Spotify configuradas en tu cuenta"}, 400
 		except Exception as e:
 			return {"error": str(e)}, 500
-
-	def exchange_spotify_authorization(self, code, client_id, auth_header):
-		try:
-			if not auth_header or not auth_header.lower().startswith('bearer '):
-				return {"error": "Token de usuario requerido"}, 401
-
-			token = auth_header.split(' ')[1]
-			user = db.verify_token(token)
-			if not user:
-				return {"error": "Token inválido"}, 401
-
-			if not code or not client_id:
-				return {"error": "Código y clientId requeridos"}, 400
-
-			# Obtener credenciales del usuario
-			user_client_id = user.spotify_client_id
-			user_client_secret = user.spotify_client_secret
-
-			if not user_client_id or not user_client_secret:
-				return {"error": "No tienes credenciales de Spotify configuradas en tu cuenta"}, 400
-
-			if client_id != user_client_id:
-				return {"error": "Client ID inválido"}, 401
-
-			credentials = f"{user_client_id}:{user_client_secret}"
-			credentials_b64 = base64.b64encode(credentials.encode()).decode()
-
-			headers = {
-				'Authorization': f'Basic {credentials_b64}',
-				'Content-Type': 'application/x-www-form-urlencoded'
-			}
-
-			data = {
-				'grant_type': 'authorization_code',
-				'code': code,
-				'redirect_uri': SPOTIFY_REDIRECT_URI
-			}
-
-			response = requests.post(SPOTIFY_AUTH_URL, headers=headers, data=data)
-
-			if response.status_code == 200:
-				token_data = response.json()
-
-				spotify_access_token = token_data.get('access_token')
-				user_info_response = requests.get(
-					'https://api.spotify.com/v1/me',
-					headers={'Authorization': f'Bearer {spotify_access_token}'}
-				)
-
-				if user_info_response.status_code == 200:
-					spotify_user = user_info_response.json()
-					spotify_email = spotify_user.get('email', '').lower()
-					if _get_email(user) and _get_email(user).lower() != spotify_email:
-						return {
-							"error": "El email de Spotify no coincide con tu cuenta",
-							"spotify_email": spotify_email,
-							"registered_email": _get_email(user)
-						}, 403
-
-				# Guardar tokens en la base de datos
-				access_token = token_data.get('access_token')
-				refresh_token = token_data.get('refresh_token')
-				expires_in = token_data.get('expires_in', 3600)
-				
-				db.save_spotify_tokens(_get_username(user), access_token, refresh_token, expires_in)
-
-				spoti_token = {
-					'access_token': access_token,
-					'token_type': token_data.get('token_type'),
-					'expires_in': expires_in,
-					'refresh_token': refresh_token,
-					'scope': token_data.get('scope')
-				}
-
-				return spoti_token, 200
-			else:
-				try:
-					error_data = response.json()
-				except Exception:
-					error_data = {"status_code": response.status_code}
-				return {"error": "Error obteniendo token de Spotify", "details": error_data}, response.status_code
-
-		except Exception as e:
-			return {"error": str(e)}, 500
-

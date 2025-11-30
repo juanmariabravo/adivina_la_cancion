@@ -54,7 +54,7 @@ export class Callback implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private spotifyService: SpotifyService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -86,13 +86,13 @@ export class Callback implements OnInit {
       return;
     }
 
-    // 1️⃣ Primera petición: obtener clientId
+    // 1️Primera petición: obtener clientId
     this.spotifyService.getClientId(email).subscribe({
       next: (clientIdResponse) => {
         const clientId = clientIdResponse.clientId;
         const token = sessionStorage.getItem('authToken');
 
-        // 2️⃣ Segunda petición: intercambiar código por token
+        // 2️Segunda petición: intercambiar código por token
         this.spotifyService.exchangeCodeForTokenWithClientId(code, clientId, token || '').subscribe({
           next: (tokenResponse) => {
             // Guardar tokens
@@ -102,8 +102,6 @@ export class Callback implements OnInit {
               tokenResponse.expires_in
             );
 
-            console.log('✅ Conectado con Spotify exitosamente');
-            
             // Redirigir a niveles
             setTimeout(() => this.router.navigate(['/levels']), 1000);
           },

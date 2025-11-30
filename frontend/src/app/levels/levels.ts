@@ -23,6 +23,7 @@ interface Level {
 })
 export class Levels implements OnInit {
   username: string = '';
+  email: string = '';
   totalScore: number = 0;
   levelsCompleted: number = 0;
   dailyCompleted: boolean = false;
@@ -81,6 +82,7 @@ export class Levels implements OnInit {
         next: (userData) => {
           this.isGuest = false; // si hay token, no es invitado
           this.username = userData.username;
+          this.email = userData.email;
           this.totalScore = userData.total_score || 0;
 
           // Procesar niveles completados
@@ -100,9 +102,6 @@ export class Levels implements OnInit {
             level.completed = completedLevels.includes(levelIdStr);
             level.played = playedLevels.includes(levelIdStr);
           });
-
-          // Guardar datos actualizados
-          this.userService.saveCurrentUser(userData);
         },
         error: (err) => {
           console.error('Token inválido o expirado:', err);

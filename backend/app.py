@@ -2,8 +2,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
-from user_service import UserService
-from game_service import GameService
+from services.user_service import UserService
+from services.spoti_service import SpotiService
+from services.game_service import GameService
 
 # Cargar variables de entorno
 load_dotenv()
@@ -28,6 +29,7 @@ PORT = int(os.getenv("PORT", 5000))
 
 # Instanciar servicios (internamente usan db y env)
 user_service = UserService()
+spoti_service = SpotiService()
 game_service = GameService()
 
 
@@ -89,7 +91,7 @@ def get_spotify_client_id():
 def get_spotify_authorization_token():
     code = request.args.get('code')
     client_id = request.args.get('clientId')
-    payload, status = user_service.exchange_spotify_authorization(code, client_id, request.headers.get('Authorization'))
+    payload, status = spoti_service.get_authorization_token(code, client_id)
     return jsonify(payload), status
 
 
@@ -108,7 +110,12 @@ def validate_answer():
     else:
         return jsonify({"correct": False}), 200
 
-
+@app.route('/api/v1/game/mark-level-played', methods=['POST'])
+def mark_level_played():
+    data = request.get_json()
+    auth_token = request.headers.get('Authorization')
+    payload, status = game_service.mark_level_played(auth_token, data)
+    return jsonify(payload), status
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=PORT, debug=DEBUG_MODE)

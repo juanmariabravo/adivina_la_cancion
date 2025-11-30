@@ -219,7 +219,6 @@ export class Register {
         this.spotifyClientSecret = '';
 
         // Guardar datos de la respuesta
-        this.service.saveCurrentUser(response.user);
         this.service.saveToken(response.token_type, response.access_token);
         
         // Redirigir después de 2 segundos

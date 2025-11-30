@@ -139,9 +139,6 @@ export class Profile implements OnInit {
             this.userService.saveToken(response.token_type, response.access_token);
           }
         }
-
-        // Actualizar usuario en localStorage
-        this.userService.saveCurrentUser(response.user);
       },
       error: (err) => {
         this.errorMessage = err.error?.error || 'Error al actualizar el perfil';

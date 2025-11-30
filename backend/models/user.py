@@ -2,8 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 class User:
-    """Modelo de usuario para la aplicación"""
-    
+    """Modelo de usuario"""
     def __init__(
         self,
         username: str,
@@ -107,6 +106,10 @@ class User:
     def complete_daily(self) -> None:
         """Marcar el desafío diario como completado hoy"""
         self.last_daily_completed = datetime.now().strftime("%d-%m-%Y")
+
+    def get_client_secret(self) -> Optional[str]:
+        """Obtener el client secret de Spotify"""
+        return self.spotify_client_secret
     
     @staticmethod
     def from_dict(data: dict) -> 'User':
