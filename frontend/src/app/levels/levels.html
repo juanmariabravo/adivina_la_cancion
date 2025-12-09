@@ -86,7 +86,7 @@
                     <h2><i class="fa-brands fa-spotify"></i> Conexión con Spotify Requerida</h2>
                     <p><strong>Importante:</strong> Debes usar el <u>mismo email</u> que tu cuenta de Spotify</p>
                     <p>Tu email registrado: <strong>{{ email }}</strong></p>
-                    <button class="connect-spotify-btn" routerLink="/profile">
+                    <button class="connect-spotify-btn" (click)="connectSpotify()">
                         Conectar con Spotify
                     </button>
                 </div>

@@ -31,6 +31,7 @@ export class Levels implements OnInit {
   isGuest: boolean = false;
   spotifyRequired: boolean = true;
   showSpotifyWarning: boolean = false;
+  errorMessage: string = '';
 
   // Generar niveles dinámicamente (Easter Egg + 30 niveles normales)
   levels: Level[] = [
@@ -158,6 +159,24 @@ export class Levels implements OnInit {
     this.showSpotifyWarning = !isConnected;
   }
 
+  connectSpotify(): void {
+    if (!this.email) {
+      this.errorMessage = 'Debes iniciar sesión para conectar con Spotify';
+      return;
+    }
+
+    this.spotifyService.getClientId(this.email).subscribe({
+      next: (response) => {
+        // Redirigir directamente sin guardar clientId
+        this.spotifyService.redirectToSpotifyAuth(response.clientId);
+      },
+      error: (err) => {
+        this.errorMessage = 'Error al conectar con Spotify';
+        console.error(err);
+      }
+    });
+  }
+
   startLevel(levelId: number): void {
     // Invitados solo pueden jugar niveles -1 (Easter Egg) y 1-10 (canciones locales)
     if (this.isGuest) {
@@ -167,8 +186,7 @@ export class Levels implements OnInit {
       return;
     }
     else if (!this.isGuest && !this.spotifyService.isSpotifyConnected()) {
-      alert('⚠️ Debes conectar tu cuenta de Spotify para jugar. Usa el mismo email que tu cuenta de Spotify.');
-      this.router.navigate(['/profile']);
+      alert('Debes conectar tu cuenta de Spotify para jugar.');
       return;
     }
     else {
