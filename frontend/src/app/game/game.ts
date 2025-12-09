@@ -237,6 +237,7 @@ export class Game implements OnInit, OnDestroy {
           this.message = `La canción es "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
           this.playCompleteAudio();
           this.saveScore();
+          this.markAsPlayed();
         } else {
           this.message = 'Respuesta incorrecta';
           this.userAnswer = '';
