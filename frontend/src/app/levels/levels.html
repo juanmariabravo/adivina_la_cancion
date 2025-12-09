@@ -96,7 +96,8 @@
             <div class="levels-grid-modern">
                 <div *ngFor="let level of levels; let i = index" class="level-card-modern"
                     [class.completed]="level.completed" [class.locked]="isGuest && level.id > 10"
-                    [class.easter-egg]="level.id === -1" (click)="startLevel(level.id)">
+                    [class.easter-egg]="level.id === -1" (click)="startLevel(level.id)"
+                    [title]="isGuest && level.id > 10 ? 'Inicia sesión para desbloquear este nivel' : ''">
                     <!-- Badge de nivel -->
                     <div class="level-number" [class.easter-number]="level.id === -1">
                         <ng-container *ngIf="level.id === -1"><i class="fa-solid fa-ring"></i></ng-container>
