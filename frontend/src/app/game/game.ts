@@ -122,7 +122,6 @@ export class Game implements OnInit, OnDestroy {
           this.audioReady = true; // Audio listo, esperar interacción del usuario
           this.primeras_letras = this.currentSong!.title.substring(0, 3) + '...';
           this.currentSong!.title_hint = this.primeras_letras;
-          this.markAsPlayed();
         } else {
           this.loadingError = true;
           this.message = 'No hay canción disponible en este nivel';
@@ -315,7 +314,7 @@ export class Game implements OnInit, OnDestroy {
     if (this.isGuest) { // si es invitado no enviamos la puntuación,
       // pero sí añadimos el nivel completado al session storage, siempre que no esté ya jugado
       if (sessionStorage.getItem('played_levels')?.split(',').includes(this.level_number.toString())) {
-        console.warn('Nivel ya jugado en modo invitado. No se actualiza el progreso.');
+        this.alreadyPlayed = true;
         return;
       }
       let local_completed_levels = sessionStorage.getItem('completed_levels');
@@ -382,10 +381,7 @@ export class Game implements OnInit, OnDestroy {
 
     this.message = `La canción era: "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
     this.playCompleteAudio();
-    this.gameService.markAsPlayed(this.levelId, this.userService.getToken()).subscribe({
-      next: () => console.log('Nivel marcado como jugado'),
-      error: (err) => console.error('Error marcando nivel como jugado', err)
-    });
+    this.markAsPlayed();
   }
 
   playAgain(): void {
