@@ -45,7 +45,7 @@ export class UserService {
   getToken(): string {
     const token = sessionStorage.getItem('authToken');
     if (!token) {
-      throw new Error('No token found');
+      return '';
     }
     return token;
   }

@@ -122,6 +122,7 @@ export class Game implements OnInit, OnDestroy {
           this.audioReady = true; // Audio listo, esperar interacción del usuario
           this.primeras_letras = this.currentSong!.title.substring(0, 3) + '...';
           this.currentSong!.title_hint = this.primeras_letras;
+          this.markAsPlayed();
         } else {
           this.loadingError = true;
           this.message = 'No hay canción disponible en este nivel';
@@ -226,7 +227,6 @@ export class Game implements OnInit, OnDestroy {
       this.message = 'Introduce una respuesta';
       return;
     }
-
     this.gameService.validateAnswer(this.levelId, this.userAnswer).subscribe({
       next: (response) => {
         if (response.correct) {
@@ -238,10 +238,6 @@ export class Game implements OnInit, OnDestroy {
           this.message = `La canción es "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
           this.playCompleteAudio();
           this.saveScore();
-          this.gameService.markAsPlayed(this.levelId, this.userService.getToken()).subscribe({
-            next: () => console.log('Nivel marcado como jugado'),
-            error: (err) => console.error('Error marcando nivel como jugado', err)
-          });
         } else {
           this.message = 'Respuesta incorrecta';
           this.userAnswer = '';
@@ -262,6 +258,7 @@ export class Game implements OnInit, OnDestroy {
         console.error('Error validando respuesta:', err);
         this.message = 'Error al validar respuesta';
       }
+      
     });
   }
 
@@ -316,7 +313,11 @@ export class Game implements OnInit, OnDestroy {
   private saveScore(): void {
     const token = this.userService.getToken();
     if (this.isGuest) { // si es invitado no enviamos la puntuación,
-      // pero sí añadimos el nivel completado al session storage
+      // pero sí añadimos el nivel completado al session storage, siempre que no esté ya jugado
+      if (sessionStorage.getItem('played_levels')?.split(',').includes(this.level_number.toString())) {
+        console.warn('Nivel ya jugado en modo invitado. No se actualiza el progreso.');
+        return;
+      }
       let local_completed_levels = sessionStorage.getItem('completed_levels');
       let completedLevels: string[] = [];
       if (local_completed_levels) {
@@ -349,6 +350,33 @@ export class Game implements OnInit, OnDestroy {
 
   }
 
+  private markAsPlayed(): void {
+    if (this.isGuest) {
+      // marcar nivel como jugado en sessionStorage
+      let local_played_levels = sessionStorage.getItem('played_levels');
+      let playedLevels: string[] = [];
+      if (local_played_levels) {
+        playedLevels = local_played_levels.split(',');
+      }
+      if (!playedLevels.includes(this.level_number.toString())) {
+        playedLevels.push(this.level_number.toString());
+        sessionStorage.setItem('played_levels', playedLevels.join(','));
+      }
+      return;
+    } else {
+      const token = this.userService.getToken();
+      if (!token) {
+        console.error('No hay token de autenticación disponible. Inicia sesión para marcar el nivel como jugado.');
+        this.router.navigate(['/login']);
+        return;
+      }
+      this.gameService.markAsPlayed(this.levelId, token).subscribe({
+      next: () => console.log('Nivel marcado como jugado'),
+      error: (err) => console.error('Error marcando nivel como jugado', err)
+    });
+    }
+  }
+  
   private revealAnswer(): void {
     if (!this.currentSong) return;
 
