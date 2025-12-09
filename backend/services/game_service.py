@@ -119,7 +119,6 @@ class GameService:
 
             if user.is_level_played(level_id):
                 return {"error": "Nivel ya jugado"}, 400
-            user.mark_level_played(level_id)
             user.complete_level(level_id)
             user.add_score(score) # Update score in memory
 
@@ -228,10 +227,10 @@ class GameService:
                 else: # si solo tiene spotify_id, obtener datos desde Spotify API
                     # Obtener token de Spotify del usuario
                     username = _get_username(user)
-                    spotify_token = db.get_spotify_access_token(username)
-                    
-                    if not spotify_token:
-                        return {"error": "No hay conexión de Spotify disponible"}, 403
+                    success, message, spotify_token = db.get_spotify_access_token(username)
+                    print(f"Spotify token status: {message}")
+                    if not success:
+                        return {"error": f"No hay conexión de Spotify disponible: {message}"}, 403
                     
                     spotiHelper = SpotifyHelper()
                     spotify_data = spotiHelper.get_track_info(song['spotify_id'], spotify_token)

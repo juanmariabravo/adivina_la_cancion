@@ -532,8 +532,8 @@ class Database:
         finally:
             conn.close()
 
-    def get_spotify_access_token(self, username: str) -> Optional[str]:
-        """Obtener access token de Spotify para un usuario"""
+    def get_spotify_access_token(self, username: str) -> tuple[bool, str, Optional[str]]:
+        """Obtener access token de Spotify para un usuario, con feedback detallado"""
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
@@ -542,16 +542,20 @@ class Database:
                 WHERE username = ?
             ''', (username,))
             row = cursor.fetchone()
-            if row:
-                access_token = row['spotify_access_token']
-                expires_at = row['spotify_token_expires_at']
-                # Verificar si el token ha expirado
-                if expires_at and expires_at > int(time.time()):
-                    return access_token
-            return None
+            if not row:
+                return False, "Usuario no encontrado", None
+            access_token = row['spotify_access_token']
+            expires_at = row['spotify_token_expires_at']
+            if not access_token:
+                return False, "No hay access token de Spotify almacenado", None
+            if not expires_at:
+                return False, "No hay información de expiración del token", None
+            if expires_at <= int(time.time()):
+                return False, "El access token de Spotify ha expirado", None
+            return True, "Access token válido", access_token
         except Exception as e:
             print(f"Error obteniendo access token de Spotify: {e}")
-            return None
+            return False, f"Error obteniendo access token de Spotify: {str(e)}", None
         finally:
             conn.close()
 

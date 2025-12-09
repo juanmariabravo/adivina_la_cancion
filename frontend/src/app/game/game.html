@@ -28,8 +28,8 @@
         <button class="action-btn secondary" (click)="goToLevels()">
           <i class="fa-solid fa-arrow-left"></i> Volver a Niveles
         </button>
-        <button class="action-btn tertiary" (click)="goToProfile()" *ngIf="message.includes('Spotify')">
-          <i class="fa-solid fa-user"></i> Ir a Perfil
+        <button class="action-btn tertiary" (click)="goToProfile()" *ngIf="message.includes('ha expirado')">
+          <i class="fa-solid fa-user"></i> Re-Conectar con Spotify
         </button>
         <button class="action-btn tertiary" (click)="goToLogin()" *ngIf="message.includes('sesión')">
           <i class="fa-solid fa-key"></i> Iniciar Sesión

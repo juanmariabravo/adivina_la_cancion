@@ -138,8 +138,8 @@ export class Game implements OnInit, OnDestroy {
             this.message = 'Debes conectar Spotify para acceder a este nivel';
           } else if (err.error?.upgrade_required) {
             this.message = 'Regístrate para jugar más niveles';
-          } else {
-            this.message = 'No tienes permisos para acceder a este nivel';
+            } else if (err.error?.error && err.error.error.includes("ha expirado")) {
+              this.message = `Tu conexión con Spotify ha expirado. Por favor, vuelve a conectarte desde tu perfil`;
           }
         } else if (err.status === 404) {
           this.message = 'Este nivel no existe o no está disponible';
