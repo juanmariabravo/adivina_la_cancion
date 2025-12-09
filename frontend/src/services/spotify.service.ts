@@ -67,18 +67,6 @@ export class SpotifyService {
     return Date.now() < parseInt(expiration);
   }
 
-  // 7. Refrescar token
-  refreshToken(): Observable<any> {
-    const refreshToken = sessionStorage.getItem('spotifyRefreshToken');
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
-    return this.http.post<any>(`${this.apiUrl}/refreshToken`, {
-      refresh_token: refreshToken
-    });
-  }
-
   // 8. Desconectar de Spotify
   disconnectSpotify(): void {
     sessionStorage.removeItem('spotifyAccessToken');

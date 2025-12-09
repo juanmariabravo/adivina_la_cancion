@@ -77,8 +77,7 @@ export class Callback implements OnInit {
   }
 
   private exchangeCodeForToken(code: string): void {
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
-    const email = currentUser.email;
+    const email = sessionStorage.getItem('email');
 
     if (!email) {
       this.errorMessage = 'Email de usuario no encontrado';

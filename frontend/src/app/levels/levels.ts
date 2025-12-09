@@ -84,6 +84,8 @@ export class Levels implements OnInit {
           this.isGuest = false; // si hay token, no es invitado
           this.username = userData.username;
           this.email = userData.email;
+          // Guardamos el email en sessionStorage para usarlo al conectar Spotify
+          sessionStorage.setItem('email', this.email);
           this.totalScore = userData.total_score || 0;
 
           // Procesar niveles completados
