@@ -126,8 +126,10 @@ python3 -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
+Cuando estás en un virtual environment en Windows, debes usar python (sin el 3)
 
-#### Frontend
+#### Frontend (utiliza otra terminal)
+> ℹ Asegúrate de tener **Node.js** y **Angular CLI** instalados.
 ```shell
 cd frontend
 npm install
@@ -165,16 +167,18 @@ SPOTIFY_API_URL=https://api.spotify.com/v1
 ```shell
 cd backend
 source venv/bin/activate  # Windows: venv\Scripts\activate
-python3 app.py
+python3 app.py # Windows: python app.py
 ```
 El servidor estará disponible en `http://127.0.0.1:5000`
+
+> ⚠︎ Cuando estás en un virtual environment en **Windows**, debes usar `python` (**sin el 3**):
 
 #### Frontend
 ```shell
 cd frontend
 ng serve --open --host 127.0.0.1
 ```
-La aplicación se abrirá en `http://127.0.0.1:4200`
+La aplicación se abrirá en [`http://127.0.0.1:4200`](http://127.0.0.1:4200)
 
 ---
 
