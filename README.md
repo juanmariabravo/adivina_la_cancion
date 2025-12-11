@@ -39,20 +39,24 @@
 ```
 adivina_la_cancion/
 ├── backend/
-│   ├── app.py                        # Aplicación principal Flask con blueprints
+│   ├── app.py                       # Aplicación principal Flask con blueprints
 │   ├── adivina_la_cancion.db          # Base de datos SQLite
 │   ├── .env                           # Variables de entorno (no incluido en repo)
 │   ├── requirements.txt               # Dependencias Python
 │   │
 │   ├── controllers/                 # Controladores (endpoints API)
-│   │   ├── user_controller.py        # Rutas de autenticación y usuario
-│   │   ├── game_controller.py        # Rutas de juego y puntuación
-│   │   └── spotify_controller.py     # Rutas de integración Spotify
+│   │   ├── user_controller.py        # Rutas de autenticación y usuario (/api/v1/auth)
+│   │   ├── game_controller.py        # Rutas de juego y puntuación (/api/v1/game, /api/v1/songs, /api/v1/ranking)
+│   │   └── spotify_controller.py     # Rutas de integración Spotify (/api/v1/spoti)
 │   │
 │   ├── services/                    # Lógica de negocio
 │   │   ├── user_service.py           # Gestión de usuarios
 │   │   ├── game_service.py           # Lógica del juego
 │   │   └── spoti_service.py          # Integración con Spotify API
+│   │
+|   ├── helpers/                     # Funciones auxiliares
+|   |   ├── spotify_preview.py        # Generación de previews de canciones usando web scraping
+│   │   ├── spotify_helper.py         # Llamadas a Spotify API y a spotify_preview.py para obtener canciones y su info
 │   │
 │   ├── models/                      # Modelos de datos
 │   │   ├── user.py                   # Modelo de usuario
@@ -87,6 +91,8 @@ adivina_la_cancion/
     │   │   ├── game.service.ts      # Lógica de juego
     │   │   └── spotify.service.ts   # Comunicación con API Spotify
     │   │
+    │   ├── environments/            # Configuración de entornos
+    │   │   ├── environment.ts        # Configuración variables desarrollo
     │   ├── styles.css               # Estilos globales
     │   ├── index.html               # HTML principal
     │   └── main.ts                  # Punto de entrada
@@ -95,6 +101,10 @@ adivina_la_cancion/
     ├── package.json                  # Dependencias Node.js
     └── tsconfig.json                 # Configuración TypeScript
 ```
+
+## 𖤓 Diagrama de arquitectura y tecnologías
+
+<img src="documentacion/diagrama_arquitectura_y_tecnologías.svg" alt="Diagrama de arquitectura y tecnologías" width="*"/>
 
 ---
 
@@ -135,12 +145,16 @@ SECRET_KEY=tu_clave_secreta_aleatoria_de_al_menos_32_caracteres
 PORT=5000
 DEBUG=True
 
-# Base de datos
-DATABASE_PATH=/ruta/completa/a/adivina_la_cancion.db
+# Base de datos (puedes usar cualquier otra ruta válida)
+DATABASE_PATH=adivina_la_cancion.db
 
-# Spotify API
+# Spotify Redirect URI
 SPOTIFY_REDIRECT_URI=http://127.0.0.1:4200/callback
+
+# Spotify API URLs
+SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize
 SPOTIFY_TOKEN_URL=https://accounts.spotify.com/api/token
+SPOTIFY_API_URL=https://api.spotify.com/v1
 ```
 
 > ⚠ **Importante:** Registra tu aplicación en [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/applications) y configura la URI de redirección a `http://127.0.0.1:4200/callback`. Necesitarás el `CLIENT_ID` y `CLIENT_SECRET` para el registro en la aplicación.

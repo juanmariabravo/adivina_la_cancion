@@ -1,0 +1,154 @@
+classDiagram
+    direction LR
+
+    %% 1. Modelos (Data Structures)
+    class User {
+        +str username [PK]
+        +str email [UNIQUE]
+        +str hashed_password
+        +datetime created_at (opt)
+        +int total_score (default=0)
+        +str levels_completed (default='')
+        +str played_levels (default='')
+        +str last_daily_completed (opt) # formato: "dd-mm-yyyy"
+        +str spotify_access_token (opt)
+        +int spotify_token_expires_at (opt)
+        +str spotify_client_id (opt)
+        +str spotify_client_secret (opt)
+
+        +to_public_dict()
+        +is_daily_completed_today()
+        +add_score(score)
+        +is_level_completed(level_id)
+        +is_level_played(level_id)
+        +complete_level(level_id)
+        +mark_level_played(level_id)
+        +get_completed_levels_count()
+        +get_played_levels_count()
+        +reset_daily_status()
+        +complete_daily()
+        +get_client_secret()
+        +from_dict()
+    }
+
+    class Song {
+        +str id [PK]
+        +str title
+        +str artists
+        +str album
+        +str genre
+        +int year
+        +str audio
+        +str image_url
+        +int level_id
+
+        +to_dict()
+        +from_dict()
+    }
+
+    %% 2. Capa de Persistencia (Database Access)
+    class Database {
+        +str db_path
+
+        +get_connection()
+        +init_database()
+        +create_user(user)
+        +get_user_by_username(username) -> User
+        +get_user_by_email(email) -> User
+        +get_user_by_client_id(client_id) -> User
+        +validate_credentials(username, password)
+        +create_token(user: User)
+        +verify_token(token)
+        +get_ranking(limit: int)
+        +update_user_profile(username, new_username, new_password)
+        +get_local_song_by_level(level_id) -> Song
+        +get_spotify_song_by_level(level_id) -> Song
+        +add_spotify_song(song: Song)
+        +delete_daily_songs()
+        +init_daily_song_level()
+        +save_spotify_tokens(username, access_token, refresh_token, expires_at)
+        +save_user(user: User)
+        +get_spotify_access_token(username) -> str
+        
+    }
+
+    %% 3. Capa de Servicios (Business Logic)
+    class UserService {
+        +register(data)
+        +login(data)
+        +get_current_user(auth_header)
+        +update_profile(auth_header, data)
+        +get_spotify_client_id(email)
+    }
+
+    class GameService {
+        +set_daily_song()
+        +validate_answer(level_id, user_answer)
+        +mark_level_played(auth_header, level_id)
+        +update_score(auth_header, data)
+        +get_ranking(limit)
+        +complete_daily(auth_header)
+        +get_level_song(level_id, auth_header)
+    }
+
+    class SpotiService {
+        +get_authorization_token(code, client_id)
+        +_basic_auth(client_id, client_secret)
+    }
+
+    %% 4. Helpers y Utilidades de Spotify
+    class SpotifyHelper {
+        +get_track_info(track_id, access_token)
+        +get_track_genres(artist_id, access_token)
+    }
+
+    class SpotifyPreview {
+        +get_preview_url(spotify_track_id)
+    }
+
+    %% 5. Capa de Controladores (API Entry Points)
+    class UserController {
+        +/api/v1/auth/register POST
+        +/api/v1/auth/login POST
+        +/api/v1/auth/me GET
+        +/api/v1/auth/update PUT
+    }
+
+    class GameController {
+        +/api/v1/game/submit-score POST
+        +/api/v1/ranking GET
+        +/api/v1/game/daily/complete POST
+        +/api/v1/songs/<level_id> GET
+        +/api/v1/game/validate POST
+        +/api/v1/game/mark-level-played POST
+    }
+
+    class SpotifyController {
+        +/api/v1/spoti/getClientId GET
+        +/api/v1/spoti/getAuthorizationToken GET
+    }
+
+    %% Relaciones
+
+    %% Controllers dependen de Services
+    UserController --> UserService : utiliza
+    GameController --> GameService : utiliza
+    SpotifyController --> SpotiService : utiliza
+
+    %% Services dependen de otros Services, Models y Database
+    UserService --> Database : utiliza (CRUD)
+    GameService --> Database : utiliza (Niveles/Ranking)
+    GameService --> UserService : utiliza (Actualizar Puntuación)
+    GameService --> SpotiService : utiliza (Tokens)
+    GameService --> SpotifyHelper : utiliza (Metadata)
+    GameService --> SpotifyPreview : utiliza (Preview URLs)
+    
+    SpotiService --> Database : utiliza (Tokens)
+    SpotiService --> SpotifyHelper : utiliza (API calls)
+    
+    SpotifyHelper --> SpotifyPreview : utiliza (Preview fallback)
+
+    %% Models son gestionados por Services (relación implícita)
+    UserService ..> User : gestiona
+    GameService ..> Song : gestiona/devuelve
+    SpotifyHelper ..> Song : extrae metadata
