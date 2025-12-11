@@ -8,19 +8,12 @@
     URL del repositorio: https://github.com/juanmariabravo/adivina_la_cancion
 
 */
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { Component } from '@angular/core';
 // Importamos el cliente HTTP para hacer peticiones
-import { HttpClient, HttpClientModule } from '@angular/common/http'; 
+import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common'; // Necesario para directivas (ngIf, ngClass, pipes)
-import { Home } from './home/home';
 import { RouterOutlet } from '@angular/router';
 
-// Definición de la estructura de la respuesta JSON que esperamos de Flask
-interface SaludoResponse {
-  mensaje: string;
-  timestamp: string;
-  servidor: string;
-}
 
 @Component({
   selector: 'app-root',
