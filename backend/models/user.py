@@ -9,7 +9,6 @@ class User:
         email: str,
         hashed_password: str,
         created_at: Optional[datetime] = None,
-        is_active: bool = True,
         total_score: int = 0,
         levels_completed: str = '',
         played_levels: str = '',
@@ -24,7 +23,6 @@ class User:
         self.email = email
         self.hashed_password = hashed_password
         self.created_at = created_at or datetime.utcnow()
-        self.is_active = is_active
         self.total_score = total_score
         self.levels_completed = levels_completed
         self.played_levels = played_levels
@@ -119,7 +117,6 @@ class User:
             email=data.get('email'),
             hashed_password=data.get('hashed_password'),
             created_at=data.get('created_at'),
-            is_active=data.get('is_active', True),
             total_score=data.get('total_score', 0),
             levels_completed=data.get('levels_completed', ''),
             played_levels=data.get('played_levels', ''),

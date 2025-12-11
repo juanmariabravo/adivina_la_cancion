@@ -9,13 +9,6 @@ SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
 SPOTIFY_REDIRECT_URI = os.getenv('SPOTIFY_REDIRECT_URI')
 SPOTIFY_TOKEN_URL = os.getenv('SPOTIFY_TOKEN_URL')
 
-
-def _get_username(user):
-	if user is None:
-		return None
-	return getattr(user, 'username', None) or (user.get('username') if isinstance(user, dict) else None)
-
-
 class UserService:
 	def register(self, data):
 		try:

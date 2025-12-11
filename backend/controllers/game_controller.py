@@ -59,7 +59,7 @@ def validate_answer():
 @game_bp.route('/game/mark-level-played', methods=['POST'])
 def mark_level_played():
     """Marcar nivel como jugado"""
-    data = request.get_json()
+    level_id = request.get_json().get('level_id')
     auth_token = request.headers.get('Authorization')
-    payload, status = game_service.mark_level_played(auth_token, data)
+    payload, status = game_service.mark_level_played(auth_token, level_id)
     return jsonify(payload), status

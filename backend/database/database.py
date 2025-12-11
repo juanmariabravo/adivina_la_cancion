@@ -9,6 +9,7 @@ from typing import Optional
 from dotenv import load_dotenv
 
 from models.user import User
+from models.song import Song
 
 # Cargar variables de entorno
 load_dotenv()
@@ -38,7 +39,6 @@ class Database:
                     email TEXT UNIQUE NOT NULL,
                     hashed_password TEXT NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    is_active BOOLEAN DEFAULT TRUE,
                     total_score INTEGER DEFAULT 0,
                     levels_completed TEXT DEFAULT '',
                     played_levels TEXT DEFAULT '',
@@ -87,9 +87,9 @@ class Database:
             # Insertar IDs de canciones de Spotify
             self.init_spotify_songs_levels()
             
-            print("✅ Base de datos inicializada correctamente en "+ DATABASE_PATH)
+            print("Base de datos inicializada correctamente en "+ DATABASE_PATH)
         except Exception as e:
-            print(f"❌ Error inicializando base de datos: {e}")
+            print(f"Error inicializando base de datos: {e}")
         finally:
             conn.close()
     
@@ -134,7 +134,7 @@ class Database:
                     print(f"Error insertando canción {song.get('id', '?')}: {e}")
             
             conn.commit()
-            print("✅ Canciones locales inicializadas")
+            print("Canciones locales inicializadas")
             
         except FileNotFoundError as e:
             print(f"Archivo JSON no encontrado: {e}")
@@ -171,9 +171,9 @@ class Database:
                     VALUES (?, ?)
                 ''', (level['spotify_id'], level['level_id']))
             conn.commit()
-            print("✅ Niveles de canciones de Spotify inicializados")
+            print("Niveles de canciones de Spotify inicializados")
         except Exception as e:
-            print(f"❌ Error inicializando niveles de canciones de Spotify: {e}")
+            print(f"Error inicializando niveles de canciones de Spotify: {e}")
         finally:
             conn.close()
 
@@ -214,7 +214,7 @@ class Database:
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT username, email, hashed_password, created_at, is_active, total_score, levels_completed, played_levels, last_daily_completed,
+                SELECT username, email, hashed_password, created_at, total_score, levels_completed, played_levels, last_daily_completed,
                        spotify_access_token, spotify_refresh_token, spotify_token_expires_at, spotify_client_id, spotify_client_secret
                 FROM users WHERE username = ?
             ''', (username,))
@@ -231,7 +231,7 @@ class Database:
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT username, email, hashed_password, created_at, is_active, total_score, levels_completed, played_levels, last_daily_completed,
+                SELECT username, email, hashed_password, created_at, total_score, levels_completed, played_levels, last_daily_completed,
                        spotify_access_token, spotify_refresh_token, spotify_token_expires_at, spotify_client_id, spotify_client_secret
                 FROM users WHERE email = ?
             ''', (email,))
@@ -248,7 +248,7 @@ class Database:
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT username, email, hashed_password, created_at, is_active, total_score, levels_completed, played_levels, last_daily_completed,
+                SELECT username, email, hashed_password, created_at, total_score, levels_completed, played_levels, last_daily_completed,
                        spotify_access_token, spotify_refresh_token, spotify_token_expires_at, spotify_client_id, spotify_client_secret
                 FROM users WHERE spotify_client_id = ?
                 LIMIT 1
@@ -260,6 +260,7 @@ class Database:
             return None
         finally:
             conn.close()
+
     def validate_credentials(self, email: str, password: str) -> Optional[User]:
         """Validar credenciales de usuario"""
         user = self.get_user_by_email(email)
@@ -287,7 +288,6 @@ class Database:
         except jwt.InvalidTokenError:
             print("Token inválido")
             return None
-    
 
     def get_ranking(self, limit: int = 10) -> list:
         """Obtener ranking de usuarios"""
@@ -295,8 +295,7 @@ class Database:
         try:
             cursor = conn.execute('''
                 SELECT username, total_score, levels_completed
-                FROM users 
-                WHERE is_active = TRUE
+                FROM users
                 ORDER BY total_score DESC
                 LIMIT ?
             ''', (limit,))
@@ -355,50 +354,41 @@ class Database:
         finally:
             conn.close()
     
-    def get_local_song_by_level(self, level_id: int) -> Optional[dict]:
+    def get_local_song_by_level(self, level_id: int) -> Optional[Song]:
         """Obtener canción local por nivel"""
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT id, title, artists, album, year, genre, audio_codificado, image_url
+                SELECT id, title, artists, album, year, genre, audio_codificado as audio, image_url
                 FROM local_songs
                 WHERE id = ?
             ''', (level_id,))
             row = cursor.fetchone()
-            return dict(row) if row else None
+            if row:
+                song_dict = dict(row)
+                song_dict['id'] = str(song_dict['id'])
+                song_dict['level_id'] = level_id
+                return Song.from_dict(song_dict)
+            return None
         finally:
             conn.close()
     
-    def get_spotify_song_by_level(self, level_id: int) -> Optional[dict]:
+    def get_spotify_song_by_level(self, level_id: int) -> Optional[Song]:
         """Obtener canción de Spotify por nivel"""
         conn = self.get_connection()
         try:
             cursor = conn.execute('''
-                SELECT spotify_id, title, artists, album, year, genre, audio, image_url, level_id
+                SELECT spotify_id as id, title, artists, album, year, genre, audio, image_url, level_id
                 FROM spotify_songs
                 WHERE level_id = ?
                 LIMIT 1
             ''', (level_id,))
             row = cursor.fetchone()
-            return dict(row) if row else None
+            return Song.from_dict(dict(row)) if row else None
         finally:
             conn.close()
-    
-    def get_song_title_by_level(self, level_id: int) -> Optional[str]:
-        """Obtener título de la canción por nivel y fuente (local o spotify)"""
-        conn = self.get_connection()
-        cursor = conn.execute('''
-            SELECT title
-            FROM spotify_songs
-            WHERE level_id = ?
-        ''', (level_id,))
-            
-        row = cursor.fetchone()
-        conn.close()
-        return row['title'] if row else None
 
-
-    def add_spotify_song(self, spotify_data: dict) -> bool:
+    def add_spotify_song(self, song: Song) -> bool:
         """Añadir canción de Spotify a la base de datos"""
         conn = self.get_connection()
         try:
@@ -407,37 +397,20 @@ class Database:
                 (spotify_id, title, artists, album, year, genre, audio, image_url, level_id)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
-                spotify_data['spotify_id'],
-                spotify_data['title'],
-                spotify_data['artists'],
-                spotify_data['album'],
-                spotify_data['year'],
-                spotify_data.get('genre', 'Unknown'),
-                spotify_data['audio'],
-                spotify_data['image_url'],
-                spotify_data['level_id']
+                song.id,
+                song.title,
+                song.artists,
+                song.album,
+                song.year,
+                song.genre,
+                song.audio,
+                song.image_url,
+                song.level_id
             ))
             conn.commit()
             return True
         except Exception as e:
             print(f"Error añadiendo canción de Spotify: {e}")
-            return False
-        finally:
-            conn.close()
-    
-    def update_spotify_song(self, spotify_id: str, title: str, artists: str, album: str, year: int, genre: str, audio: str, image_url: str) -> bool:
-        """Actualizar el nivel de una canción de Spotify"""
-        conn = self.get_connection()
-        try:
-            conn.execute('''
-                UPDATE spotify_songs 
-                SET title = ?, artists = ?, album = ?, year = ?, genre = ?, audio = ?, image_url = ?
-                WHERE spotify_id = ?
-            ''', (title, artists, album, year, genre, audio, image_url, spotify_id))
-            conn.commit()
-            return True
-        except Exception as e:
-            print(f"Error actualizando canción de Spotify: {e}")
             return False
         finally:
             conn.close()
@@ -506,13 +479,12 @@ class Database:
         try:
             conn.execute('''
                 UPDATE users 
-                SET email = ?, hashed_password = ?, is_active = ?, total_score = ?, levels_completed = ?, played_levels = ?, last_daily_completed = ?,
+                SET email = ?, hashed_password = ?, total_score = ?, levels_completed = ?, played_levels = ?, last_daily_completed = ?,
                     spotify_access_token = ?, spotify_refresh_token = ?, spotify_token_expires_at = ?, spotify_client_id = ?, spotify_client_secret = ?
                 WHERE username = ?
             ''', (
                 user.email,
                 user.hashed_password,
-                user.is_active,
                 user.total_score,
                 user.levels_completed,
                 user.played_levels,

@@ -11,13 +11,6 @@ from helpers.spotify_helper import SpotifyHelper
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-
-def _get_username(user):
-    if user is None:
-        return None
-    return getattr(user, 'username', None) or (user.get('username') if isinstance(user, dict) else None)
-
-
 class GameService:
     def __init__(self):
         self.set_daily_song()
@@ -46,11 +39,13 @@ class GameService:
                 level_num = int(level_str)
             except ValueError:
                 return False
-            song_name = db.get_local_song_by_level(level_num).get('title')
+            song = db.get_local_song_by_level(level_num)
+            song_name = song.title if song else None
             if not song_name:
                 return False
         else:
-            song_name = db.get_song_title_by_level(int(level_id))
+            song_name = db.get_spotify_song_by_level(int(level_id))
+            song_name = song_name.title if song_name else None
             if not song_name:
                 return False
             
@@ -62,7 +57,7 @@ class GameService:
         if normalized_answer == normalized_title:
             return True
         
-        # Comparación con 90% de similitud usando SequenceMatcher: si la respuesta es muy parecida al título se considera correcta
+        # Comparación con 85% de similitud usando SequenceMatcher: si la respuesta es muy parecida al título se considera correcta
         similarity = SequenceMatcher(None, normalized_answer, normalized_title).ratio()
         return similarity >= 0.85
 
@@ -81,7 +76,7 @@ class GameService:
         title = re.sub(r'\s+', ' ', title).strip()
         return title
 
-    def mark_level_played(self, auth_header, data):
+    def mark_level_played(self, auth_header, level_id):
         try:
             if not auth_header or not auth_header.lower().startswith('bearer '):
                 return {"error": "Token requerido"}, 401
@@ -91,10 +86,9 @@ class GameService:
             if not user:
                 return {"error": "Token inválido"}, 401
 
-            if not data or 'level_id' not in data:
+            if not level_id:
                 return {"error": "Nivel requerido"}, 400
 
-            level_id = data['level_id']
             user.mark_level_played(level_id)
             db.save_user(user)
             return {"message": "Nivel marcado como jugado"}, 200
@@ -178,19 +172,7 @@ class GameService:
                 if not song:
                     return {"error": "Nivel no disponible para invitados"}, 404
 
-                return {
-                    "song": {
-                        "id": song['id'],
-                        "title": song['title'],
-                        "artists": song['artists'],
-                        "album": song['album'],
-                        "year": song['year'],
-                        "genre": song['genre'],
-                        "audio": song['audio_codificado'],
-                        "image_url": song['image_url']
-                    },
-                    "source": "local"
-                }, 200
+                return song.to_dict(), 200
 
             else:
                 # Usuario autenticado: verificar token de autenticación
@@ -210,53 +192,27 @@ class GameService:
                     return {"error": "Nivel no disponible"}, 404
                 
                 # si ya tiene los datos guardados en la BD, devolverlos directamente
-                if song and song.get('title') and song.get('artists') and song.get('album') and song.get('year') and song.get('genre') and song.get('audio') and song.get('image_url'):
-                    return {
-                        "song": {
-                            "id": song['spotify_id'],
-                            "title": song['title'],
-                            "artists": song['artists'],
-                            "album": song['album'],
-                            "year": song['year'],
-                            "genre": song['genre'],
-                            "audio": song['audio'],
-                            "image_url": song['image_url']
-                        },
-                        "source": "database"
-                    }, 200
+                if song and song.title and song.artists and song.album and song.year and song.genre and song.audio and song.image_url:
+                    return song.to_dict(), 200
                 else: # si solo tiene spotify_id, obtener datos desde Spotify API
                     # Obtener token de Spotify del usuario
-                    username = _get_username(user)
+                    username = user.username
                     success, message, spotify_token = db.get_spotify_access_token(username)
                     print(f"Spotify token status: {message}")
                     if not success:
                         return {"error": f"No hay conexión de Spotify disponible: {message}"}, 403
                     
                     spotiHelper = SpotifyHelper()
-                    spotify_data = spotiHelper.get_track_info(song['spotify_id'], spotify_token)
+                    spoti_song = spotiHelper.get_track_info(song.id, spotify_token)
                     
-                    if not spotify_data:
+                    if not spoti_song:
                         return {"error": "Nivel no disponible"}, 404
 
                     # Guardar datos obtenidos en la base de datos para futuras consultas
-                    spotify_data['level_id'] = int(level_id)
-                    db.add_spotify_song(spotify_data)
+                    spoti_song.level_id = int(level_id)
+                    db.add_spotify_song(spoti_song)
 
-                    return {
-                        "song": {
-                            "id": spotify_data['spotify_id'],
-                            "title": spotify_data['title'],
-                            "artists": spotify_data['artists'],
-                            "album": spotify_data['album'],
-                            "year": spotify_data['year'],
-                            "genre": spotify_data['genre'],
-                            "audio": spotify_data['audio'],
-                            "image_url": spotify_data['image_url'],
-                            "level_id": spotify_data['level_id']
-                        },
-                        "source": "spotify"
-                    }, 200
-                
+                    return spoti_song.to_dict(), 200
 
         except Exception as e:
             return {"error": str(e)}, 500

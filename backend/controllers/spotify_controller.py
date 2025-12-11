@@ -22,5 +22,9 @@ def get_spotify_authorization_token():
     """Obtener token de autorización de Spotify"""
     code = request.args.get('code')
     client_id = request.args.get('clientId')
+    
+    if not code or not client_id:
+        return jsonify({"error": "Faltan parámetros requeridos"}), 400
+    
     payload, status = spoti_service.get_authorization_token(code, client_id)
     return jsonify(payload), status

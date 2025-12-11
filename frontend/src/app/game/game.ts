@@ -117,8 +117,8 @@ export class Game implements OnInit, OnDestroy {
     this.gameService.getSongForLevel(this.levelId, token || undefined).subscribe({
       next: (response) => {
         this.message = '';
-        if (response.song) {
-          this.currentSong = response.song;
+        if (response) {
+          this.currentSong = response;
           this.audioReady = true; // Audio listo, esperar interacción del usuario
           this.primeras_letras = this.currentSong!.title.substring(0, 3) + '...';
           this.currentSong!.title_hint = this.primeras_letras;
