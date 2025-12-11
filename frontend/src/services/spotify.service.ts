@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SpotifyService {
-  private apiUrl = 'http://127.0.0.1:5000/api/v1/spoti';
-  private spotifyAuthUrl = 'https://accounts.spotify.com/authorize';
-  private redirectUri = 'http://127.0.0.1:4200/callback';
-  private scopes = 'user-read-private playlist-read-private user-read-email';
+  private apiUrl = `${environment.apiUrl}/spoti`;
+  private spotifyAuthUrl = environment.spotifyAuthUrl;
+  private redirectUri = environment.spotifyRedirectUri;
+  private scopes = environment.spotifyScopes;
 
   constructor(private http: HttpClient) {}
 
@@ -63,11 +64,10 @@ export class SpotifyService {
       return false;
     }
 
-    // Verificar si el token ha expirado
     return Date.now() < parseInt(expiration);
   }
 
-  // 8. Desconectar de Spotify
+  // 7. Desconectar de Spotify
   disconnectSpotify(): void {
     sessionStorage.removeItem('spotifyAccessToken');
     sessionStorage.removeItem('spotifyRefreshToken');

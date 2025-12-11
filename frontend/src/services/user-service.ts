@@ -1,15 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-
-  private registerUrl = 'http://127.0.0.1:5000/api/v1/auth/register'
-  private loginUrl = 'http://127.0.0.1:5000/api/v1/auth/login'
-  private meUrl = 'http://127.0.0.1:5000/api/v1/auth/me'
-  private updateProfileUrl = 'http://127.0.0.1:5000/api/v1/auth/update-profile'
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
@@ -23,13 +20,13 @@ export class UserService {
       spotify_client_secret: spotifyClientSecret
     };
     const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
-    return this.http.post<any>(this.registerUrl, info, { headers });
+    return this.http.post<any>(`${this.apiUrl}/auth/register`, info, { headers });
   }
 
   login(email: string, password: string) {
     const payload = { email, password };
     const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
-    return this.http.post<any>(this.loginUrl, payload, { headers });
+    return this.http.post<any>(`${this.apiUrl}/auth/login`, payload, { headers });
   }
 
   saveToken(type: string, access_token: string) {
@@ -38,7 +35,6 @@ export class UserService {
   }
 
   logout() {
-    // remove everything from sessionStorage
     sessionStorage.clear();
   }
 
@@ -61,7 +57,7 @@ export class UserService {
       'Authorization': token
     };
 
-    return this.http.get<any>(this.meUrl, { headers });
+    return this.http.get<any>(`${this.apiUrl}/auth/me`, { headers });
   }
 
   updateProfile(username?: string, password?: string) {
@@ -79,6 +75,6 @@ export class UserService {
       'Authorization': token
     };
 
-    return this.http.put<any>(this.updateProfileUrl, payload, { headers });
+    return this.http.put<any>(`${this.apiUrl}/auth/update-profile`, payload, { headers });
   }
 }

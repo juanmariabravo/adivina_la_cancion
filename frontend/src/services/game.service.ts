@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameService {
-  private apiUrl = 'http://127.0.0.1:5000/api/v1';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
@@ -61,6 +62,7 @@ export class GameService {
     });
   }
 
+  // Marcar nivel como jugado
   markAsPlayed(levelId: string, authToken: string): Observable<any> {
     const headers = {
       'Content-Type': 'application/json',
