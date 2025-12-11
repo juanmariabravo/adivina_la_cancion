@@ -111,10 +111,10 @@ class UserService:
 			if new_password and len(new_password) < 6:
 				return {"error": "La contraseña debe tener al menos 6 caracteres"}, 400
 
-			success, message = db.update_user_profile(_get_username(user), new_username, new_password)
+			success, message = db.update_user_profile(user.username, new_username, new_password)
 
 			if success:
-				updated_user = db.get_user_by_username(new_username if new_username else _get_username(user))
+				updated_user = db.get_user_by_username(new_username if new_username else user.username)
 				new_token = None
 				if new_username:
 					new_token = db.create_token(updated_user)
