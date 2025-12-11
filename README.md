@@ -4,8 +4,9 @@
 
 > Este proyecto ha sido desarrollado para la asignatura de Multimedia del cuarto curso del grado en Ingeniería Informática, de la Universidad de Castilla La Mancha.
 
-<img src="home_adivina.png" alt="Mockup del juego Adivina la Canción" width="*"/>
-<img src="adivina_la_cancion.png" alt="Nivel de Adivina la Canción" width="*"/>
+<img src="imgs_app/home-adivina.png" alt="Página principal de Adivina la Canción" width="*"/>
+
+*Página principal de Adivina la Canción*
 
 ---
 
@@ -224,20 +225,30 @@ typescript: ~5.6.2
 
 ---
 
-## ◬ Solución de problemas
+## ◬ Otras imágenes de la aplicación
+<img src="imgs_app/levels_capt.png" alt="Niveles de Adivina la Canción" width="*"/>
 
-### Error CORS
-Si encuentras errores de CORS, verifica que:
-- Flask-CORS está instalado: `pip install flask-cors`
-- La configuración de CORS incluye tu origen en `app.py`
+*Pantalla de selección de niveles*
 
-### Token de Spotify expirado
-- El sistema renovará automáticamente el token
-- Asegúrate de que el `refresh_token` esté guardado correctamente
+<img src="imgs_app/level20_capt.png" alt="Nivel 20 de Adivina la Canción" width="*"/>
 
-### Base de datos no inicializada
-- Elimina el archivo `.db` y reinicia el backend
-- Se creará automáticamente con las tablas necesarias
+*Pantalla de juego en nivel 20*
+
+<img src="imgs_app/level20_solved_capt.png" alt="Nivel 20 resuelto de Adivina la Canción" width="*"/>
+
+*Pantalla tras resolver el nivel 20*
+
+<img src="imgs_app/ranking_capt.png" alt="Ranking de Adivina la Canción" width="*"/>
+
+*Tabla de clasificación global*
+
+<img src="imgs_app/perfil_capt.png" alt="Perfil de usuario en Adivina la Canción" width="*"/>
+
+*Perfil de usuario con estadísticas*
+
+<img src="imgs_app/MockupJuegoAdivinaLaCancion.png" alt="Mockup del juego Adivina la Canción" width="*"/>
+
+*Boceto rápido del juego Adivina la Canción*
 
 ---
 
