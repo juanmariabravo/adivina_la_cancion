@@ -123,7 +123,7 @@ class GameService:
             user.add_score(score) # Update score in memory
 
             if level_id == "0":
-                user.complete_daily(level_id)
+                user.complete_daily()
             
             if db.save_user(user):
                 return {"message": "Puntuación actualizada", "total_score": user.total_score}, 200
