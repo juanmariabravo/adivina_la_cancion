@@ -1,3 +1,18 @@
+"""
+Obtener la URL de previsualización (preview) de una pista de Spotify usando la página embebida como workaround.
+
+Descripción:
+    Esta función solicita la página embebida de Spotify para una pista concreta
+    y extrae, mediante una búsqueda en el HTML, la URL del audio de previsualización.
+    Es un método de tipo "workaround" que depende de la estructura interna de la página
+    de Spotify y puede dejar de funcionar si Spotify cambia dicho HTML o el formato JSON
+    incrustado.
+
+Referencia / Atribución:
+    Basado en el workaround publicado en GitHub:
+    Rexdotsh. (s. f.). GitHub - rexdotsh/spotify-preview-url-workaround. GitHub.
+    https://github.com/rexdotsh/spotify-preview-url-workaround
+"""
 import re
 from typing import Optional
 
