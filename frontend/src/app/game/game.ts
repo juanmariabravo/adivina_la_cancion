@@ -55,7 +55,6 @@ export class Game implements OnInit, OnDestroy {
   gameStarted: boolean = false; // controlar si el juego ha comenzado
   canReplayAudio: boolean = false; // permitir repetir audio
 
-  private apiUrl = 'http://127.0.0.1:5000/api/v1';
   alreadyPlayed: boolean = false;
 
   constructor(
