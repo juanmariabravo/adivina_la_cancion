@@ -1,3 +1,12 @@
+"""
+app.py - Punto de entrada para la API "Adivina la Canción"
+
+    Autor: Juan María Bravo
+    Correo: juanmaria.bravo@alu.uclm.es
+    Proyecto: Adivina la Canción
+    Última edición: 2025-12-11
+    URL del repositorio: https://github.com/juanmariabravo/adivina_la_cancion
+"""
 from flask import Flask, jsonify
 from flask_cors import CORS
 import os

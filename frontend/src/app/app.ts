@@ -1,3 +1,13 @@
+/*
+  app.ts - Componente raíz de la aplicación Angular "Adivina la Canción"
+
+    Autor: Juan María Bravo
+    Correo: juanmaria.bravo@alu.uclm.es
+    Proyecto: Adivina la Canción
+    Última edición: 2025-12-11
+    URL del repositorio: https://github.com/juanmariabravo/adivina_la_cancion
+
+*/
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 // Importamos el cliente HTTP para hacer peticiones
 import { HttpClient, HttpClientModule } from '@angular/common/http'; 
