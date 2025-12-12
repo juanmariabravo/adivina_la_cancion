@@ -313,9 +313,9 @@ export class Game implements OnInit, OnDestroy {
     const token = this.userService.getToken();
     if (this.isGuest) { // si es invitado no enviamos la puntuación,
       // pero sí añadimos el nivel completado al session storage, siempre que no esté ya jugado
+      this.nextLevelButtonEnabled = true; // no hay que esperar al backend porque no hay puntuación en modo invitado
       if (sessionStorage.getItem('played_levels')?.split(',').includes(this.level_number.toString())) {
         this.alreadyPlayed = true;
-        this.nextLevelButtonEnabled = true;
         return;
       }
       let local_completed_levels = sessionStorage.getItem('completed_levels');
