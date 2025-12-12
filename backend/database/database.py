@@ -46,8 +46,8 @@ class Database:
                     spotify_access_token TEXT,
                     spotify_refresh_token TEXT,
                     spotify_token_expires_at INTEGER,
-                    spotify_client_id TEXT,
-                    spotify_client_secret TEXT
+                    spotify_client_id TEXT UNIQUE NOT NULL,
+                    spotify_client_secret TEXT UNIQUE NOT NULL
                 )
             ''')
             
@@ -192,6 +192,22 @@ class Database:
             if self.get_user_by_email(email):
                 return False, "El email ya está registrado"
             
+            # Verificar si el client_id ya existe (si se proporciona)
+            if spotify_client_id:
+                cursor = conn.execute('''
+                    SELECT username FROM users WHERE spotify_client_id = ?
+                ''', (spotify_client_id,))
+                if cursor.fetchone():
+                    return False, "Este Client ID de Spotify ya está registrado por otro usuario"
+            
+            # Verificar si el client_secret ya existe (si se proporciona)
+            if spotify_client_secret:
+                cursor = conn.execute('''
+                    SELECT username FROM users WHERE spotify_client_secret = ?
+                ''', (spotify_client_secret,))
+                if cursor.fetchone():
+                    return False, "Este Client Secret de Spotify ya está registrado por otro usuario"
+            
             # Hashear contraseña
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             
@@ -203,6 +219,16 @@ class Database:
             
             conn.commit()
             return True, "Usuario creado exitosamente"
+        except sqlite3.IntegrityError as e:
+            print(f"Error de integridad creando usuario: {e}")
+            if "spotify_client_id" in str(e):
+                return False, "Este Client ID de Spotify ya está registrado"
+            elif "spotify_client_secret" in str(e):
+                return False, "Este Client Secret de Spotify ya está registrado"
+            elif "email" in str(e):
+                return False, "El email ya está registrado"
+            else:
+                return False, "Ya existe un usuario con estos datos"
         except Exception as e:
             print(f"Error creando usuario: {e}")
             return False, f"Error al crear el usuario: {str(e)}"

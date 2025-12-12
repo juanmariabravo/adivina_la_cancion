@@ -25,7 +25,7 @@ app = Flask(__name__)
 # Configurar CORS de manera más explícita
 CORS(app, resources={
     r"/api/*": {
-        "origins": ["http://localhost:4200", "http://127.0.0.1:4200"],
+        "origins": "*",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "expose_headers": ["Content-Type", "Authorization"],
@@ -42,7 +42,6 @@ PORT = int(os.getenv("PORT", 5000))
 app.register_blueprint(user_bp)
 app.register_blueprint(game_bp)
 app.register_blueprint(spotify_bp)
-
 
 # Ruta de health check
 @app.route('/api/v1/health', methods=['GET'])

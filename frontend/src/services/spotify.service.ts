@@ -34,7 +34,7 @@ export class SpotifyService {
     window.location.href = `${this.spotifyAuthUrl}?${params.toString()}`;
   }
 
-  // 3. Intercambiar código por token (con clientId ya obtenido)
+  // 3. Intercambiar código por token (SOLO confirma conexión, no recibe tokens)
   exchangeCodeForTokenWithClientId(code: string, clientId: string, authToken: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/getAuthorizationToken`, {
       params: { code, clientId },
@@ -42,35 +42,18 @@ export class SpotifyService {
     });
   }
 
-  // 4. Guardar tokens en sessionStorage
-  saveSpotifyTokens(accessToken: string, refreshToken: string, expiresIn: number): void {
-    const expirationTime = Date.now() + (expiresIn * 1000);
-    sessionStorage.setItem('spotifyAccessToken', accessToken);
-    sessionStorage.setItem('spotifyRefreshToken', refreshToken);
-    sessionStorage.setItem('spotifyTokenExpiration', expirationTime.toString());
+  // 4. Marcar que Spotify está conectado (sin guardar tokens en frontend)
+  markSpotifyConnected(): void {
+    sessionStorage.setItem('spotifyConnected', 'true');
   }
 
-  // 5. Obtener access token guardado
-  getSpotifyAccessToken(): string | null {
-    return sessionStorage.getItem('spotifyAccessToken');
-  }
-
-  // 6. Verificar si el usuario está conectado a Spotify
+  // 5. Verificar si el usuario está conectado a Spotify
   isSpotifyConnected(): boolean {
-    const token = this.getSpotifyAccessToken();
-    const expiration = sessionStorage.getItem('spotifyTokenExpiration');
-    
-    if (!token || !expiration) {
-      return false;
-    }
-
-    return Date.now() < parseInt(expiration);
+    return sessionStorage.getItem('spotifyConnected') === 'true';
   }
 
-  // 7. Desconectar de Spotify
+  // 6. Desconectar de Spotify
   disconnectSpotify(): void {
-    sessionStorage.removeItem('spotifyAccessToken');
-    sessionStorage.removeItem('spotifyRefreshToken');
-    sessionStorage.removeItem('spotifyTokenExpiration');
+    sessionStorage.removeItem('spotifyConnected');
   }
 }

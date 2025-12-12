@@ -50,7 +50,9 @@ class SpotiService:
                 token_data.get("refresh_token"),
                 token_data.get("expires_in")
             )
-            return token_data, 200
+            
+            # Solo confirmar éxito, NO enviar tokens
+            return {"message": "Spotify conectado exitosamente", "connected": True}, 200
         except RequestException as e:
             return {"error": f"Error getting authorization token: {str(e)}"}, 400
         except Exception as e:

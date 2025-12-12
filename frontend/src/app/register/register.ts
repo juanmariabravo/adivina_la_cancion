@@ -209,7 +209,9 @@ export class Register {
       next: (response: any) => {
         this.loading = false;
         this.successMessage = '¡Cuenta creada exitosamente! Redirigiendo...';
-        
+        // Guardar datos de la respuesta
+        this.service.saveToken(response.token_type, response.access_token);
+
         // Limpiar formulario
         this.username = '';
         this.email = '';
@@ -218,9 +220,6 @@ export class Register {
         this.spotifyClientId = '';
         this.spotifyClientSecret = '';
 
-        // Guardar datos de la respuesta
-        this.service.saveToken(response.token_type, response.access_token);
-        
         // Redirigir después de 2 segundos
         setTimeout(() => {
           this.router.navigate(['/levels']);
@@ -232,11 +231,15 @@ export class Register {
         if (err.status === 400) {
           const errorMsg = err.error?.error || '';
           
-          // Detectar si es error de username o email duplicado
-          if (errorMsg.toLowerCase().includes('usuario')) {
+          // Detectar tipo de error específico
+          if (errorMsg.toLowerCase().includes('nombre de usuario')) {
             this.usernameError = errorMsg;
           } else if (errorMsg.toLowerCase().includes('email')) {
             this.emailError = errorMsg;
+          } else if (errorMsg.toLowerCase().includes('client id')) {
+            this.spotifyClientIdError = errorMsg;
+          } else if (errorMsg.toLowerCase().includes('client secret')) {
+            this.spotifyClientSecretError = errorMsg;
           } else {
             this.formError = errorMsg || 'Error en el registro';
           }
@@ -245,6 +248,8 @@ export class Register {
         } else {
           this.formError = err.error?.error || 'Error del servidor. Intenta más tarde.';
         }
+        
+        console.warn('Error en registro:', err);
       }
     });
   }

@@ -63,6 +63,7 @@ export class Callback implements OnInit {
 
       if (error) {
         this.errorMessage = 'Error al conectar con Spotify: ' + error;
+        console.warn('Error de autorización de Spotify:', error);
         setTimeout(() => this.router.navigate(['/levels']), 3000);
         return;
       }
@@ -71,6 +72,7 @@ export class Callback implements OnInit {
         this.exchangeCodeForToken(code);
       } else {
         this.errorMessage = 'No se recibió código de autorización';
+        console.warn('No se recibió código de autorización en callback');
         setTimeout(() => this.router.navigate(['/levels']), 3000);
       }
     });
@@ -81,6 +83,7 @@ export class Callback implements OnInit {
 
     if (!email) {
       this.errorMessage = 'Email de usuario no encontrado';
+      console.warn('Email de usuario no encontrado en sessionStorage');
       setTimeout(() => this.router.navigate(['/levels']), 3000);
       return;
     }
@@ -92,26 +95,32 @@ export class Callback implements OnInit {
         const token = sessionStorage.getItem('authToken');
 
         // 2️Segunda petición: intercambiar código por token
-        this.spotifyService.exchangeCodeForTokenWithClientId(code, clientId, token || '').subscribe({
-          next: (tokenResponse) => {
-            // Guardar tokens
-            this.spotifyService.saveSpotifyTokens(
-              tokenResponse.access_token,
-              tokenResponse.refresh_token,
-              tokenResponse.expires_in
-            );
-
-            // Redirigir a niveles
-            setTimeout(() => this.router.navigate(['/levels']), 1000);
+        this.spotifyService.exchangeCodeForTokenWithClientId(code, clientId, token!).subscribe({
+          next: (response) => {
+            console.log('✓ Conexión con Spotify exitosa', response);
+            
+            if (response.connected) {
+              // Solo marcar como conectado (tokens quedan en backend)
+              this.spotifyService.markSpotifyConnected();
+              console.log('✓ Spotify conectado exitosamente');
+              
+              // Redirigir a niveles
+              setTimeout(() => this.router.navigate(['/levels']), 1000);
+            } else {
+              this.errorMessage = 'Error en la conexión con Spotify';
+              console.warn('Respuesta inesperada del servidor:', response);
+              setTimeout(() => this.router.navigate(['/levels']), 3000);
+            }
           },
           error: (err) => {
-            this.errorMessage = 'Error al conectar con Spotify. ' + err.error.error;
+            this.errorMessage = 'Error al conectar con Spotify. ' + (err.error?.error || err.message);
+            console.warn('Error al intercambiar código por token de Spotify:', err);
             setTimeout(() => this.router.navigate(['/levels']), 3000);
           }
         });
       },
       error: (err) => {
-        console.error('Error obteniendo clientId:', err);
+        console.warn('Error obteniendo clientId desde el backend:', err);
         this.errorMessage = 'Error al obtener configuración';
         setTimeout(() => this.router.navigate(['/levels']), 3000);
       }

@@ -166,10 +166,6 @@ export class Login implements OnInit {
         // Guardar datos de la respuesta
         this.service.saveToken(response.token_type, response.access_token);
 
-        // Guardar email en sessionStorage para obtener clientId luego
-        const currentUser = { email: email };
-        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-
         // Redirigir después de 1.5 segundos
         setTimeout(() => {
           this.router.navigate(['/levels']);
