@@ -56,6 +56,7 @@ export class Game implements OnInit, OnDestroy {
   canReplayAudio: boolean = false; // permitir repetir audio
 
   alreadyPlayed: boolean = false;
+  nextLevelButtonEnabled: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -315,6 +316,7 @@ export class Game implements OnInit, OnDestroy {
       // pero sí añadimos el nivel completado al session storage, siempre que no esté ya jugado
       if (sessionStorage.getItem('played_levels')?.split(',').includes(this.level_number.toString())) {
         this.alreadyPlayed = true;
+        this.nextLevelButtonEnabled = true;
         return;
       }
       let local_completed_levels = sessionStorage.getItem('completed_levels');
@@ -336,6 +338,8 @@ export class Game implements OnInit, OnDestroy {
     this.gameService.submitScore(this.score, this.levelId, token).subscribe({
       next: (response) => {
         console.log('Puntuación enviada:', response);
+        // marcar que la puntuación se ha guardado
+        this.nextLevelButtonEnabled = true;
       },
       error: (err) => {
         if (err.status === 400 && err.error && err.error.error === 'Nivel ya jugado') {
@@ -401,6 +405,7 @@ export class Game implements OnInit, OnDestroy {
     this.score = 0; // Sin puntuación por rendirse
 
     this.revealAnswer();
+    this.nextLevelButtonEnabled = true;
   }
 
   private playCompleteAudio(): void {

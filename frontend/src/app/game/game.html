@@ -128,7 +128,7 @@
       <div class="result-actions">
         <div class="actions">
           <button (click)="playAgain()" class="action-btn secondary">Jugar de nuevo</button>
-          <button (click)="nextLevel()" class="action-btn primary">Siguiente Nivel</button>
+          <button (click)="nextLevel()" class="action-btn primary" *ngIf="nextLevelButtonEnabled">Siguiente Nivel</button>
           <button (click)="goToLevels()" class="action-btn secondary">Volver a niveles</button>
         </div>
       </div>
