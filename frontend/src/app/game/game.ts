@@ -237,7 +237,6 @@ export class Game implements OnInit, OnDestroy {
           this.message = `La canción es "${this.currentSong!.title}" de ${this.currentSong!.artists}`;
           this.playCompleteAudio();
           this.saveScore();
-          this.markAsPlayed();
         } else {
           this.message = 'Respuesta incorrecta';
           this.userAnswer = '';
@@ -328,10 +327,12 @@ export class Game implements OnInit, OnDestroy {
         completedLevels.push(this.level_number.toString());
         sessionStorage.setItem('completed_levels', completedLevels.join(','));
       }
+      this.markAsPlayed();
       return;
     } else if (!token) { // si es usuario registrado pero no hay token, redirigimos al login
       console.error('No hay token de autenticación disponible. Inicia sesión para guardar la puntuación.');
       this.router.navigate(['/login']);
+      this.markAsPlayed();
       return;
     }
     // Si es usuario registrado, enviamos la puntuación al backend
@@ -340,17 +341,18 @@ export class Game implements OnInit, OnDestroy {
         console.log('Puntuación enviada:', response);
         // marcar que la puntuación se ha guardado
         this.nextLevelButtonEnabled = true;
+        this.markAsPlayed();
       },
       error: (err) => {
         if (err.status === 400 && err.error && err.error.error === 'Nivel ya jugado') {
           this.alreadyPlayed = true;
           console.warn('Nivel ya jugado por este usuario. Puntuación no actualizada.');
+          this.nextLevelButtonEnabled = true;
           return;
         }
         console.error('Error enviando puntuación:', err);
       }
     });
-
   }
 
   private markAsPlayed(): void {
