@@ -122,11 +122,29 @@ export class Levels implements OnInit {
     // deshabilitar botón de perfil
     this.isGuest = true;
     this.totalScore = 0;
-    this.dailyCompleted = false;
-    // calcular niveles jugados completados, del sessionStorage
+
+    // Revisar si el nivel diario (ID 0) está en completed_levels o played_levels
     const completedLevelsStr = sessionStorage.getItem('completed_levels') || '';
+    const playedLevelsStr = sessionStorage.getItem('played_levels') || '';
     const completedLevels = completedLevelsStr ? completedLevelsStr.split(',') : [];
+    const playedLevels = playedLevelsStr ? playedLevelsStr.split(',') : [];
+
+    // Si el nivel diario (ID 0) está en completed_levels, marcarlo como completado
+    if (completedLevels.includes('0')) {
+      this.dailyCompleted = true;
+    }
+    else if (playedLevels.includes('0')) {
+      this.dailyCompleted = false;
+    }
+
     this.levelsCompleted = completedLevels.length;
+
+    // Actualizar estado visual de los niveles
+    this.levels.forEach(level => {
+      const levelIdStr = level.id.toString();
+      level.completed = completedLevels.includes(levelIdStr);
+      level.played = playedLevels.includes(levelIdStr);
+    });
   }
 
   private startCountdown(): void {
