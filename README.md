@@ -123,10 +123,9 @@ cd adivina_la_cancion
 ```shell
 cd backend
 python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate  # en Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
-Cuando estás en un virtual environment en Windows, debes usar python (sin el 3)
 
 #### Frontend (utiliza otra terminal)
 > ℹ Asegúrate de tener **Node.js** y **Angular CLI** instalados.
@@ -158,6 +157,7 @@ SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize
 SPOTIFY_TOKEN_URL=https://accounts.spotify.com/api/token
 SPOTIFY_API_URL=https://api.spotify.com/v1
 ```
+El archivo de variables de entorno del frontend se encuentra en `frontend/src/environments/environment.ts`. Este archivo se incluye en el repositorio para facilitar la configuración inicial, ya que no contiene datos sensibles.
 
 > ⚠ **Importante:** Registra tu aplicación en [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/applications) y configura la URI de redirección a `http://127.0.0.1:4200/callback`. Necesitarás el `CLIENT_ID` y `CLIENT_SECRET` para el registro en la aplicación.
 
@@ -166,8 +166,8 @@ SPOTIFY_API_URL=https://api.spotify.com/v1
 #### Backend
 ```shell
 cd backend
-source venv/bin/activate  # Windows: venv\Scripts\activate
-python3 app.py # Windows: python app.py
+source venv/bin/activate  # en Windows: venv\Scripts\activate
+python3 app.py # en Windows: python app.py
 ```
 El servidor estará disponible en `http://127.0.0.1:5000`
 
